@@ -5,6 +5,11 @@ import { dirname, resolve } from 'node:path';
 const BASE_URL =
   'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-birthday-assets';
 
+const SOURCE_BUNDLE = {
+  remote: 'source-bundle.json',
+  sha256: '16802a3d8afe79ed8df3dc3f8513c57a4d5dcc236dc46b27967530e6e7a93c47',
+};
+
 const ASSETS = [
   {
     remote: 'hero_garden_party.jpg',
@@ -28,19 +33,37 @@ const ASSETS = [
   },
 ];
 
-for (const asset of ASSETS) {
-  const target = resolve(process.cwd(), asset.local);
-  if (existsSync(target)) continue;
-
-  const res = await fetch(`${BASE_URL}/${asset.remote}`);
+async function fetchVerifiedBuffer(remoteName, expectedSha256) {
+  const res = await fetch(`${BASE_URL}/${remoteName}`);
   if (!res.ok) {
-    throw new Error(`Failed to fetch ${asset.remote}: HTTP ${res.status}`);
+    throw new Error(`Failed to fetch ${remoteName}: HTTP ${res.status}`);
   }
   const buf = Buffer.from(await res.arrayBuffer());
   const digest = createHash('sha256').update(buf).digest('hex');
-  if (digest !== asset.sha256) {
-    throw new Error(`SHA-256 mismatch for ${asset.remote}`);
+  if (digest !== expectedSha256) {
+    throw new Error(`SHA-256 mismatch for ${remoteName}`);
   }
+  return buf;
+}
+
+if (!existsSync(resolve(process.cwd(), 'src/App.jsx'))) {
+  const bundleBuf = await fetchVerifiedBuffer(
+    SOURCE_BUNDLE.remote,
+    SOURCE_BUNDLE.sha256
+  );
+  const filesMap = JSON.parse(bundleBuf.toString('utf8'));
+  for (const [relPath, content] of Object.entries(filesMap)) {
+    const outPath = resolve(process.cwd(), relPath);
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, content, 'utf8');
+  }
+  console.log(`Restored ${Object.keys(filesMap).length} source files.`);
+}
+
+for (const asset of ASSETS) {
+  const target = resolve(process.cwd(), asset.local);
+  if (existsSync(target)) continue;
+  const buf = await fetchVerifiedBuffer(asset.remote, asset.sha256);
   mkdirSync(dirname(target), { recursive: true });
   writeFileSync(target, buf);
   console.log(`Fetched ${asset.local} (${buf.length} bytes)`);
