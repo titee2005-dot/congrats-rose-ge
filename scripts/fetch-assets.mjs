@@ -6,16 +6,11 @@ const BASE_URL =
   'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-birthday-assets';
 
 const SOURCE_BUNDLE = {
-  remote: 'source-bundle-v4.json',
-  sha256: 'd1ea074782a9808499416b4d36eaa9d5ff602ee9bf7e62e299987140138a0cfa',
+  remote: 'source-bundle-v5.json',
+  sha256: '6bbefd5d756a1b5cb82fa53d15f630de8656ad260ff22d41e42bcb6de791ddf8',
 };
 
 const ASSETS = [
-  {
-    remote: 'hero_garden_party.jpg',
-    local: 'public/assets/hero_garden_party.jpg',
-    sha256: '091418bb35d301ae9c972cbf34e419e1445021400d9b349cfc84908261b0fe85',
-  },
   {
     remote: 'og_cover.jpg',
     local: 'public/assets/og_cover.jpg',

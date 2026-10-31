@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ROSE_PROFILE, ROSE_PARTY_MEDIA } from '../data/roseData';
 import PixelFrame from './PixelFrame';
-import { PixelIcon } from './PixelSprites';
+import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
 function computeTimeInfo() {
   const now = Date.now();
@@ -41,6 +41,7 @@ const pad = (n) => String(n).padStart(2, '0');
 export default function Hero({ siteConfig }) {
   const [t, setT] = useState(computeTimeInfo);
   const [isMuted, setIsMuted] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
 
@@ -54,6 +55,7 @@ export default function Hero({ siteConfig }) {
   useEffect(() => {
     setVideoError(false);
     setIsMuted(true);
+    setIsPaused(false);
   }, [rawVideoUrl]);
 
   useEffect(() => {
@@ -66,13 +68,26 @@ export default function Hero({ siteConfig }) {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().catch(() => {});
+      setIsPaused(false);
+    } else {
+      v.pause();
+      setIsPaused(true);
+    }
+  };
+
   const toggleSound = () => {
     setIsMuted((prev) => {
       const next = !prev;
       if (videoRef.current) {
         videoRef.current.muted = next;
-        if (!next) {
+        if (!next && videoRef.current.paused) {
           videoRef.current.play().catch(() => {});
+          setIsPaused(false);
         }
       }
       return next;
@@ -99,7 +114,7 @@ export default function Hero({ siteConfig }) {
       </div>
 
       <div className="hero-grid">
-        {/* ช่องหลัก: Rose Birthday Party (รองรับวิดีโอ MP4 / WebM / YouTube หรือรูปปก) */}
+        {/* ช่องหลัก: Rose Birthday Party (วิดีโอพร้อมปุ่มหยุด/เล่น และเปิด/ปิดเสียง โดยไม่ใช้ภาพเก่าเป็นพื้นหลัง) */}
         <PixelFrame
           label="Rose Birthday Party"
           icon="cake"
@@ -122,34 +137,62 @@ export default function Hero({ siteConfig }) {
                   ref={videoRef}
                   key={rawVideoUrl}
                   src={rawVideoUrl}
-                  poster={ROSE_PARTY_MEDIA.posterUrl}
                   className="hero-video"
                   autoPlay
                   loop
                   muted={isMuted}
                   playsInline
                   preload="auto"
+                  onClick={togglePlay}
+                  onPlay={() => setIsPaused(false)}
+                  onPause={() => setIsPaused(true)}
                   onError={() => setVideoError(true)}
                 />
-                <button
-                  type="button"
-                  className="hero-sound-btn"
-                  onClick={toggleSound}
-                  title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
-                >
-                  <PixelIcon
-                    name={isMuted ? 'volume-off' : 'volume-on'}
-                    size={15}
-                  />
-                  <span>{isMuted ? 'เปิดเสียง' : 'ปิดเสียง'}</span>
-                </button>
+
+                {isPaused && (
+                  <button
+                    type="button"
+                    className="hero-pause-overlay"
+                    onClick={togglePlay}
+                    aria-label="เล่นวิดีโอต่อ"
+                    title="คลิกเพื่อเล่นวิดีโอต่อ"
+                  >
+                    <span className="hero-pause-badge">
+                      <PixelIcon name="play" size={24} />
+                    </span>
+                  </button>
+                )}
+
+                <div className="hero-video-controls">
+                  <button
+                    type="button"
+                    className="hero-sound-btn"
+                    onClick={togglePlay}
+                    title={isPaused ? 'เล่นวิดีโอต่อ' : 'หยุดวิดีโอชั่วคราว'}
+                  >
+                    <PixelIcon name={isPaused ? 'play' : 'pause'} size={14} />
+                    <span>{isPaused ? 'เล่น' : 'หยุด'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="hero-sound-btn"
+                    onClick={toggleSound}
+                    title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
+                  >
+                    <PixelIcon
+                      name={isMuted ? 'volume-off' : 'volume-on'}
+                      size={15}
+                    />
+                    <span>{isMuted ? 'เปิดเสียง' : 'ปิดเสียง'}</span>
+                  </button>
+                </div>
               </>
             ) : (
-              <img
-                src={ROSE_PARTY_MEDIA.posterUrl}
-                alt="Rose Birthday Party — ปาร์ตี้วันเกิด 19 ปีของโรสในสวนกุหลาบกับน้องกระต่าย"
-                className="hero-photo"
-              />
+              <div className="hero-video-empty">
+                <PixelBunnySprite variant="party-19" frame="hop" size={56} />
+                <span>Rose Birthday Party</span>
+              </div>
             )}
           </div>
         </PixelFrame>

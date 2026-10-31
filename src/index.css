@@ -102,6 +102,7 @@ textarea {
 .footer-top-btn,
 .bunny-bubble,
 .hero-sound-btn,
+.hero-pause-badge,
 .bunny-num-btn,
 .px-tab,
 .act-btn {
@@ -724,7 +725,7 @@ textarea {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #fff4f8;
+  background: #1b0e16;
   box-shadow: 0 0 0 3px var(--line);
   overflow: hidden;
 }
@@ -741,19 +742,57 @@ textarea {
 
 .hero-video {
   background: #1b0e16;
+  cursor: pointer;
 }
 
-.hero-sound-btn {
-  --b: 2px;
+.hero-pause-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: rgba(34, 14, 26, 0.32);
+  cursor: pointer;
+  padding: 0;
+}
+
+.hero-pause-badge {
+  --b: 3px;
   --ln: var(--line);
-  --sh: transparent;
+  --sh: #c9477a;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--pink-d);
+  transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+.hero-pause-overlay:hover .hero-pause-badge {
+  transform: scale(1.06);
+  background: var(--pink-xl);
+}
+
+.hero-video-controls {
   position: absolute;
   right: 10px;
   bottom: 10px;
   z-index: 4;
   display: inline-flex;
   align-items: center;
+  gap: 8px;
+}
+
+.hero-sound-btn {
+  --b: 2px;
+  --ln: var(--line);
+  --sh: transparent;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  margin: 2px;
   padding: 5px 11px;
   border: none;
   background: rgba(255, 255, 255, 0.94);
@@ -767,6 +806,20 @@ textarea {
 .hero-sound-btn:hover {
   background: var(--pink-l);
   transform: translateY(-1px);
+}
+
+.hero-video-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #fff5f9 0%, #ffe6f1 55%, #f2e8ff 100%);
+  color: var(--pink-d);
+  font-family: var(--font-pixel);
+  font-weight: 700;
 }
 
 .hero-info-body {
@@ -876,7 +929,8 @@ textarea {
 .sec-head {
   text-align: center;
   max-width: 680px;
-  margin: 0 auto 40px;
+  margin: 0 auto 36px;
+  padding-bottom: 14px;
 }
 
 .sec-title {
@@ -2778,7 +2832,7 @@ textarea {
     padding: 12px 16px;
   }
 
-  /* Timeline คอลัมน์เดียว */
+  /* Timeline คอลัมน์เดียว: เว้นระยะห่างระหว่างการ์ดไม่ให้ชนป้ายแท็บ */
   .tl-line {
     left: 20px;
     transform: none;
@@ -2788,25 +2842,28 @@ textarea {
   .tl-row.is-right {
     width: 100%;
     margin-left: 0;
-    padding-left: 58px;
+    padding-top: 6px;
+    padding-left: 62px;
     padding-right: 0;
   }
 
   .tl-row + .tl-row {
-    margin-top: 18px;
+    margin-top: 32px;
   }
 
   .tl-row.is-left .tl-node,
   .tl-row.is-right .tl-node {
-    left: 3px;
+    left: 2px;
     right: auto;
+    top: 54px;
   }
 
   .tl-row.is-left::after,
   .tl-row.is-right::after {
-    left: 43px;
+    left: 42px;
     right: auto;
-    width: 15px;
+    top: 72px;
+    width: 20px;
   }
 }
 
@@ -2899,23 +2956,33 @@ textarea {
     padding: 16px 10px 10px;
   }
 
-  .hero-sound-btn {
+  .hero-video-controls {
     right: 6px;
     bottom: 6px;
+    gap: 5px;
+  }
+
+  .hero-sound-btn {
     padding: 4px 9px;
     font-size: 0.72rem;
   }
 
+  .hero-pause-badge {
+    width: 46px;
+    height: 46px;
+  }
+
   .px-section {
-    padding: 38px 0;
+    padding: 42px 0;
   }
 
   .sec-head {
-    margin-bottom: 26px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
   }
 
   .pf.has-tab {
-    margin-top: 34px;
+    margin-top: 36px;
   }
 
   .pf-tab {
@@ -2927,36 +2994,57 @@ textarea {
   }
 
   .pf-body {
-    padding: 22px 14px 16px;
+    padding: 22px 16px 18px;
   }
 
-  /* Timeline บนจอมือถือ กระชับเส้นด้านซ้ายให้การ์ดกว้างอ่านง่าย */
+  /* Timeline บนจอมือถือ: เว้นระยะห่างระหว่างหมุด เส้นปะ และการ์ดแต่ละใบให้โปร่งสบายตา */
   .tl-line {
-    left: 15px;
+    left: 16px;
   }
 
   .tl-row,
   .tl-row.is-right {
-    padding-left: 42px;
+    padding-top: 6px;
+    padding-left: 52px;
+  }
+
+  .tl-row + .tl-row {
+    margin-top: 28px;
   }
 
   .tl-row.is-left .tl-node,
   .tl-row.is-right .tl-node {
-    left: -1px;
-    top: 46px;
+    left: 0;
+    top: 52px;
     width: 32px;
     height: 32px;
   }
 
   .tl-row.is-left::after,
   .tl-row.is-right::after {
-    left: 31px;
-    top: 60px;
-    width: 11px;
+    left: 32px;
+    top: 66px;
+    width: 20px;
+  }
+
+  .tl-fallback-scene {
+    gap: 12px;
+    padding: 18px 14px;
+  }
+
+  .tl-scene-center {
+    gap: 14px;
   }
 
   .tl-title {
+    margin: 16px 0 8px;
     font-size: 1.04rem;
+    line-height: 1.45;
+  }
+
+  .tl-body {
+    margin: 0 0 14px;
+    line-height: 1.8;
   }
 
   .wall-grid {

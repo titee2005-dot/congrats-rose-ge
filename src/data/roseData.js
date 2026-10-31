@@ -34,7 +34,7 @@ export const ROSE_PARTY_MEDIA = {
   // วิดีโอวันเกิด Rose BNK48 (สามารถเปลี่ยนหรืออัปโหลดใหม่ผ่านหน้า /admin ได้ตลอดเวลา)
   defaultVideoUrl:
     'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/rose_party_19th.mp4',
-  posterUrl: '/assets/hero_garden_party.jpg',
+  posterUrl: '',
 };
 
 // คำนวณจำนวนกระต่ายตามจำนวนคำอวยพรที่อนุมัติแล้ว:

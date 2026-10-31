@@ -202,6 +202,8 @@ const VECTOR_ICON_NAMES = new Set([
   'image',
   'wand',
   'status-dot',
+  'play',
+  'pause',
   'volume-on',
   'volume-off',
   'camera',
@@ -415,6 +417,23 @@ export function PixelIcon({ name = 'rose', size = 24, className = '' }) {
           <>
             <circle cx="10" cy="10" r="6" fill="#4bc47d" opacity="0.28" />
             <circle cx="10" cy="10" r="3.8" fill="#2ea862" />
+          </>
+        )}
+
+        {name === 'play' && (
+          <path
+            d="M6 4.2L15.8 10L6 15.8V4.2Z"
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinejoin="round"
+          />
+        )}
+
+        {name === 'pause' && (
+          <>
+            <rect x="5.2" y="4.2" width="3.4" height="11.6" rx="1" fill="currentColor" />
+            <rect x="11.4" y="4.2" width="3.4" height="11.6" rx="1" fill="currentColor" />
           </>
         )}
 
