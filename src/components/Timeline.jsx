@@ -20,10 +20,9 @@ const SCENE_MAP = {
 const TONES = ['pink', 'lavender', 'mint', 'butter'];
 const NODE_ICONS = ['heart', 'rose', 'star', 'note'];
 
-function MemoryCard({ ev, index }) {
+function MemoryCard({ ev, index, isLast }) {
   const [imgError, setImgError] = useState(false);
   const isLeft = index % 2 === 0;
-  const isLast = index === ROSE_TIMELINE.length - 1;
 
   return (
     <ScrollReveal
@@ -40,7 +39,7 @@ function MemoryCard({ ev, index }) {
       </div>
 
       <PixelFrame
-        label={`${ev.seasonLabel} · ${ev.date}`}
+        label={`${ev.seasonLabel || `Memory ${String(index + 1).padStart(2, '0')}`} · ${ev.date || ''}`}
         icon={isLast ? 'cake' : 'heart'}
         tone={isLast ? 'pink' : TONES[index % TONES.length]}
         className="tl-card"
@@ -56,23 +55,28 @@ function MemoryCard({ ev, index }) {
           ) : (
             <TimelineChapterArt
               scene={SCENE_MAP[ev.scene] || 'birth'}
-              chapter={ev.chapter}
+              chapter={ev.chapter || index + 1}
             />
           )}
         </div>
 
         <h3 className="tl-title">{ev.title}</h3>
         <p className="tl-body">{ev.body}</p>
-        <span className="tl-note">
-          <PixelIcon name="heart" size={14} />
-          <span>{ev.polaroidNote}</span>
-        </span>
+        {ev.polaroidNote && (
+          <span className="tl-note">
+            <PixelIcon name="heart" size={14} />
+            <span>{ev.polaroidNote}</span>
+          </span>
+        )}
       </PixelFrame>
     </ScrollReveal>
   );
 }
 
-export default function Timeline() {
+export default function Timeline({ items }) {
+  const timelineList =
+    Array.isArray(items) && items.length > 0 ? items : ROSE_TIMELINE;
+
   return (
     <section className="px-section" id="journey">
       <ScrollReveal>
@@ -86,8 +90,13 @@ export default function Timeline() {
 
       <div className="tl">
         <div className="tl-line" aria-hidden="true" />
-        {ROSE_TIMELINE.map((ev, idx) => (
-          <MemoryCard key={ev.chapter} ev={ev} index={idx} />
+        {timelineList.map((ev, idx) => (
+          <MemoryCard
+            key={ev.chapter || idx}
+            ev={ev}
+            index={idx}
+            isLast={idx === timelineList.length - 1}
+          />
         ))}
       </div>
     </section>

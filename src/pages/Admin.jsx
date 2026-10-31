@@ -2,9 +2,41 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import WishCardView from '../components/WishCardView';
 import PixelFrame from '../components/PixelFrame';
-import { PixelBunnySprite, PixelIcon } from '../components/PixelSprites';
+import { PixelBunnySprite, PixelIcon, TimelineChapterArt } from '../components/PixelSprites';
 import { isSupabaseConfigured } from '../supabase';
-import { computeAutoBunnyCount } from '../data/roseData';
+import { computeAutoBunnyCount, ROSE_TIMELINE } from '../data/roseData';
+
+function compressImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('File read failed'));
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Image decode failed'));
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxSize = 1200;
+        if (width > height) {
+          if (width > maxSize) {
+            height = Math.round(height * (maxSize / width));
+            width = maxSize;
+          }
+        } else if (height > maxSize) {
+          width = Math.round(width * (maxSize / height));
+          height = maxSize;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Admin({
   wishes,
@@ -13,6 +45,9 @@ export default function Admin({
   siteConfig,
   updateSiteConfig,
   uploadPartyVideo,
+  timelineItems = [],
+  updateTimelineItems,
+  uploadTimelineImage,
 }) {
   const [tab, setTab] = useState('pending');
   const [search, setSearch] = useState('');
@@ -27,9 +62,24 @@ export default function Admin({
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [configToast, setConfigToast] = useState('');
 
+  // Local state สำหรับแก้ไข Timeline
+  const [timelineList, setTimelineList] = useState(
+    Array.isArray(timelineItems) && timelineItems.length > 0
+      ? timelineItems
+      : ROSE_TIMELINE
+  );
+  const [uploadingChapterIdx, setUploadingChapterIdx] = useState(null);
+  const [isSavingTimeline, setIsSavingTimeline] = useState(false);
+
   useEffect(() => {
     setVideoInput(siteConfig?.party_video_url || '');
   }, [siteConfig?.party_video_url]);
+
+  useEffect(() => {
+    if (Array.isArray(timelineItems) && timelineItems.length > 0) {
+      setTimelineList(timelineItems);
+    }
+  }, [timelineItems]);
 
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'rose19';
 
@@ -37,7 +87,7 @@ export default function Admin({
     setConfigToast(msg);
     setTimeout(() => {
       setConfigToast((prev) => (prev === msg ? '' : prev));
-    }, 3000);
+    }, 3200);
   };
 
   const handleLogin = () => {
@@ -68,7 +118,7 @@ export default function Admin({
           <PixelBunnySprite variant="pink-rose" frame="hop" size={64} />
           <h2>เข้าสู่ระบบแอดมิน</h2>
           <p className="admin-login-hint">
-            สำหรับอนุมัติการ์ด ปรับจำนวนกระต่าย และตั้งค่าวิดีโอหน้าเว็บ
+            สำหรับอนุมัติการ์ด ปรับจำนวนกระต่าย แก้ไข Timeline และตั้งค่าวิดีโอหน้าเว็บ
           </p>
 
           <div className="admin-pw-wrap">
@@ -158,7 +208,7 @@ export default function Admin({
       showSavedNotice(
         trimmed
           ? 'บันทึกลิงก์วิดีโอช่อง Rose Birthday Party แล้ว'
-          : 'กลับไปใช้ภาพปกเริ่มต้นในช่อง Rose Birthday Party แล้ว'
+          : 'นำวิดีโอออกเรียบร้อยแล้ว'
       );
     }
   };
@@ -179,6 +229,129 @@ export default function Admin({
       setVideoInput(url);
       showSavedNotice('อัปโหลดและเปลี่ยนวิดีโอ Rose Birthday Party เรียบร้อยแล้ว!');
     }
+  };
+
+  // =========================
+  // ฟังก์ชันจัดการ Timeline
+  // =========================
+  const handleTimelineFieldChange = (index, field, value) => {
+    setTimelineList((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const handleSaveChapter = async (index) => {
+    if (!updateTimelineItems) return;
+    setIsSavingTimeline(true);
+    const ok = await updateTimelineItems(timelineList);
+    setIsSavingTimeline(false);
+    if (ok) {
+      const ch = timelineList[index];
+      showSavedNotice(`บันทึก ${ch?.seasonLabel || `บทที่ ${index + 1}`} เรียบร้อยแล้ว!`);
+    }
+  };
+
+  const handleUploadChapterPhoto = async (index, file) => {
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      alert('ไฟล์รูปใหญ่เกิน 25MB กรุณาเลือกไฟล์ขนาดไม่เกิน 25MB นะคะ');
+      return;
+    }
+
+    setUploadingChapterIdx(index);
+    try {
+      let finalUrl = null;
+      if (uploadTimelineImage) {
+        finalUrl = await uploadTimelineImage(file, timelineList[index]?.chapter || index + 1);
+      }
+      if (!finalUrl) {
+        // Local fallback: compress to Data URL
+        finalUrl = await compressImageFile(file);
+      }
+
+      const nextList = [...timelineList];
+      nextList[index] = { ...nextList[index], img: finalUrl };
+      setTimelineList(nextList);
+      if (updateTimelineItems) {
+        await updateTimelineItems(nextList);
+      }
+      showSavedNotice(`อัปเดตรูปภาพสำหรับ ${nextList[index]?.seasonLabel || `บทที่ ${index + 1}`} สำเร็จแล้ว!`);
+    } catch (err) {
+      console.error(err);
+      alert('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ');
+    } finally {
+      setUploadingChapterIdx(null);
+    }
+  };
+
+  const handleRemoveChapterPhoto = async (index) => {
+    const nextList = [...timelineList];
+    nextList[index] = { ...nextList[index], img: '' };
+    setTimelineList(nextList);
+    if (updateTimelineItems) {
+      await updateTimelineItems(nextList);
+    }
+    showSavedNotice(`นำรูปออกและคืนค่าเป็นภาพพิกเซลเรียบร้อยแล้ว`);
+  };
+
+  const handleAddChapter = async () => {
+    const nextNum = timelineList.length + 1;
+    const newChapter = {
+      chapter: nextNum,
+      seasonLabel: `Memory ${String(nextNum).padStart(2, '0')}`,
+      date: '2026',
+      title: 'ความทรงจำใหม่ของโรส',
+      body: 'พิมพ์ข้อความเรื่องราวความประทับใจของโรสตรงนี้...',
+      polaroidNote: 'Rose BNK48 19th',
+      img: '',
+      scene: 'birthday19',
+      tape: 'pink-plaid',
+    };
+    const nextList = [...timelineList, newChapter];
+    setTimelineList(nextList);
+    if (updateTimelineItems) {
+      await updateTimelineItems(nextList);
+    }
+    showSavedNotice(`เพิ่มความทรงจำ Memory ${nextNum} เรียบร้อยแล้ว`);
+  };
+
+  const handleDeleteChapter = async (index) => {
+    const ch = timelineList[index];
+    if (
+      !window.confirm(
+        `ต้องการลบ "${ch?.seasonLabel || `บทที่ ${index + 1}`} - ${ch?.title}" จริงหรือไม่?`
+      )
+    ) {
+      return;
+    }
+    const filtered = timelineList
+      .filter((_, i) => i !== index)
+      .map((item, i) => ({
+        ...item,
+        chapter: i + 1,
+      }));
+    setTimelineList(filtered);
+    if (updateTimelineItems) {
+      await updateTimelineItems(filtered);
+    }
+    showSavedNotice('ลบความทรงจำเรียบร้อยแล้ว');
+  };
+
+  const handleResetTimelineToDefault = async () => {
+    if (
+      !window.confirm(
+        'ต้องการรีเซ็ตข้อมูล Timeline กลับเป็น 9 บทเริ่มต้นของโรสหรือไม่?'
+      )
+    ) {
+      return;
+    }
+    setTimelineList(ROSE_TIMELINE);
+    if (updateTimelineItems) {
+      await updateTimelineItems(ROSE_TIMELINE);
+    }
+    showSavedNotice('คืนค่า Timeline เป็น 9 บทเริ่มต้นเรียบร้อยแล้ว');
   };
 
   const filteredWishes = wishes
@@ -210,6 +383,7 @@ export default function Admin({
     { key: 'pending', label: 'รออนุมัติ', icon: 'clock', count: pendingList.length },
     { key: 'approved', label: 'อนุมัติแล้ว', icon: 'check', count: approvedList.length },
     { key: 'hidden', label: 'ซ่อนไว้', icon: 'eye-off', count: hiddenList.length },
+    { key: 'timeline', label: 'ไทม์ไลน์ความทรงจำ', icon: 'rose', count: timelineList.length },
   ];
 
   return (
@@ -321,7 +495,7 @@ export default function Admin({
               </div>
 
               <small className="cfg-scale-note">
-                เกณฑ์อัตโนมัติ: 0–10 คน = 1 ตัว · 11–20 = 2 ตัว · 21–30 = 3 ตัว · 31–40 = 4 ตัว · 41+ = 5 ตัว (สูงสุด 5 ตัว)
+                เกณฑ์อัตโนมัติ: การ์ด 7 ใบต่อกระต่าย 1 ตัว (1–7 ใบ = 1 ตัว · 8–14 = 2 ตัว · 15–21 = 3 ตัว · 22–28 = 4 ตัว · 29+ = 5 ตัว สูงสุด 5 ตัว)
               </small>
             </div>
 
@@ -396,7 +570,7 @@ export default function Admin({
                         const ok = await updateSiteConfig({ party_video_url: '' });
                         setIsSavingConfig(false);
                         if (ok) {
-                          showSavedNotice('นำวิดีโอออกและกลับไปใช้ภาพปกเริ่มต้นแล้ว');
+                          showSavedNotice('นำวิดีโอออกเรียบร้อยแล้ว');
                         }
                       }}
                     >
@@ -414,11 +588,18 @@ export default function Admin({
           </div>
         </PixelFrame>
 
+        {/* แถบควบคุมแท็บ: รออนุมัติ | อนุมัติแล้ว | ซ่อนไว้ | ไทม์ไลน์ความทรงจำ */}
         <div className="admin-top">
           <div>
-            <h2 className="admin-title">จัดการการ์ดคำอวยพร</h2>
+            <h2 className="admin-title">
+              {tab === 'timeline'
+                ? 'จัดการไทม์ไลน์เส้นทางของโรส'
+                : 'จัดการการ์ดคำอวยพร'}
+            </h2>
             <p className="admin-sub">
-              การ์ดใหม่ทุกใบจะอยู่ในหมวด &ldquo;รออนุมัติ&rdquo; ก่อนแสดงบนหน้าเว็บ
+              {tab === 'timeline'
+                ? 'เพิ่ม แก้ไขรูปภาพ วันที่ หัวข้อ และข้อความความทรงจำของโรสได้อย่างอิสระ'
+                : 'การ์ดใหม่ทุกใบจะอยู่ในหมวด "รออนุมัติ" ก่อนแสดงบนหน้าเว็บ'}
             </p>
           </div>
           {tab === 'pending' && pendingList.length > 0 && (
@@ -430,6 +611,25 @@ export default function Admin({
               <PixelIcon name="check" size={15} />
               <span>อนุมัติทั้งหมด ({pendingList.length})</span>
             </button>
+          )}
+          {tab === 'timeline' && (
+            <div className="admin-tl-actions">
+              <button
+                type="button"
+                className="px-btn primary sm"
+                onClick={handleAddChapter}
+              >
+                <PixelIcon name="check" size={14} />
+                <span>+ เพิ่มความทรงจำใหม่</span>
+              </button>
+              <button
+                type="button"
+                className="px-btn sm"
+                onClick={handleResetTimelineToDefault}
+              >
+                <span>↺ คืนค่า 9 บทเริ่มต้น</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -448,19 +648,185 @@ export default function Admin({
               </button>
             ))}
           </div>
-          <div className="admin-search-wrap">
-            <PixelIcon name="search" size={16} className="admin-search-icon" />
-            <input
-              type="text"
-              className="px-input admin-search"
-              placeholder="ค้นหาชื่อหรือข้อความ..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          {tab !== 'timeline' && (
+            <div className="admin-search-wrap">
+              <PixelIcon name="search" size={16} className="admin-search-icon" />
+              <input
+                type="text"
+                className="px-input admin-search"
+                placeholder="ค้นหาชื่อหรือข้อความ..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          )}
         </div>
 
-        {filteredWishes.length === 0 ? (
+        {/* แท็บที่ 4: จัดการไทม์ไลน์เส้นทางการเติบโตของโรส */}
+        {tab === 'timeline' ? (
+          <div className="admin-tl-list">
+            {timelineList.map((ch, idx) => (
+              <PixelFrame
+                key={ch.chapter || idx}
+                label={`Chapter ${ch.chapter || idx + 1}: ${ch.seasonLabel || `Memory ${idx + 1}`}`}
+                icon="rose"
+                tone="pink"
+                bodyClassName="admin-tl-card-body"
+              >
+                <div className="admin-tl-grid">
+                  {/* คอลัมน์ซ้าย: พรีวิวรูป + อัปโหลดรูปภาพ */}
+                  <div className="admin-tl-preview-col">
+                    <div className="admin-tl-photo-box">
+                      {ch.img ? (
+                        <img src={ch.img} alt={ch.title} />
+                      ) : (
+                        <TimelineChapterArt
+                          scene={ch.scene || 'birth'}
+                          chapter={ch.chapter || idx + 1}
+                        />
+                      )}
+                    </div>
+
+                    <div className="admin-tl-photo-actions">
+                      <label className="px-btn primary sm">
+                        <PixelIcon name="upload" size={15} />
+                        <span>
+                          {uploadingChapterIdx === idx
+                            ? 'กำลังอัปโหลด...'
+                            : ch.img
+                            ? 'เปลี่ยนรูปถ่าย'
+                            : 'อัปโหลดรูปถ่ายจริง'}
+                        </span>
+                        <input
+                          type="file"
+                          hidden
+                          accept="image/png,image/jpeg,image/webp"
+                          disabled={uploadingChapterIdx === idx}
+                          onChange={(e) =>
+                            handleUploadChapterPhoto(idx, e.target.files?.[0])
+                          }
+                        />
+                      </label>
+
+                      {ch.img && (
+                        <button
+                          type="button"
+                          className="px-btn sm"
+                          onClick={() => handleRemoveChapterPhoto(idx)}
+                        >
+                          <PixelIcon name="close" size={14} />
+                          <span>นำรูปออก (ใช้ภาพพิกเซล)</span>
+                        </button>
+                      )}
+
+                      <input
+                        type="url"
+                        className="px-input"
+                        placeholder="หรือวาง URL รูปภาพ..."
+                        value={ch.img || ''}
+                        onChange={(e) =>
+                          handleTimelineFieldChange(idx, 'img', e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  {/* คอลัมน์ขวา: ฟิลด์แก้ไขข้อความ */}
+                  <div className="admin-tl-fields-col">
+                    <div className="admin-tl-row2">
+                      <div className="admin-tl-field">
+                        <label>ป้ายช่วงเวลา (Season Label)</label>
+                        <input
+                          type="text"
+                          className="px-input"
+                          placeholder="เช่น Memory 01"
+                          value={ch.seasonLabel || ''}
+                          onChange={(e) =>
+                            handleTimelineFieldChange(idx, 'seasonLabel', e.target.value)
+                          }
+                        />
+                      </div>
+                      <div className="admin-tl-field">
+                        <label>วันที่ / ยุคสมัย (Date)</label>
+                        <input
+                          type="text"
+                          className="px-input"
+                          placeholder="เช่น 1 November 2007"
+                          value={ch.date || ''}
+                          onChange={(e) =>
+                            handleTimelineFieldChange(idx, 'date', e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="admin-tl-field">
+                      <label>หัวข้อความทรงจำ (Title)</label>
+                      <input
+                        type="text"
+                        className="px-input"
+                        placeholder="หัวข้อความทรงจำของโรส..."
+                        value={ch.title || ''}
+                        onChange={(e) =>
+                          handleTimelineFieldChange(idx, 'title', e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="admin-tl-field">
+                      <label>เนื้อหาเรื่องราว (Story Body)</label>
+                      <textarea
+                        className="px-input px-textarea"
+                        style={{ minHeight: '100px' }}
+                        placeholder="พิมพ์เรื่องราวความประทับใจของโรส..."
+                        value={ch.body || ''}
+                        onChange={(e) =>
+                          handleTimelineFieldChange(idx, 'body', e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="admin-tl-field">
+                      <label>ข้อความป้ายแถบด้านล่าง (Polaroid Note)</label>
+                      <input
+                        type="text"
+                        className="px-input"
+                        placeholder="เช่น Little Rose · Nakhon Pathom"
+                        value={ch.polaroidNote || ''}
+                        onChange={(e) =>
+                          handleTimelineFieldChange(idx, 'polaroidNote', e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div className="admin-tl-btn-row">
+                      <button
+                        type="button"
+                        className="act-btn delete"
+                        style={{ flex: 'none', padding: '7px 14px' }}
+                        onClick={() => handleDeleteChapter(idx)}
+                      >
+                        ลบบทนี้
+                      </button>
+
+                      <div className="admin-tl-btn-group">
+                        <button
+                          type="button"
+                          className="px-btn primary sm"
+                          disabled={isSavingTimeline}
+                          onClick={() => handleSaveChapter(idx)}
+                        >
+                          <PixelIcon name="check" size={15} />
+                          <span>บันทึกบทนี้</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PixelFrame>
+            ))}
+          </div>
+        ) : filteredWishes.length === 0 ? (
           <PixelFrame tone="cream" bodyClassName="empty-body">
             <PixelBunnySprite variant="white-ribbon" frame="idle" size={56} />
             <h3>ไม่มีการ์ดในหมวดนี้</h3>

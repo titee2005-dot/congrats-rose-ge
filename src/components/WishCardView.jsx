@@ -34,7 +34,7 @@ export default function WishCardView({
         </span>
         <div className="wc-titles">
           <strong>{letterNumber || 'Happy 19th Rose'}</strong>
-          <small>{theme.name}</small>
+          <small>{theme.sub || theme.name}</small>
         </div>
         {v === 'airmail' ? (
           <div className="wc-stamp" aria-hidden="true">

@@ -180,13 +180,14 @@ export default function WishForm({ onAddWish }) {
                           '--pick-bg': t.softBg,
                         }}
                         onClick={() => setSelectedCard(t.id)}
+                        title={t.sub || t.name}
+                        aria-label={t.sub || t.name}
                       >
                         <span className={`pick-swatch sw-${t.variant}`}>
                           <span>
                             <PixelIcon name={t.iconName || 'rose'} size={18} />
                           </span>
                         </span>
-                        <span className="pick-name">{t.name}</span>
                         {active && (
                           <span className="pick-check">
                             <PixelIcon name="check" size={13} />

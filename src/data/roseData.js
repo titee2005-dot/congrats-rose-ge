@@ -38,11 +38,11 @@ export const ROSE_PARTY_MEDIA = {
 };
 
 // คำนวณจำนวนกระต่ายตามจำนวนคำอวยพรที่อนุมัติแล้ว:
-// 0–10 คน = 1 ตัว, เพิ่มทีละ 10 คน (11–20=2, 21–30=3, 31–40=4, 41+=5) สูงสุด 5 ตัว
+// การ์ด 7 ใบต่อกระต่าย 1 ตัว (1–7 ใบ = 1 ตัว, 8–14 = 2 ตัว, 15–21 = 3 ตัว, 22–28 = 4 ตัว, 29+ = 5 ตัว) สูงสุด 5 ตัว
 export function computeAutoBunnyCount(wishCount = 0) {
   const n = Math.max(0, Number(wishCount) || 0);
-  if (n <= 10) return 1;
-  return Math.min(5, 1 + Math.ceil((n - 10) / 10));
+  if (n <= 7) return 1;
+  return Math.min(5, Math.ceil(n / 7));
 }
 
 // ==========================================
@@ -51,7 +51,7 @@ export function computeAutoBunnyCount(wishCount = 0) {
 export const CARD_THEMES = [
   {
     id: 'pressed-rose',
-    name: 'จดหมายกุหลาบทับแห้ง',
+    name: 'Pressed Rose Letter',
     sub: 'Pressed Rose Letter',
     variant: 'wax-letter',
     accent: '#c94a76',
@@ -59,12 +59,12 @@ export const CARD_THEMES = [
     headerTone: '#f8cddc',
     borderTone: '#eab3c7',
     tapeTone: 'pink-plaid',
-    sealText: 'R•19',
+    sealText: 'Rose',
     iconName: 'rose',
   },
   {
     id: 'bunny-polaroid',
-    name: 'โพลาลอยด์โบว์กระต่าย',
+    name: 'Bunny Ribbon Note',
     sub: 'Bunny Ribbon Note',
     variant: 'ribbon-polaroid',
     accent: '#df5c8e',
@@ -77,7 +77,7 @@ export const CARD_THEMES = [
   },
   {
     id: 'vintage-airmail',
-    name: 'โปสการ์ดไปรษณีย์สวนกุหลาบ',
+    name: 'Rose Garden Postcard',
     sub: 'Rose Garden Postcard',
     variant: 'airmail',
     accent: '#b84a6e',
@@ -90,7 +90,7 @@ export const CARD_THEMES = [
   },
   {
     id: 'lavender-note',
-    name: 'สมุดโน้ตลาเวนเดอร์ รุ่น 6',
+    name: 'Wisteria Diary Page',
     sub: 'Wisteria Diary Page',
     variant: 'grid-diary',
     accent: '#8558b5',
@@ -103,7 +103,7 @@ export const CARD_THEMES = [
   },
   {
     id: 'tea-party',
-    name: 'การ์ดปาร์ตี้น้ำชา 19 ปี',
+    name: 'Sweet 19 Tea Party',
     sub: 'Sweet 19 Tea Party',
     variant: 'tea-frame',
     accent: '#cf6178',
@@ -116,7 +116,7 @@ export const CARD_THEMES = [
   },
   {
     id: 'sage-botanical',
-    name: 'การ์ดเรือนกระจกใบไม้ผลิ',
+    name: 'Botanical Greenhouse',
     sub: 'Botanical Greenhouse',
     variant: 'botanical',
     accent: '#59876b',

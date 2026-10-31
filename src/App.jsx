@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 import { supabase, isSupabaseConfigured } from './supabase';
-import { INITIAL_DEMO_WISHES } from './data/roseData';
+import { INITIAL_DEMO_WISHES, ROSE_TIMELINE } from './data/roseData';
 
 // =========================
 // IndexedDB & Local Fallback Helpers
@@ -12,6 +12,7 @@ const DB_NAME = 'Rose19BirthdayWishesDB';
 const STORE_NAME = 'wishes_cache_store';
 const LOCAL_FALLBACK_KEY = 'rose19_wishes_local_v2';
 const LOCAL_CONFIG_KEY = 'rose19_site_config_v1';
+const LOCAL_TIMELINE_KEY = 'rose19_timeline_items_v2';
 const WISHES_TABLE = import.meta.env.VITE_SUPABASE_TABLE || 'rose_wishes';
 const SETTINGS_TABLE = 'rose_settings';
 const PARTY_MEDIA_BUCKET = 'rose-party-media';
@@ -20,6 +21,27 @@ export const DEFAULT_SITE_CONFIG = {
   bunny_mode: 'auto', // 'auto' | 'manual'
   bunny_manual_count: 3, // 0..5
   party_video_url: '',
+};
+
+const loadLocalTimeline = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_TIMELINE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    // ignore
+  }
+  return ROSE_TIMELINE;
+};
+
+const saveLocalTimeline = (items) => {
+  try {
+    localStorage.setItem(LOCAL_TIMELINE_KEY, JSON.stringify(items));
+  } catch {
+    // ignore
+  }
 };
 
 const initDB = () =>
@@ -114,6 +136,7 @@ const saveLocalSiteConfig = (cfg) => {
 export default function App() {
   const [wishes, setWishes] = useState([]);
   const [siteConfig, setSiteConfig] = useState(loadLocalSiteConfig);
+  const [timelineItems, setTimelineItems] = useState(loadLocalTimeline);
   const [isLoading, setIsLoading] = useState(true);
 
   const sortWishes = (items) =>
@@ -122,13 +145,14 @@ export default function App() {
     );
 
   // =========================
-  // โหลดข้อมูลคำอวยพร + ตั้งค่าเว็บ (กระต่าย & วิดีโอ) แบบ Real-time
+  // โหลดข้อมูลคำอวยพร + ตั้งค่าเว็บ (กระต่าย & วิดีโอ) + ไทม์ไลน์ แบบ Real-time
   // =========================
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
       const initial = sortWishes(loadLocalFallbackWishes());
       setWishes(initial);
       setSiteConfig(loadLocalSiteConfig());
+      setTimelineItems(loadLocalTimeline());
       setIsLoading(false);
 
       const onStorage = (e) => {
@@ -137,6 +161,9 @@ export default function App() {
         }
         if (e.key === LOCAL_CONFIG_KEY) {
           setSiteConfig(loadLocalSiteConfig());
+        }
+        if (e.key === LOCAL_TIMELINE_KEY) {
+          setTimelineItems(loadLocalTimeline());
         }
       };
       window.addEventListener('storage', onStorage);
@@ -156,7 +183,7 @@ export default function App() {
 
       try {
         if (!hasCache && isMounted) setIsLoading(true);
-        const [wishesRes, settingsRes] = await Promise.all([
+        const [wishesRes, settingsRes, timelineRes] = await Promise.all([
           supabase
             .from(WISHES_TABLE)
             .select('*')
@@ -165,6 +192,11 @@ export default function App() {
             .from(SETTINGS_TABLE)
             .select('value')
             .eq('key', 'site_config')
+            .maybeSingle(),
+          supabase
+            .from(SETTINGS_TABLE)
+            .select('value')
+            .eq('key', 'timeline_items')
             .maybeSingle(),
         ]);
 
@@ -178,6 +210,16 @@ export default function App() {
           const merged = { ...DEFAULT_SITE_CONFIG, ...settingsRes.data.value };
           setSiteConfig(merged);
           saveLocalSiteConfig(merged);
+        }
+
+        if (
+          !timelineRes.error &&
+          Array.isArray(timelineRes.data?.value) &&
+          timelineRes.data.value.length > 0 &&
+          isMounted
+        ) {
+          setTimelineItems(timelineRes.data.value);
+          saveLocalTimeline(timelineRes.data.value);
         }
       } catch (err) {
         console.error('Unexpected fetch error:', err);
@@ -243,6 +285,13 @@ export default function App() {
             const merged = { ...DEFAULT_SITE_CONFIG, ...payload.new.value };
             setSiteConfig(merged);
             saveLocalSiteConfig(merged);
+          }
+          if (
+            payload.new?.key === 'timeline_items' &&
+            Array.isArray(payload.new?.value)
+          ) {
+            setTimelineItems(payload.new.value);
+            saveLocalTimeline(payload.new.value);
           }
         }
       )
@@ -450,6 +499,69 @@ export default function App() {
     }
   };
 
+  // =========================
+  // อัปเดตข้อมูล Timeline จากหน้า /admin
+  // =========================
+  const updateTimelineItems = async (nextItems) => {
+    setTimelineItems(nextItems);
+    saveLocalTimeline(nextItems);
+
+    if (!isSupabaseConfigured || !supabase) {
+      return true;
+    }
+
+    try {
+      const { error } = await supabase.from(SETTINGS_TABLE).upsert(
+        {
+          key: 'timeline_items',
+          value: nextItems,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      );
+      if (error) {
+        console.error('Error saving timeline_items:', error);
+        alert('บันทึก Timeline ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Save timeline_items error:', err);
+      return false;
+    }
+  };
+
+  // อัปโหลดรูปภาพความทรงจำ Timeline ขึ้น Supabase Storage
+  const uploadTimelineImage = async (file, chapter) => {
+    if (!file) return null;
+    if (!isSupabaseConfigured || !supabase) {
+      return null;
+    }
+
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const filePath = `timeline_ch${chapter || 'x'}_${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from(PARTY_MEDIA_BUCKET)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type || 'image/jpeg',
+      });
+
+    if (error) {
+      console.error('Upload timeline image error:', error);
+      alert('อัปโหลดรูปไม่สำเร็จ (ตรวจสอบขนาดไฟล์ไม่เกิน 25MB)');
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from(PARTY_MEDIA_BUCKET)
+      .getPublicUrl(filePath);
+
+    return data?.publicUrl || null;
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -461,6 +573,7 @@ export default function App() {
               addWish={addWish}
               isLoading={isLoading}
               siteConfig={siteConfig}
+              timelineItems={timelineItems}
             />
           }
         />
@@ -474,6 +587,9 @@ export default function App() {
               siteConfig={siteConfig}
               updateSiteConfig={updateSiteConfig}
               uploadPartyVideo={uploadPartyVideo}
+              timelineItems={timelineItems}
+              updateTimelineItems={updateTimelineItems}
+              uploadTimelineImage={uploadTimelineImage}
             />
           }
         />

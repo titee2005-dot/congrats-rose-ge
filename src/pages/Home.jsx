@@ -37,7 +37,13 @@ const TWINKLES = [
   { top: '8%', left: '58%', delay: '3s' },
 ];
 
-export default function Home({ wishes, addWish, isLoading, siteConfig }) {
+export default function Home({
+  wishes,
+  addWish,
+  isLoading,
+  siteConfig,
+  timelineItems,
+}) {
   const [bunniesVisible, setBunniesVisible] = useState(true);
   const [carrotSignal, setCarrotSignal] = useState(0);
   const approvedCount = wishes.filter((w) => w.status === 'approved').length;
@@ -95,7 +101,7 @@ export default function Home({ wishes, addWish, isLoading, siteConfig }) {
 
       <main className="px-main">
         <Hero siteConfig={siteConfig} />
-        <Timeline />
+        <Timeline items={timelineItems} />
         <WishForm onAddWish={addWish} />
         <WishWall wishes={wishes} isLoading={isLoading} />
         <FollowRose />
