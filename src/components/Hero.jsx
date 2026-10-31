@@ -38,7 +38,11 @@ function extractYouTubeId(url) {
 
 const pad = (n) => String(n).padStart(2, '0');
 
-export default function Hero({ siteConfig }) {
+export default function Hero({
+  siteConfig,
+  onHeroScrolledPast,
+  onHeroVideoPlaying,
+}) {
   const [t, setT] = useState(computeTimeInfo);
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -62,6 +66,37 @@ export default function Hero({ siteConfig }) {
     const timer = setInterval(() => setT(computeTimeInfo()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // ตรวจจับเมื่อเลื่อนจอผ่านส่วนแรก (Hero) เพื่อหยุดวิดีโออัตโนมัติ และแจ้งเริ่มเพลงเว็บ
+  useEffect(() => {
+    const heroEl = document.getElementById('home');
+    if (!heroEl) return;
+
+    const handleScroll = () => {
+      const rect = heroEl.getBoundingClientRect();
+      // เมื่อส่วนแรกเลื่อนพ้นจอขึ้นไป (bottom พ้นด้านบนของจอ)
+      const isPast = rect.bottom <= 100;
+      if (isPast) {
+        if (videoRef.current && !videoRef.current.paused) {
+          videoRef.current.pause();
+          setIsPaused(true);
+        }
+        onHeroScrolledPast?.(true);
+      } else {
+        onHeroScrolledPast?.(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [onHeroScrolledPast]);
+
+  // แจ้งสถานะเสียงวิดีโอ เพื่อหยุด BGM ชั่วคราวเมื่อเปิดเสียงวิดีโอ
+  useEffect(() => {
+    const isActuallyPlayingWithSound = !isPaused && !isMuted;
+    onHeroVideoPlaying?.(isActuallyPlayingWithSound);
+  }, [isPaused, isMuted, onHeroVideoPlaying]);
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);

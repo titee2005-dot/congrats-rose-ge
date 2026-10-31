@@ -21,6 +21,8 @@ export const DEFAULT_SITE_CONFIG = {
   bunny_mode: 'auto', // 'auto' | 'manual'
   bunny_manual_count: 3, // 0..5
   party_video_url: '',
+  bgm_enabled: true,
+  bgm_auto_start_on_scroll: true,
 };
 
 const loadLocalTimeline = () => {

@@ -2640,6 +2640,83 @@ textarea {
   color: var(--ink2);
 }
 
+.admin-cfg-icon-box {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--pink-xl);
+  border: 2px solid var(--line);
+  color: var(--pink-d);
+  flex-shrink: 0;
+}
+
+.admin-bgm-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  padding: 8px;
+}
+
+.admin-bgm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  background: #fffdf9;
+  border: 1px solid rgba(110, 58, 85, 0.12);
+}
+
+.admin-bgm-row.is-main-track {
+  background: #fff0f5;
+  border-color: var(--pink-d);
+}
+
+.admin-bgm-idx {
+  font-family: var(--font-pixel);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #9c6c82;
+  width: 20px;
+  text-align: center;
+}
+
+.admin-bgm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-bgm-meta strong {
+  font-size: 0.82rem;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-bgm-meta span {
+  font-size: 0.72rem;
+  color: #7a5868;
+}
+
+.admin-bgm-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+
+.pill-pink { color: #c94a76; background: #fff0f5; }
+.pill-lavender { color: #7b4eb2; background: #f7f1ff; }
+.pill-mint { color: #388458; background: #eef8f2; }
+.pill-butter { color: #a46d1b; background: #fdf6e6; }
+
 .admin-controls {
   display: flex;
   align-items: center;
@@ -3270,5 +3347,473 @@ textarea {
 
   .px-floater {
     display: none;
+  }
+}
+
+/* =========================================================
+   18. เครื่องเล่นเพลงประจำเว็บ (Retro Pixel BGM Player)
+   ========================================================= */
+.px-bgm-bar {
+  position: fixed;
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  left: 20px;
+  z-index: 92;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px 5px 6px;
+  background: #fff;
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 0 var(--line);
+  max-width: calc(100vw - 40px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.px-bgm-bar.is-playing {
+  border-color: var(--pink-d);
+  box-shadow: 4px 4px 0 0 var(--pink-d);
+}
+
+.px-bgm-disc-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--line);
+  background: var(--pink-xl);
+  color: var(--pink-d);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.px-bgm-disc {
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s;
+}
+
+.px-bgm-disc.spin {
+  animation: bgmSpin 3.6s linear infinite;
+}
+
+@keyframes bgmSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.px-bgm-eq {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+
+.px-bgm-eq i {
+  width: 2px;
+  background: var(--line);
+  border-radius: 1px;
+  animation: eqJump 0.8s ease-in-out infinite alternate;
+}
+
+.px-bgm-eq i:nth-child(1) { height: 4px; animation-delay: 0.1s; }
+.px-bgm-eq i:nth-child(2) { height: 9px; animation-delay: 0.3s; }
+.px-bgm-eq i:nth-child(3) { height: 6px; animation-delay: 0.2s; }
+
+@keyframes eqJump {
+  0% { height: 3px; }
+  100% { height: 10px; }
+}
+
+.px-bgm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 130px;
+  max-width: 220px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+}
+
+.px-bgm-tag {
+  align-self: flex-start;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--pink-d);
+  background: var(--pink-xl);
+  padding: 1px 5px;
+  line-height: 1.2;
+}
+
+.px-bgm-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.px-bgm-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.px-bgm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 30px;
+  padding: 0 7px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.px-bgm-btn:hover {
+  background: var(--pink-xl);
+}
+
+.px-bgm-btn:active {
+  transform: translateY(1px);
+}
+
+.px-bgm-btn.is-main {
+  background: var(--pink-l);
+  color: var(--line);
+  padding: 0 9px;
+}
+
+.px-bgm-btn.is-active {
+  background: var(--pink-d);
+  color: #fff;
+  border-color: var(--line);
+}
+
+.px-bgm-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-pixel);
+}
+
+.px-bgm-prompt {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #fff5f8;
+  border: 2px solid var(--pink-d);
+  box-shadow: 3px 3px 0 0 var(--line);
+  color: var(--pink-d);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  animation: promptFloat 2s ease-in-out infinite alternate;
+}
+
+@keyframes promptFloat {
+  from { transform: translateY(0); }
+  to { transform: translateY(-3px); }
+}
+
+/* Modal / Drawer สำหรับเลือกเพลง */
+.px-bgm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(70, 30, 48, 0.48);
+  backdrop-filter: blur(2px);
+  animation: bgmFadeIn 0.2s ease-out;
+}
+
+@keyframes bgmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.px-bgm-drawer {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 86vh;
+  background: #fff;
+  border: 3px solid var(--line);
+  box-shadow: 6px 6px 0 0 var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: bgmPop 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes bgmPop {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.px-bgm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--pink-l);
+  border-bottom: 2px solid var(--line);
+}
+
+.px-bgm-head-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--line);
+}
+
+.px-bgm-sub {
+  margin: 0;
+  padding: 8px 16px;
+  background: #fff9fb;
+  border-bottom: 1.5px dashed rgba(110, 58, 85, 0.18);
+  font-size: 0.8rem;
+  color: var(--pink-d);
+}
+
+.px-bgm-now-playing {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border-bottom: 2px solid var(--line);
+}
+
+.px-bgm-now-art {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  background: var(--pink-xl);
+  border: 2px solid var(--line);
+  color: var(--pink-d);
+  flex-shrink: 0;
+}
+
+.px-bgm-now-art.spin {
+  animation: bgmSpin 3.6s linear infinite;
+}
+
+.px-bgm-now-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.px-bgm-now-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--pink-d);
+  text-transform: uppercase;
+}
+
+.px-bgm-now-title {
+  font-size: 0.94rem;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.px-bgm-now-artist {
+  font-size: 0.8rem;
+  color: #7a5868;
+}
+
+.px-bgm-now-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.px-bgm-tracklist {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 340px;
+  padding: 6px 0;
+}
+
+.px-bgm-track-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(110, 58, 85, 0.08);
+}
+
+.px-bgm-track-item:hover {
+  background: var(--pink-xl);
+}
+
+.px-bgm-track-item.is-active {
+  background: #fff0f5;
+  border-left: 4px solid var(--pink-d);
+  padding-left: 12px;
+}
+
+.px-bgm-track-idx {
+  font-family: var(--font-pixel);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #9c6c82;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.px-bgm-mini-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.px-bgm-mini-eq i {
+  width: 2px;
+  background: var(--pink-d);
+  animation: eqJump 0.8s ease-in-out infinite alternate;
+}
+
+.px-bgm-mini-eq i:nth-child(1) { height: 4px; animation-delay: 0.1s; }
+.px-bgm-mini-eq i:nth-child(2) { height: 11px; animation-delay: 0.3s; }
+.px-bgm-mini-eq i:nth-child(3) { height: 7px; animation-delay: 0.2s; }
+
+.px-bgm-track-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.px-bgm-track-row1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.px-bgm-track-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.px-bgm-track-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border: 1px solid currentColor;
+}
+
+.px-bgm-track-tag.tag-pink {
+  color: #c94a76;
+  background: #fff0f5;
+}
+
+.px-bgm-track-tag.tag-lavender {
+  color: #7b4eb2;
+  background: #f7f1ff;
+}
+
+.px-bgm-track-tag.tag-mint {
+  color: #388458;
+  background: #eef8f2;
+}
+
+.px-bgm-track-tag.tag-butter {
+  color: #a46d1b;
+  background: #fdf6e6;
+}
+
+.px-bgm-track-desc {
+  font-size: 0.76rem;
+  color: #7a5868;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.px-bgm-track-dur {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #9c6c82;
+  flex-shrink: 0;
+}
+
+.px-bgm-track-item.is-active .px-bgm-track-dur {
+  color: var(--pink-d);
+}
+
+.px-bgm-footer-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #fffdf9;
+  border-top: 1.5px dashed rgba(110, 58, 85, 0.2);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #7a5868;
+}
+
+@media (max-width: 600px) {
+  .px-bgm-bar {
+    left: 12px;
+    bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+    max-width: calc(100vw - 24px);
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .px-bgm-info {
+    min-width: 100px;
+    max-width: 130px;
+  }
+
+  .px-bgm-title {
+    font-size: 0.78rem;
+  }
+
+  .px-bgm-btn {
+    height: 28px;
+    padding: 0 5px;
+    font-size: 0.72rem;
   }
 }

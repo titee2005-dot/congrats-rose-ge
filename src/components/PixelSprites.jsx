@@ -206,6 +206,11 @@ const VECTOR_ICON_NAMES = new Set([
   'pause',
   'volume-on',
   'volume-off',
+  'next',
+  'prev',
+  'disc',
+  'music',
+  'playlist',
   'camera',
   'chevron-right',
   'chevron-down',
@@ -464,6 +469,47 @@ export function PixelIcon({ name = 'rose', size = 24, className = '' }) {
               strokeWidth="2.1"
               strokeLinecap="round"
             />
+          </>
+        )}
+
+        {name === 'next' && (
+          <>
+            <path d="M4.5 4.5L10.5 10L4.5 15.5V4.5Z" fill="currentColor" />
+            <path d="M10.5 4.5L16.5 10L10.5 15.5V4.5Z" fill="currentColor" />
+          </>
+        )}
+
+        {name === 'prev' && (
+          <>
+            <path d="M15.5 4.5L9.5 10L15.5 15.5V4.5Z" fill="currentColor" />
+            <path d="M9.5 4.5L3.5 10L9.5 15.5V4.5Z" fill="currentColor" />
+          </>
+        )}
+
+        {name === 'disc' && (
+          <>
+            <circle cx="10" cy="10" r="7.8" stroke="currentColor" strokeWidth="1.8" fill="none" />
+            <circle cx="10" cy="10" r="4.8" stroke="currentColor" strokeWidth="1" strokeDasharray="2.5 2" fill="none" />
+            <circle cx="10" cy="10" r="2.2" fill="currentColor" />
+          </>
+        )}
+
+        {name === 'music' && (
+          <>
+            <circle cx="6.5" cy="13.5" r="2.5" fill="currentColor" />
+            <circle cx="14.5" cy="11.5" r="2.5" fill="currentColor" />
+            <path d="M9 13.5V5L17 3.2V11.5" stroke="currentColor" strokeWidth="1.8" fill="none" />
+            <path d="M9 6.8L17 5" stroke="currentColor" strokeWidth="1.8" />
+          </>
+        )}
+
+        {name === 'playlist' && (
+          <>
+            <rect x="3" y="4.5" width="8" height="2" rx="0.5" fill="currentColor" />
+            <rect x="3" y="8.5" width="7" height="2" rx="0.5" fill="currentColor" />
+            <rect x="3" y="12.5" width="6" height="2" rx="0.5" fill="currentColor" />
+            <circle cx="14" cy="13" r="2.2" fill="currentColor" />
+            <path d="M16 13V6.2L18.5 5.5V8L16 8.5" fill="currentColor" />
           </>
         )}
 

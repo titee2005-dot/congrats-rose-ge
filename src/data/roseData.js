@@ -365,3 +365,65 @@ export const INITIAL_DEMO_WISHES = [
     created_at: '2026-11-01T00:15:00+07:00',
   },
 ];
+
+// ==========================================
+// เพลย์ลิสต์เพลงประจำเว็บวันเกิด Rose BNK48 19th
+// ลำดับ: เพลงหลัก Happy Birthday -> เพลงเดบิวต์/เพลงที่น้องร่วมร้อง -> วนลูปใหม่
+// ==========================================
+export const ROSE_PLAYLIST = [
+  {
+    id: 'hbd-bnk48',
+    title: 'Happy Birthday (Namida Surprise!)',
+    artist: 'BNK48',
+    sub: 'เพลงหลักฉลองวันเกิด 19 ปีของโรส',
+    tag: 'เพลงหลักวันเกิด',
+    tagTone: 'pink',
+    youtubeId: 'kYJv5_ZzY9Y',
+    audioUrl: '',
+    duration: '4:42',
+  },
+  {
+    id: 'kimi-ga-suki',
+    title: 'จะยังไงก็รักเธอ (Doushitemo Kimi ga Suki da)',
+    artist: 'BNK48 รุ่นที่ 6 (Rose BNK48)',
+    sub: 'เพลงเดบิวต์ของรุ่น 6 ที่โรสร่วมร้องและเต้น',
+    tag: 'เดบิวต์รุ่น 6',
+    tagTone: 'lavender',
+    youtubeId: 'jRVOQHriw2w',
+    audioUrl: '',
+    duration: '4:44',
+  },
+  {
+    id: 'kimi-iru',
+    title: 'แค่เพียงมีเธอ (Kimi-iru)',
+    artist: 'BNK48 (Rose Center)',
+    sub: 'โปรเจกต์พิเศษที่โรสได้รับหน้าที่เป็นเซ็นเตอร์',
+    tag: 'Rose Center',
+    tagTone: 'mint',
+    youtubeId: 'ijhKKAgQggY',
+    audioUrl: '',
+    duration: '4:30',
+  },
+  {
+    id: 'shonichi',
+    title: 'วันแรก (Shonichi)',
+    artist: 'BNK48',
+    sub: 'บทเพลงแห่งความพยายามและหยาดเหงื่อบนเส้นทางฝัน',
+    tag: 'เพลงสร้างพลัง',
+    tagTone: 'butter',
+    youtubeId: 'IMx1ojx2fiE',
+    audioUrl: '',
+    duration: '3:50',
+  },
+  {
+    id: '365-planes',
+    title: '365 วันกับเครื่องบินกระดาษ (2024 ver.)',
+    artist: 'BNK48',
+    sub: 'บินไปสู่ฝันอันสดใสในวัย 19 ปี',
+    tag: 'อบอุ่นหัวใจ',
+    tagTone: 'pink',
+    youtubeId: 'M-DfHYCoIB4',
+    audioUrl: '',
+    duration: '4:02',
+  },
+];

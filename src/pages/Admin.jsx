@@ -585,6 +585,68 @@ export default function Admin({
                 รองรับทั้งการอัปโหลดไฟล์ MP4/WebM (ไม่เกิน 50MB), ลิงก์ตรง .mp4, ลิงก์ YouTube หรือวางไฟล์ที่ <code>public/assets/rose_party.mp4</code>
               </small>
             </div>
+
+            {/* การ์ดเพลงประจำเว็บ (BGM Playlist) */}
+            <div className="admin-cfg-box">
+              <div className="admin-cfg-head">
+                <div className="admin-cfg-icon-box">
+                  <PixelIcon name="disc" size={32} />
+                </div>
+                <div>
+                  <h3>เพลงประจำเว็บ (Rose Playlist)</h3>
+                  <p>
+                    เล่นเพลง Happy Birthday เป็นหลัก แล้วรันเพลงที่น้องมีส่วนร่วมจนครบแล้ววนลูปใหม่
+                  </p>
+                </div>
+              </div>
+
+              <div className="admin-bgm-summary-list">
+                <div className="admin-bgm-row is-main-track">
+                  <span className="admin-bgm-idx">01</span>
+                  <div className="admin-bgm-meta">
+                    <strong>Happy Birthday (Namida Surprise!)</strong>
+                    <span>BNK48 · เพลงหลักวันเกิด 19 ปี</span>
+                  </div>
+                  <span className="admin-bgm-pill pill-pink">เพลงหลัก</span>
+                </div>
+                <div className="admin-bgm-row">
+                  <span className="admin-bgm-idx">02</span>
+                  <div className="admin-bgm-meta">
+                    <strong>จะยังไงก็รักเธอ (Doushitemo Kimi ga Suki da)</strong>
+                    <span>BNK48 รุ่นที่ 6 · เพลงเดบิวต์ของโรส</span>
+                  </div>
+                  <span className="admin-bgm-pill pill-lavender">เดบิวต์</span>
+                </div>
+                <div className="admin-bgm-row">
+                  <span className="admin-bgm-idx">03</span>
+                  <div className="admin-bgm-meta">
+                    <strong>แค่เพียงมีเธอ (Kimi-iru)</strong>
+                    <span>BNK48 · Rose Center Special Project</span>
+                  </div>
+                  <span className="admin-bgm-pill pill-mint">Rose Center</span>
+                </div>
+                <div className="admin-bgm-row">
+                  <span className="admin-bgm-idx">04</span>
+                  <div className="admin-bgm-meta">
+                    <strong>วันแรก (Shonichi)</strong>
+                    <span>BNK48 · เพลงสร้างพลังและหยาดเหงื่อ</span>
+                  </div>
+                  <span className="admin-bgm-pill pill-butter">ให้กำลังใจ</span>
+                </div>
+                <div className="admin-bgm-row">
+                  <span className="admin-bgm-idx">05</span>
+                  <div className="admin-bgm-meta">
+                    <strong>365 วันกับเครื่องบินกระดาษ (2024 ver.)</strong>
+                    <span>BNK48 · บินไปสู่ฝันในวัย 19 ปี</span>
+                  </div>
+                  <span className="admin-bgm-pill pill-pink">อบอุ่น</span>
+                </div>
+              </div>
+
+              <small className="cfg-scale-note">
+                ระบบถูกตั้งค่าให้: วิดีโอหยุดเล่นอัตโนมัติเมื่อผู้ใช้เลื่อนจอผ่านส่วนแรก (Hero) แล้วเพลง Happy Birthday จะเริ่มขึ้นทันที โดยผู้ใช้สามารถกดเลือกเปลี่ยนเพลงได้ตลอดเวลาจากเครื่องเล่นมุมซ้ายล่าง
+              </small>
+            </div>
           </div>
         </PixelFrame>
 

@@ -7,6 +7,7 @@ import WishWall from '../components/WishWall';
 import FollowRose from '../components/FollowRose';
 import Footer from '../components/Footer';
 import PixelBunnies from '../components/PixelBunnies';
+import MusicPlayer from '../components/MusicPlayer';
 import { PixelIcon } from '../components/PixelSprites';
 import { computeAutoBunnyCount } from '../data/roseData';
 
@@ -46,6 +47,9 @@ export default function Home({
 }) {
   const [bunniesVisible, setBunniesVisible] = useState(true);
   const [carrotSignal, setCarrotSignal] = useState(0);
+  const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
+  const [heroVideoActive, setHeroVideoActive] = useState(false);
+
   const approvedCount = wishes.filter((w) => w.status === 'approved').length;
   const autoBunnyCount = computeAutoBunnyCount(approvedCount);
   const targetBunnyCount =
@@ -100,7 +104,11 @@ export default function Home({
       />
 
       <main className="px-main">
-        <Hero siteConfig={siteConfig} />
+        <Hero
+          siteConfig={siteConfig}
+          onHeroScrolledPast={setIsScrolledPastHero}
+          onHeroVideoPlaying={setHeroVideoActive}
+        />
         <Timeline items={timelineItems} />
         <WishForm onAddWish={addWish} />
         <WishWall wishes={wishes} isLoading={isLoading} />
@@ -108,6 +116,12 @@ export default function Home({
       </main>
 
       <Footer />
+
+      {/* เครื่องเล่นเพลงประจำเว็บ (เริ่มเล่นเพลง Happy Birthday เมื่อเลื่อนผ่าน Hero) */}
+      <MusicPlayer
+        isScrolledPastHero={isScrolledPastHero}
+        heroVideoActive={heroVideoActive}
+      />
 
       {/* ลูกเล่นน้องกระต่าย Pixel Art วิ่งเล่นบนสนามหญ้าด้านล่างจอ */}
       <PixelBunnies
