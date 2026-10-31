@@ -28,6 +28,23 @@ export const ROSE_PROFILE = {
 };
 
 // ==========================================
+// ตั้งค่ามีเดียช่อง Rose Birthday Party (วางไฟล์วิดีโอในโค้ด หรือตั้งค่าผ่านหน้า /admin ได้)
+// ==========================================
+export const ROSE_PARTY_MEDIA = {
+  // หากวางไฟล์วิดีโอในโปรเจกต์ เช่น public/assets/rose_party.mp4 ให้ใส่ '/assets/rose_party.mp4'
+  defaultVideoUrl: '',
+  posterUrl: '/assets/hero_garden_party.jpg',
+};
+
+// คำนวณจำนวนกระต่ายตามจำนวนคำอวยพรที่อนุมัติแล้ว:
+// 0–10 คน = 1 ตัว, เพิ่มทีละ 10 คน (11–20=2, 21–30=3, 31–40=4, 41+=5) สูงสุด 5 ตัว
+export function computeAutoBunnyCount(wishCount = 0) {
+  const n = Math.max(0, Number(wishCount) || 0);
+  if (n <= 10) return 1;
+  return Math.min(5, 1 + Math.ceil((n - 10) / 10));
+}
+
+// ==========================================
 // 6 ดีไซน์การ์ดโปสการ์ดและสมุดภาพ Scrapbook ให้แฟนคลับเลือก
 // ==========================================
 export const CARD_THEMES = [

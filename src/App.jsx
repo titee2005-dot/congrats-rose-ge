@@ -6,12 +6,21 @@ import { supabase, isSupabaseConfigured } from './supabase';
 import { INITIAL_DEMO_WISHES } from './data/roseData';
 
 // =========================
-// IndexedDB Cache Helper สำหรับโหมดเชื่อมต่อ Supabase
+// IndexedDB & Local Fallback Helpers
 // =========================
 const DB_NAME = 'Rose19BirthdayWishesDB';
 const STORE_NAME = 'wishes_cache_store';
 const LOCAL_FALLBACK_KEY = 'rose19_wishes_local_v2';
+const LOCAL_CONFIG_KEY = 'rose19_site_config_v1';
 const WISHES_TABLE = import.meta.env.VITE_SUPABASE_TABLE || 'rose_wishes';
+const SETTINGS_TABLE = 'rose_settings';
+const PARTY_MEDIA_BUCKET = 'rose-party-media';
+
+export const DEFAULT_SITE_CONFIG = {
+  bunny_mode: 'auto', // 'auto' | 'manual'
+  bunny_manual_count: 3, // 0..5
+  party_video_url: '',
+};
 
 const initDB = () =>
   new Promise((resolve, reject) => {
@@ -79,8 +88,32 @@ const saveLocalFallbackWishes = (items) => {
   }
 };
 
+const loadLocalSiteConfig = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_CONFIG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return { ...DEFAULT_SITE_CONFIG, ...parsed };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_SITE_CONFIG;
+};
+
+const saveLocalSiteConfig = (cfg) => {
+  try {
+    localStorage.setItem(LOCAL_CONFIG_KEY, JSON.stringify(cfg));
+  } catch {
+    // ignore
+  }
+};
+
 export default function App() {
   const [wishes, setWishes] = useState([]);
+  const [siteConfig, setSiteConfig] = useState(loadLocalSiteConfig);
   const [isLoading, setIsLoading] = useState(true);
 
   const sortWishes = (items) =>
@@ -89,17 +122,21 @@ export default function App() {
     );
 
   // =========================
-  // โหลดข้อมูล (รองรับทั้งโหมด Supabase และโหมด Local ทันที)
+  // โหลดข้อมูลคำอวยพร + ตั้งค่าเว็บ (กระต่าย & วิดีโอ) แบบ Real-time
   // =========================
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
       const initial = sortWishes(loadLocalFallbackWishes());
       setWishes(initial);
+      setSiteConfig(loadLocalSiteConfig());
       setIsLoading(false);
 
       const onStorage = (e) => {
         if (e.key === LOCAL_FALLBACK_KEY) {
           setWishes(sortWishes(loadLocalFallbackWishes()));
+        }
+        if (e.key === LOCAL_CONFIG_KEY) {
+          setSiteConfig(loadLocalSiteConfig());
         }
       };
       window.addEventListener('storage', onStorage);
@@ -108,7 +145,7 @@ export default function App() {
 
     let isMounted = true;
 
-    const fetchSupabaseWishes = async () => {
+    const fetchInitialData = async () => {
       let hasCache = false;
       const cached = await getFromIDB();
       if (isMounted && Array.isArray(cached) && cached.length > 0) {
@@ -119,20 +156,28 @@ export default function App() {
 
       try {
         if (!hasCache && isMounted) setIsLoading(true);
-        const { data, error } = await supabase
-          .from(WISHES_TABLE)
-          .select('*')
-          .order('created_at', { ascending: false });
+        const [wishesRes, settingsRes] = await Promise.all([
+          supabase
+            .from(WISHES_TABLE)
+            .select('*')
+            .order('created_at', { ascending: false }),
+          supabase
+            .from(SETTINGS_TABLE)
+            .select('value')
+            .eq('key', 'site_config')
+            .maybeSingle(),
+        ]);
 
-        if (error) {
-          console.error('Error fetching wishes:', error);
-          return;
-        }
-
-        if (isMounted) {
-          const list = data || [];
+        if (!wishesRes.error && isMounted) {
+          const list = wishesRes.data || [];
           setWishes(list);
           saveToIDB(list);
+        }
+
+        if (!settingsRes.error && settingsRes.data?.value && isMounted) {
+          const merged = { ...DEFAULT_SITE_CONFIG, ...settingsRes.data.value };
+          setSiteConfig(merged);
+          saveLocalSiteConfig(merged);
         }
       } catch (err) {
         console.error('Unexpected fetch error:', err);
@@ -141,10 +186,10 @@ export default function App() {
       }
     };
 
-    fetchSupabaseWishes();
+    fetchInitialData();
 
     const channel = supabase
-      .channel('rose-wishes-realtime')
+      .channel('rose-live-sync')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: WISHES_TABLE },
@@ -190,6 +235,17 @@ export default function App() {
           setWishes((prev) => prev.filter((w) => w.id !== deletedId));
         }
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: SETTINGS_TABLE },
+        (payload) => {
+          if (payload.new?.key === 'site_config' && payload.new?.value) {
+            const merged = { ...DEFAULT_SITE_CONFIG, ...payload.new.value };
+            setSiteConfig(merged);
+            saveLocalSiteConfig(merged);
+          }
+        }
+      )
       .subscribe();
 
     return () => {
@@ -197,6 +253,75 @@ export default function App() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // =========================
+  // อัปเดตตั้งค่าเว็บจากหน้า /admin (จำนวนกระต่าย & วิดีโอ Rose Birthday Party)
+  // =========================
+  const updateSiteConfig = async (patch) => {
+    const nextConfig = { ...siteConfig, ...patch };
+    setSiteConfig(nextConfig);
+    saveLocalSiteConfig(nextConfig);
+
+    if (!isSupabaseConfigured || !supabase) {
+      return true;
+    }
+
+    try {
+      const { error } = await supabase.from(SETTINGS_TABLE).upsert(
+        {
+          key: 'site_config',
+          value: nextConfig,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      );
+      if (error) {
+        console.error('Error saving site_config:', error);
+        alert('บันทึกการตั้งค่าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Save site_config error:', err);
+      return false;
+    }
+  };
+
+  // อัปโหลดไฟล์วิดีโอขึ้น Supabase Storage โดยตรงจากหน้า /admin
+  const uploadPartyVideo = async (file) => {
+    if (!file) return null;
+    if (!isSupabaseConfigured || !supabase) {
+      alert('โหมดออฟไลน์ไม่รองรับการอัปโหลดวิดีโอขึ้นเซิร์ฟเวอร์');
+      return null;
+    }
+
+    const ext = (file.name.split('.').pop() || 'mp4').toLowerCase();
+    const filePath = `party_${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from(PARTY_MEDIA_BUCKET)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type || 'video/mp4',
+      });
+
+    if (error) {
+      console.error('Upload video error:', error);
+      alert('อัปโหลดวิดีโอไม่สำเร็จ (ตรวจสอบขนาดไฟล์ไม่เกิน 50MB)');
+      return null;
+    }
+
+    const { data } = supabase.storage
+      .from(PARTY_MEDIA_BUCKET)
+      .getPublicUrl(filePath);
+
+    if (data?.publicUrl) {
+      await updateSiteConfig({ party_video_url: data.publicUrl });
+      return data.publicUrl;
+    }
+    return null;
+  };
 
   // =========================
   // เพิ่มคำอวยพรใหม่ (ตั้งสถานะเป็น pending เพื่อรอแอดมินอนุมัติ)
@@ -306,7 +431,10 @@ export default function App() {
     }
 
     try {
-      const { error } = await supabase.from(WISHES_TABLE).delete().eq('id', id);
+      const { error } = await supabase
+        .from(WISHES_TABLE)
+        .delete()
+        .eq('id', id);
       if (error) {
         console.error('Error deleting wish:', error);
         alert('เกิดข้อผิดพลาดในการลบคำอวยพร');
@@ -332,6 +460,7 @@ export default function App() {
               wishes={wishes}
               addWish={addWish}
               isLoading={isLoading}
+              siteConfig={siteConfig}
             />
           }
         />
@@ -342,6 +471,9 @@ export default function App() {
               wishes={wishes}
               updateWishStatus={updateWishStatus}
               deleteWish={deleteWish}
+              siteConfig={siteConfig}
+              updateSiteConfig={updateSiteConfig}
+              uploadPartyVideo={uploadPartyVideo}
             />
           }
         />

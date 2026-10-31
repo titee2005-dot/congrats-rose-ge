@@ -8,6 +8,7 @@ import FollowRose from '../components/FollowRose';
 import Footer from '../components/Footer';
 import PixelBunnies from '../components/PixelBunnies';
 import { PixelIcon } from '../components/PixelSprites';
+import { computeAutoBunnyCount } from '../data/roseData';
 
 // ไอคอนพิกเซลลอยขึ้นช้า ๆ เป็นฉากหลัง
 const FLOATERS = [
@@ -36,9 +37,14 @@ const TWINKLES = [
   { top: '8%', left: '58%', delay: '3s' },
 ];
 
-export default function Home({ wishes, addWish, isLoading }) {
+export default function Home({ wishes, addWish, isLoading, siteConfig }) {
   const [bunniesVisible, setBunniesVisible] = useState(true);
   const approvedCount = wishes.filter((w) => w.status === 'approved').length;
+  const autoBunnyCount = computeAutoBunnyCount(approvedCount);
+  const targetBunnyCount =
+    siteConfig?.bunny_mode === 'manual'
+      ? Math.max(0, Math.min(5, Number(siteConfig.bunny_manual_count ?? autoBunnyCount)))
+      : autoBunnyCount;
 
   return (
     <div className="px-page">
@@ -76,7 +82,7 @@ export default function Home({ wishes, addWish, isLoading }) {
       <Header wishCount={approvedCount} />
 
       <main className="px-main">
-        <Hero />
+        <Hero siteConfig={siteConfig} />
         <Timeline />
         <WishForm onAddWish={addWish} />
         <WishWall wishes={wishes} isLoading={isLoading} />
@@ -87,6 +93,7 @@ export default function Home({ wishes, addWish, isLoading }) {
 
       {/* ลูกเล่นน้องกระต่าย Pixel Art วิ่งเล่นบนสนามหญ้าด้านล่างจอ */}
       <PixelBunnies
+        targetCount={targetBunnyCount}
         visible={bunniesVisible}
         onToggleVisible={() => setBunniesVisible((v) => !v)}
       />

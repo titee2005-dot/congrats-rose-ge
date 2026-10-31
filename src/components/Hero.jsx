@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ROSE_PROFILE } from '../data/roseData';
+import { useState, useEffect, useRef } from 'react';
+import { ROSE_PROFILE, ROSE_PARTY_MEDIA } from '../data/roseData';
 import PixelFrame from './PixelFrame';
 import { PixelIcon } from './PixelSprites';
 
@@ -23,10 +23,38 @@ function computeTimeInfo() {
   };
 }
 
+function extractYouTubeId(url) {
+  if (!url) return null;
+  const trimmed = url.trim();
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{11})/,
+  ];
+  for (const re of patterns) {
+    const m = trimmed.match(re);
+    if (m && m[1]) return m[1];
+  }
+  return null;
+}
+
 const pad = (n) => String(n).padStart(2, '0');
 
-export default function Hero() {
+export default function Hero({ siteConfig }) {
   const [t, setT] = useState(computeTimeInfo);
+  const [isMuted, setIsMuted] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef(null);
+
+  const rawVideoUrl = (
+    siteConfig?.party_video_url ||
+    ROSE_PARTY_MEDIA.defaultVideoUrl ||
+    ''
+  ).trim();
+  const youtubeId = extractYouTubeId(rawVideoUrl);
+
+  useEffect(() => {
+    setVideoError(false);
+    setIsMuted(true);
+  }, [rawVideoUrl]);
 
   useEffect(() => {
     const timer = setInterval(() => setT(computeTimeInfo()), 1000);
@@ -36,6 +64,19 @@ export default function Hero() {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleSound = () => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (videoRef.current) {
+        videoRef.current.muted = next;
+        if (!next) {
+          videoRef.current.play().catch(() => {});
+        }
+      }
+      return next;
+    });
   };
 
   return (
@@ -58,19 +99,55 @@ export default function Hero() {
       </div>
 
       <div className="hero-grid">
-        {/* ภาพหลัก: ปาร์ตี้วันเกิดในสวนกุหลาบของน้องกระต่าย */}
+        {/* ช่องหลัก: Rose Birthday Party (รองรับวิดีโอ MP4 / WebM / YouTube หรือรูปปก) */}
         <PixelFrame
-          label="Rose's Garden Party"
+          label="Rose Birthday Party"
           icon="cake"
           tone="pink"
           className="hero-photo-frame"
           bodyClassName="hero-photo-body"
         >
-          <img
-            src="/assets/hero_garden_party.jpg"
-            alt="ปาร์ตี้วันเกิด 19 ปีของโรสในสวนกุหลาบกับน้องกระต่าย"
-            className="hero-photo"
-          />
+          <div className="hero-media-wrap">
+            {youtubeId ? (
+              <iframe
+                className="hero-video-embed"
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&playsinline=1&rel=0`}
+                title="Rose Birthday Party Video"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            ) : rawVideoUrl && !videoError ? (
+              <>
+                <video
+                  ref={videoRef}
+                  key={rawVideoUrl}
+                  src={rawVideoUrl}
+                  poster={ROSE_PARTY_MEDIA.posterUrl}
+                  className="hero-video"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  preload="metadata"
+                  onError={() => setVideoError(true)}
+                />
+                <button
+                  type="button"
+                  className="hero-sound-btn"
+                  onClick={toggleSound}
+                  title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
+                >
+                  {isMuted ? '🔇 เปิดเสียง' : '🔊 ปิดเสียง'}
+                </button>
+              </>
+            ) : (
+              <img
+                src={ROSE_PARTY_MEDIA.posterUrl}
+                alt="Rose Birthday Party — ปาร์ตี้วันเกิด 19 ปีของโรสในสวนกุหลาบกับน้องกระต่าย"
+                className="hero-photo"
+              />
+            )}
+          </div>
         </PixelFrame>
 
         {/* การ์ดข้อมูลวันเกิด */}

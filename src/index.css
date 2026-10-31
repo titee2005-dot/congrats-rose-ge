@@ -98,6 +98,8 @@ textarea {
 .tl-node,
 .bunny-dock,
 .bunny-bubble,
+.hero-sound-btn,
+.bunny-num-btn,
 .px-tab,
 .act-btn {
   box-shadow:
@@ -657,11 +659,46 @@ textarea {
   padding: 22px 14px 14px;
 }
 
-.hero-photo {
+.hero-media-wrap {
+  position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  object-fit: cover;
+  background: #fff4f8;
   box-shadow: 0 0 0 3px var(--line);
+  overflow: hidden;
+}
+
+.hero-photo,
+.hero-video,
+.hero-video-embed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+  display: block;
+}
+
+.hero-sound-btn {
+  --b: 2px;
+  --ln: var(--line);
+  --sh: transparent;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 4;
+  padding: 5px 11px;
+  border: none;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--line);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.15s ease;
+}
+
+.hero-sound-btn:hover {
+  background: var(--pink-l);
+  transform: translateY(-1px);
 }
 
 .hero-info-body {
@@ -1910,7 +1947,15 @@ textarea {
   right: 0;
   bottom: 0;
   z-index: 45;
-  height: 92px;
+  height: 84px;
+  pointer-events: none;
+  transition: transform 0.28s ease, opacity 0.25s ease;
+}
+
+.bunny-playground.is-typing-hidden,
+.bunny-dock.is-typing-hidden {
+  transform: translateY(120px);
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -1948,7 +1993,7 @@ textarea {
   --ln: var(--line);
   --sh: transparent;
   position: absolute;
-  bottom: 60px;
+  bottom: 56px;
   padding: 4px 10px;
   background: #fff;
   color: var(--line);
@@ -1968,6 +2013,25 @@ textarea {
   height: 6px;
   margin-left: -3px;
   background: var(--line);
+}
+
+/* ป้องกันกรอบคำพูดล้นขอบจอมือถือซ้าย-ขวา */
+.bunny-bubble.bubble-left {
+  left: -8px;
+}
+
+.bunny-bubble.bubble-left::after {
+  left: 24px;
+}
+
+.bunny-bubble.bubble-right {
+  right: -8px;
+}
+
+.bunny-bubble.bubble-right::after {
+  left: auto;
+  right: 24px;
+  margin-left: 0;
 }
 
 .bunny-carrot-drop {
@@ -1994,7 +2058,7 @@ textarea {
 
 .bunny-heart-burst {
   position: absolute;
-  bottom: 50px;
+  bottom: 48px;
   display: flex;
   gap: 5px;
   font-size: 0.95rem;
@@ -2014,19 +2078,21 @@ textarea {
   }
 }
 
+/* ปุ่มควบคุมลอยอยู่เหนือเลนวิ่งของกระต่าย เพื่อไม่ให้บังตัวกระต่ายตอนวิ่งผ่าน */
 .bunny-dock {
   --b: 3px;
   --ln: var(--line);
   --sh: #f6a9c6;
   position: fixed;
-  right: 18px;
-  bottom: 32px;
+  right: 16px;
+  bottom: 74px;
   z-index: 55;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px;
-  background: #fff;
+  gap: 5px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.96);
+  transition: transform 0.28s ease, opacity 0.25s ease;
 }
 
 .bunny-dock-btn,
@@ -2034,11 +2100,11 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
+  padding: 5px 9px;
   border: none;
   background: var(--pink-xl);
   color: var(--ink);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
   transition: background-color 0.18s ease;
@@ -2047,6 +2113,17 @@ textarea {
 .bunny-dock-toggle {
   background: var(--pink-l);
   color: var(--line);
+}
+
+.bunny-dock-toggle.is-muted {
+  background: var(--butter-l);
+}
+
+.dock-count {
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--pink-d);
 }
 
 .bunny-dock-btn:hover,
@@ -2136,7 +2213,134 @@ textarea {
 }
 
 .admin-main {
-  padding-top: 30px;
+  padding-top: 24px;
+}
+
+.admin-settings-frame {
+  margin-bottom: 34px;
+}
+
+.admin-settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-toast {
+  padding: 9px 14px;
+  background: var(--mint-l);
+  color: #28613e;
+  font-size: 0.86rem;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px #8bd0a8;
+}
+
+.admin-settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.admin-cfg-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #fff9fc;
+  box-shadow: inset 0 0 0 2px #f2d0df;
+}
+
+.admin-cfg-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-cfg-head h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.admin-cfg-head p {
+  margin: 2px 0 0;
+  font-size: 0.84rem;
+  color: var(--ink2);
+}
+
+.bunny-mode-row .px-tab {
+  width: calc(100% - 9px);
+  text-align: center;
+}
+
+.cfg-mini-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.bunny-count-btns {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.bunny-num-btn {
+  --b: 2px;
+  --ln: #dcb6c7;
+  --sh: transparent;
+  margin: 2px;
+  padding: 8px 4px;
+  border: none;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.bunny-num-btn:hover:not(:disabled) {
+  background: var(--pink-xl);
+  transform: translateY(-1px);
+}
+
+.bunny-num-btn.is-selected {
+  --ln: var(--line);
+  --sh: #c9477a;
+  background: var(--pink);
+  color: #fff;
+}
+
+.video-cfg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.video-upload-btn {
+  width: calc(100% - 9px);
+}
+
+.video-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cfg-scale-note {
+  margin-top: auto;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--ink2);
+}
+
+.cfg-scale-note code {
+  padding: 1px 5px;
+  background: #fff;
+  font-size: 0.74rem;
+  box-shadow: 0 0 0 1px #e7c6d4;
 }
 
 .admin-top {
@@ -2258,12 +2462,13 @@ textarea {
 }
 
 /* =========================================================
-   17. Responsive
+   17. Responsive (รองรับหน้าจอแท็บเล็ต & มือถือทุกขนาด)
    ========================================================= */
 @media (max-width: 960px) {
   .hero-grid,
   .wish-layout,
-  .follow-grid {
+  .follow-grid,
+  .admin-settings-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2281,6 +2486,11 @@ textarea {
 }
 
 @media (max-width: 820px) {
+  /* ป้องกัน iOS Safari ซูมหน้าจออัตโนมัติตอนกดพิมพ์ข้อความ */
+  .px-input {
+    font-size: 16px;
+  }
+
   .px-menu-btn {
     display: grid;
     place-items: center;
@@ -2352,29 +2562,133 @@ textarea {
 }
 
 @media (max-width: 560px) {
+  .px-page {
+    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  }
+
   .px-main {
-    padding: 0 14px;
+    padding: 0 12px;
   }
 
   .px-header-wrap {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding: 10px 12px 4px;
+  }
+
+  .px-header {
+    gap: 8px;
+    padding: 7px 10px;
+  }
+
+  .px-brand-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .px-brand-text strong {
+    font-size: 1.18rem;
   }
 
   .px-brand-text em {
     display: none;
   }
 
+  .hero {
+    padding: 20px 0 26px;
+  }
+
+  .px-chip {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .hero-title-lg {
+    font-size: clamp(2.65rem, 13.5vw, 3.6rem);
+    text-shadow:
+      2px 0 0 var(--line), -2px 0 0 var(--line), 0 2px 0 var(--line), 0 -2px 0 var(--line),
+      2px 2px 0 var(--line), -2px 2px 0 var(--line), 2px -2px 0 var(--line), -2px -2px 0 var(--line),
+      5px 6px 0 #ff9cc2;
+  }
+
+  .hero-sub {
+    margin-top: 12px;
+    font-size: 0.96rem;
+    padding: 0 4px;
+  }
+
+  .hero-photo-body {
+    padding: 16px 10px 10px;
+  }
+
+  .hero-sound-btn {
+    right: 6px;
+    bottom: 6px;
+    padding: 4px 9px;
+    font-size: 0.72rem;
+  }
+
+  .px-section {
+    padding: 38px 0;
+  }
+
+  .sec-head {
+    margin-bottom: 26px;
+  }
+
+  .pf.has-tab {
+    margin-top: 34px;
+  }
+
+  .pf-tab {
+    left: 10px;
+    max-width: calc(100% - 20px);
+    padding: 5px 10px 3px;
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+
+  .pf-body {
+    padding: 22px 14px 16px;
+  }
+
+  /* Timeline บนจอมือถือ กระชับเส้นด้านซ้ายให้การ์ดกว้างอ่านง่าย */
+  .tl-line {
+    left: 15px;
+  }
+
+  .tl-row,
+  .tl-row.is-right {
+    padding-left: 42px;
+  }
+
+  .tl-row.is-left .tl-node,
+  .tl-row.is-right .tl-node {
+    left: -1px;
+    top: 46px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .tl-row.is-left::after,
+  .tl-row.is-right::after {
+    left: 31px;
+    top: 60px;
+    width: 11px;
+  }
+
+  .tl-title {
+    font-size: 1.04rem;
+  }
+
   .wall-grid {
     grid-template-columns: 1fr;
+    gap: 22px;
   }
 
   .card-picker {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .pf-body {
-    padding: 24px 16px 18px;
+    gap: 8px;
   }
 
   .cd-cell b {
@@ -2386,16 +2700,96 @@ textarea {
     flex: none;
   }
 
+  .px-modal-backdrop {
+    padding: 12px;
+  }
+
+  .profile-head {
+    gap: 12px;
+  }
+
+  .profile-avatar {
+    width: 68px;
+    height: 68px;
+  }
+
+  .px-social {
+    padding: 13px 14px;
+    gap: 12px;
+  }
+
+  .px-social-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* น้องกระต่ายบนมือถือ: ตัวกะทัดรัด และปุ่มควบคุมขนาดจิ๋วลอยพ้นหัวกระต่าย 100% */
+  .bunny-playground {
+    height: 62px;
+    bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bunny-playground::before {
+    height: 16px;
+  }
+
+  .running-bunny {
+    bottom: 8px;
+  }
+
+  .bunny-carrot-drop {
+    bottom: 8px;
+  }
+
+  .bunny-bubble {
+    bottom: 44px;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
   .bunny-dock {
+    --b: 2px;
     right: 10px;
-    bottom: 28px;
-    padding: 4px;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding: 3px;
+    gap: 4px;
+  }
+
+  .bunny-dock .dock-label {
+    display: none;
   }
 
   .bunny-dock-btn,
   .bunny-dock-toggle {
-    font-size: 0.72rem;
-    padding: 5px 8px;
+    font-size: 0.74rem;
+    padding: 5px 7px;
+  }
+
+  /* หน้า Admin บนมือถือ */
+  .admin-db-pill {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .admin-head-actions {
+    margin-left: auto;
+  }
+
+  .bunny-count-btns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-search {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-facts,
+  .profile-facts {
+    grid-template-columns: 1fr;
   }
 }
 
