@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <!-- Cute Pixel White Bunny with Pastel Pink Ribbon & Rose -->
+  <rect width="16" height="16" rx="3" fill="#ffd9e8"/>
+  <!-- Left & Right Ears -->
+  <rect x="4" y="1" width="2" height="5" fill="#5e2b47"/>
+  <rect x="10" y="1" width="2" height="5" fill="#5e2b47"/>
+  <rect x="4" y="2" width="2" height="4" fill="#ffffff"/>
+  <rect x="10" y="2" width="2" height="4" fill="#ffffff"/>
+  <rect x="5" y="3" width="1" height="2" fill="#ffb3d1"/>
+  <rect x="10" y="3" width="1" height="2" fill="#ffb3d1"/>
+  <!-- Pink Bow on Ear -->
+  <rect x="9" y="5" width="3" height="2" fill="#ff5c9e"/>
+  <rect x="10" y="5" width="1" height="1" fill="#ffd6e7"/>
+  <!-- Head Outline -->
+  <rect x="3" y="6" width="10" height="7" fill="#5e2b47"/>
+  <rect x="2" y="7" width="12" height="5" fill="#5e2b47"/>
+  <!-- Head White Fill -->
+  <rect x="4" y="7" width="8" height="5" fill="#ffffff"/>
+  <rect x="3" y="8" width="10" height="3" fill="#ffffff"/>
+  <!-- Eyes & Blush & Nose -->
+  <rect x="5" y="9" width="1" height="2" fill="#5e2b47"/>
+  <rect x="10" y="9" width="1" height="2" fill="#5e2b47"/>
+  <rect x="4" y="10" width="1" height="1" fill="#ff85b3"/>
+  <rect x="11" y="10" width="1" height="1" fill="#ff85b3"/>
+  <rect x="7" y="10" width="2" height="1" fill="#ff5c9e"/>
+  <!-- Tiny Rose at bottom -->
+  <rect x="7" y="13" width="2" height="2" fill="#f43f7a"/>
+  <rect x="6" y="14" width="1" height="1" fill="#4eb879"/>
+  <rect x="9" y="14" width="1" height="1" fill="#4eb879"/>
+</svg>
