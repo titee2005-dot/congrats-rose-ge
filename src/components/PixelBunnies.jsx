@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from 'react';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
 const BUNNY_QUOTES = [
-  'HBD พี่โรส 19 ขวบ! 🎂',
-  'รักโรสที่สุดเลยน้า~ 🌹',
-  'ปิ้วๆ เขียนการ์ดให้โรสกัน! 💌',
-  'จะยังไงก็รักโรส ♡',
-  '19 ปีขอให้สดใสทุกวันเลย ✨',
-  'กระต่ายน้อยของโรสเองคับ 🐰',
-  'แค่เพียงมีโรสก็มีความสุขแล้ว 🩷',
-  'กินของอร่อยเยอะๆ นะพี่โรส 🍰',
+  { text: 'HBD พี่โรส 19 ขวบ!', icon: 'cake' },
+  { text: 'รักโรสที่สุดเลยน้า~', icon: 'rose' },
+  { text: 'ปิ้วๆ เขียนการ์ดให้โรสกัน!', icon: 'envelope' },
+  { text: 'จะยังไงก็รักโรส', icon: 'heart' },
+  { text: '19 ปีขอให้สดใสทุกวันเลย', icon: 'star' },
+  { text: 'กระต่ายน้อยของโรสเองคับ', icon: 'bunny' },
+  { text: 'แค่เพียงมีโรสก็มีความสุขแล้ว', icon: 'heart' },
+  { text: 'กินของอร่อยเยอะๆ นะพี่โรส', icon: 'cake' },
 ];
 
 const VARIANTS = [
@@ -31,7 +31,7 @@ function createBunny(id, variantIndex, startX, withGreeting = false) {
     state: 'run',
     frame: 'idle',
     timer: 10 + (id % 7) * 3,
-    speech: withGreeting ? 'HBD พี่โรส 19 ขวบ! 🎂' : null,
+    speech: withGreeting ? BUNNY_QUOTES[0] : null,
     speechTicks: withGreeting ? 28 : 0,
     jumpOffset: 0,
   };
@@ -165,7 +165,7 @@ export default function PixelBunnies({
               frame = frame === 'blink' ? 'idle' : 'blink';
               state = 'idle';
               if (!speech) {
-                speech = 'ง่ำๆ อร่อยจัง 🥕♥';
+                speech = { text: 'ง่ำๆ อร่อยจัง', icon: 'carrot' };
                 speechTicks = 18;
               }
             }
@@ -254,7 +254,6 @@ export default function PixelBunnies({
     return () => clearInterval(interval);
   }, [visible, safeTarget, isTyping]);
 
-  // หากแอดมินตั้งเป็น 0 ตัว ไม่ต้องแสดงแถบกระต่าย
   if (safeTarget <= 0) return null;
 
   const spawnBurst = (xPercent) => {
@@ -295,7 +294,6 @@ export default function PixelBunnies({
 
   return (
     <>
-      {/* สนามหญ้าพิกเซลด้านล่างจอ — ไม่มีปุ่มวางขวางทางวิ่งแล้ว */}
       {visible && (
         <div
           className={`bunny-playground ${isTyping ? 'is-typing-hidden' : ''}`}
@@ -318,9 +316,9 @@ export default function PixelBunnies({
               style={{ left: `${burst.x}%` }}
               aria-hidden="true"
             >
-              <span>♥</span>
-              <span>🌹</span>
-              <span>✦</span>
+              <PixelIcon name="heart" size={16} />
+              <PixelIcon name="rose" size={18} />
+              <PixelIcon name="star" size={14} />
             </div>
           ))}
 
@@ -342,7 +340,10 @@ export default function PixelBunnies({
               >
                 {b.speech && (
                   <span className={`bunny-bubble ${bubbleEdgeClass}`}>
-                    {b.speech}
+                    <span>{b.speech.text}</span>
+                    {b.speech.icon && (
+                      <PixelIcon name={b.speech.icon} size={13} />
+                    )}
                   </span>
                 )}
                 <PixelBunnySprite
@@ -357,7 +358,7 @@ export default function PixelBunnies({
         </div>
       )}
 
-      {/* ปุ่มมินิลอยอยู่เหนือเลนวิ่งของกระต่าย (ไม่บังตัวกระต่ายเวลากระต่ายวิ่งผ่าน) */}
+      {/* ปุ่มมินิลอยอยู่เหนือเลนวิ่งของกระต่าย (ใช้ไอคอน SVG ล้วน) */}
       <div className={`bunny-dock ${isTyping ? 'is-typing-hidden' : ''}`}>
         {visible && (
           <button
@@ -367,7 +368,7 @@ export default function PixelBunnies({
             title="โยนแครอทเรียกน้องกระต่าย"
             aria-label="โยนแครอทเรียกน้องกระต่าย"
           >
-            <span aria-hidden="true">🥕</span>
+            <PixelIcon name="carrot" size={18} />
             <span className="dock-label">แครอท</span>
           </button>
         )}

@@ -1,6 +1,6 @@
 // ==========================================
 // ข้อมูลหลักของเว็บวันเกิดครบ 19 ปี Rose BNK48 (ปาณิสรา บูรณาภา)
-// ธีม: Rose's Secret Garden & Botanical Scrapbook
+// ธีม: Pastel Pixel Bunny Garden (#19thBloomingRose)
 // ==========================================
 
 export const ROSE_PROFILE = {
@@ -19,12 +19,12 @@ export const ROSE_PROFILE = {
   height: '167 cm',
   bloodGroup: 'B',
   favorites: [
-    'กระต่าย น้องแมว และน้องหมา 🐰',
-    'แต่งนิยาย & อ่านเรื่องราวสนุก ๆ 📖',
-    'อาหารญี่ปุ่น ปิ้งย่าง และส้มตำ 🍣',
-    'ดูซีรีส์ เล่นเกม และช็อปปิ้ง 🎀',
+    { text: 'กระต่าย น้องแมว และน้องหมา', icon: 'bunny' },
+    { text: 'แต่งนิยาย & อ่านเรื่องราวสนุก ๆ', icon: 'book' },
+    { text: 'อาหารญี่ปุ่น ปิ้งย่าง และส้มตำ', icon: 'food' },
+    { text: 'ดูซีรีส์ เล่นเกม และช็อปปิ้ง', icon: 'ribbon' },
   ],
-  hashtags: ['#Happy19thRoseDay', '#RoseBNK48', '#BNK486thGen'],
+  hashtags: ['#19thBloomingRose', '#RoseBNK48', '#BNK486thGen'],
 };
 
 // ==========================================
@@ -45,7 +45,7 @@ export function computeAutoBunnyCount(wishCount = 0) {
 }
 
 // ==========================================
-// 6 ดีไซน์การ์ดโปสการ์ดและสมุดภาพ Scrapbook ให้แฟนคลับเลือก
+// 6 ดีไซน์การ์ดโปสการ์ดและสมุดภาพให้แฟนคลับเลือก (ใช้ไอคอน Vector SVG ทั้งหมด)
 // ==========================================
 export const CARD_THEMES = [
   {
@@ -59,7 +59,7 @@ export const CARD_THEMES = [
     borderTone: '#eab3c7',
     tapeTone: 'pink-plaid',
     sealText: 'R•19',
-    iconEmoji: '🌹',
+    iconName: 'rose',
   },
   {
     id: 'bunny-polaroid',
@@ -72,7 +72,7 @@ export const CARD_THEMES = [
     borderTone: '#f2bed2',
     tapeTone: 'rose-dot',
     sealText: 'BUNNY',
-    iconEmoji: '🐰',
+    iconName: 'bunny',
   },
   {
     id: 'vintage-airmail',
@@ -85,7 +85,7 @@ export const CARD_THEMES = [
     borderTone: '#d9b8c4',
     tapeTone: 'sage-stripe',
     sealText: 'POST',
-    iconEmoji: '✉️',
+    iconName: 'envelope',
   },
   {
     id: 'lavender-note',
@@ -98,7 +98,7 @@ export const CARD_THEMES = [
     borderTone: '#cbb3eb',
     tapeTone: 'lavender-check',
     sealText: 'GEN6',
-    iconEmoji: '💜',
+    iconName: 'heart-purple',
   },
   {
     id: 'tea-party',
@@ -111,7 +111,7 @@ export const CARD_THEMES = [
     borderTone: '#f0bcae',
     tapeTone: 'pink-plaid',
     sealText: '19TH',
-    iconEmoji: '🎂',
+    iconName: 'cake',
   },
   {
     id: 'sage-botanical',
@@ -124,7 +124,7 @@ export const CARD_THEMES = [
     borderTone: '#b4d4bd',
     tapeTone: 'sage-stripe',
     sealText: 'BLOOM',
-    iconEmoji: '🌿',
+    iconName: 'leaf',
   },
 ];
 
@@ -152,7 +152,7 @@ export function resolveCardTheme(bgValue) {
 }
 
 // ==========================================
-// บันทึกการผลิบานทั้ง 9 ฤดูกาล (Timeline เถากุหลาบ + โพลาลอยด์ติดเทปวาชิ)
+// บันทึกการผลิบานทั้ง 9 ความทรงจำ (Timeline)
 // วางรูปจริงของโรสได้ที่ public/assets/timeline/ch1.jpg ถึง ch9.jpg
 // ==========================================
 export const ROSE_TIMELINE = [
@@ -162,7 +162,7 @@ export const ROSE_TIMELINE = [
     date: '1 November 2007',
     title: 'วันที่เมล็ดพันธุ์ดอกกุหลาบถือกำเนิด',
     body: 'จุดเริ่มต้นของเรื่องราวแสนอบอุ่น วันที่เด็กสาวชื่อ “โรส — ปาณิสรา บูรณาภา” ลืมตาดูโลก ณ จังหวัดนครปฐม พร้อมรอยยิ้มอ่อนโยนและความฝันเล็ก ๆ ในหัวใจที่จะได้ส่งต่อความสุขผ่านเสียงเพลง',
-    polaroidNote: 'Little Rose • Nakhon Pathom ♡',
+    polaroidNote: 'Little Rose · Nakhon Pathom',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch1.jpg'
     scene: 'seed',
     tape: 'pink-plaid',
@@ -175,7 +175,7 @@ export const ROSE_TIMELINE = [
     date: 'May 2025',
     title: 'หัวใจที่ไม่เคยยอมแพ้ — แคนดิเดต BNK48 รุ่นที่ 6',
     body: 'แม้เคยผ่านความผิดหวังจากการออดิชันมาก่อน แต่โรสไม่เคยหยุดพัฒนาตัวเอง เธอกลับมาสู้อีกครั้งในฐานะแคนดิเดต BNK48 รุ่นที่ 6 จนหลายคนตกหลุมรักในความตั้งใจและแววตาที่มุ่งมั่นของเธอ',
-    polaroidNote: 'Never Give Up on Your Dream ✿',
+    polaroidNote: 'Never Give Up on Your Dream',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch2.jpg'
     scene: 'sprout',
     tape: 'sage-stripe',
@@ -201,7 +201,7 @@ export const ROSE_TIMELINE = [
     date: '23 August 2025',
     title: 'CHAPTER: NEXT — คอนเสิร์ตใหญ่ครั้งแรกในชีวิต',
     body: 'เวทีคอนเสิร์ตใหญ่ที่เปิดโอกาสให้โรสได้เปล่งประกายเคียงข้างรุ่นพี่และเพื่อน ๆ ทุกหยาดเหงื่อจากการฝึกซ้อมแปรเปลี่ยนเป็นรอยยิ้มและความสุขที่ส่งไปถึงผู้ชมทุกที่นั่ง',
-    polaroidNote: 'Shining Under the Stage Lights ✨',
+    polaroidNote: 'Shining Under the Stage Lights',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch4.jpg'
     scene: 'stage',
     tape: 'rose-dot',
@@ -214,7 +214,7 @@ export const ROSE_TIMELINE = [
     date: '11 October 2025',
     title: 'BNK48 6th Generation Debut Stage',
     body: 'สเตจเดบิวต์อย่างเป็นทางการ ณ MBK Center กับเพลงประจำรุ่น “Doushitemo Kimi ga Suki da (จะยังไงก็รักเธอ)” วันสำคัญที่พิสูจน์ว่าดอกกุหลาบดอกนี้พร้อมเบ่งบานบนเส้นทางไอดอลอย่างงดงาม',
-    polaroidNote: 'Doushitemo Kimi ga Suki da 🌷',
+    polaroidNote: 'Doushitemo Kimi ga Suki da',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch5.jpg'
     scene: 'debut',
     tape: 'pink-plaid',
@@ -227,7 +227,7 @@ export const ROSE_TIMELINE = [
     date: 'January 2026',
     title: '(N)EXTENSION — สมุดบันทึกเบื้องหลังการเติบโต',
     body: 'สารคดีที่พาแฟนคลับไปสัมผัสตัวตนของโรสให้ลึกซึ้งยิ่งขึ้น ทั้งความอ่อนโยน ความฝันของเด็กสาวที่รักกระต่าย ชอบแต่งนิยาย และไม่เคยหยุดเรียนรู้ในทุก ๆ วัน',
-    polaroidNote: 'Every Page Tells Her Story 📖',
+    polaroidNote: 'Every Page Tells Her Story',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch6.jpg'
     scene: 'diary',
     tape: 'sage-stripe',
@@ -240,7 +240,7 @@ export const ROSE_TIMELINE = [
     date: 'March 2026',
     title: 'Center เพลงพิเศษ “แค่เพียงมีเธอ (Kimi ga Iru Dake de)”',
     body: 'อีกหนึ่งก้าวสำคัญที่น่าภูมิใจสุด ๆ กับการรับตำแหน่ง Center ในโปรเจกต์พิเศษ Collaboration ไทย–ญี่ปุ่น ถ่ายทอดเสียงร้องใสละมุนและเสน่ห์ที่สะกดใจผู้ฟังในวงกว้าง',
-    polaroidNote: 'Our Shining Center Rose 🌹',
+    polaroidNote: 'Our Shining Center Rose',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch7.jpg'
     scene: 'center',
     tape: 'rose-dot',
@@ -253,7 +253,7 @@ export const ROSE_TIMELINE = [
     date: 'October 2026',
     title: 'พลังรักจากสวนกุหลาบ — General Election 2026',
     body: 'แรงซัพพอร์ตอันท่วมท้นจากแฟนคลับทุกคนที่ร่วมเดินเคียงข้าง สร้างโมเมนต์สุดประทับใจในการประกาศผลด่วน เป็นเครื่องยืนยันว่าความตั้งใจของโรสมีผู้คนมากมายคอยโอบกอดอยู่เสมอ',
-    polaroidNote: 'Together in Rose’s Garden ♡',
+    polaroidNote: 'Together in Rose’s Garden',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch8.jpg'
     scene: 'bouquet',
     tape: 'lavender-check',
@@ -265,8 +265,8 @@ export const ROSE_TIMELINE = [
     seasonLabel: 'Memory 09',
     date: '1 November 2026',
     title: 'Blooming Nineteen — สุขสันต์วันเกิดครบ 19 ปีนะโรส!',
-    body: 'ก้าวเข้าสู่วัย 19 ปีอย่างงดงาม ขอบคุณที่เติบโตมาอย่างดีและเป็นรอยยิ้มที่แสนอบอุ่นให้พวกเราเสมอ ขอให้ฤดูกาลที่ 19 ของโรสเต็มไปด้วยความสุข สุขภาพแข็งแรง ได้กินของอร่อยเยอะ ๆ และเบ่งบานในแบบที่เป็นตัวเองตลอดไป 🌹🐰🎂',
-    polaroidNote: 'Happy 19th Birthday, Dear Rose! 🎂',
+    body: 'ก้าวเข้าสู่วัย 19 ปีอย่างงดงาม ขอบคุณที่เติบโตมาอย่างดีและเป็นรอยยิ้มที่แสนอบอุ่นให้พวกเราเสมอ ขอให้ฤดูกาลที่ 19 ของโรสเต็มไปด้วยความสุข สุขภาพแข็งแรง ได้กินของอร่อยเยอะ ๆ และเบ่งบานในแบบที่เป็นตัวเองตลอดไป',
+    polaroidNote: 'Happy 19th Birthday, Dear Rose!',
     img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch9.jpg'
     scene: 'birthday19',
     tape: 'pink-plaid',
@@ -309,9 +309,9 @@ export const INITIAL_DEMO_WISHES = [
   {
     id: 105,
     bg: 'pressed-rose',
-    name: 'กระต่ายในสวนกุหลาบ 🌹🐰',
+    name: 'กระต่ายในสวนกุหลาบ',
     message:
-      'สุขสันต์วันเกิดครบ 19 ปีนะน้องโรส! ขอบคุณที่ไม่ยอมแพ้กับความฝันจนได้มาเจอกันนะ ขอให้ปีที่ 19 เป็นปีที่ใจดีกับโรสมาก ๆ ยิ้มเยอะ ๆ กินอิ่มนอนหลับ พวกเราจะคอยเป็นสวนกุหลาบที่อบอุ่นให้โรสอยู่ตรงนี้เสมอเลย 🩷✨',
+      'สุขสันต์วันเกิดครบ 19 ปีนะน้องโรส! ขอบคุณที่ไม่ยอมแพ้กับความฝันจนได้มาเจอกันนะ ขอให้ปีที่ 19 เป็นปีที่ใจดีกับโรสมาก ๆ ยิ้มเยอะ ๆ กินอิ่มนอนหลับ พวกเราจะคอยเป็นสวนกุหลาบที่อบอุ่นให้โรสอยู่ตรงนี้เสมอเลย',
     img: '',
     status: 'approved',
     created_at: '2026-11-01T00:12:00+07:00',
@@ -321,7 +321,7 @@ export const INITIAL_DEMO_WISHES = [
     bg: 'bunny-polaroid',
     name: 'BunnyLover48',
     message:
-      "Happy 19th Birthday P'Rose! 🎂🐰 ขอให้มีความสุขในทุก ๆ วันเลยนะะะ ดีใจมากที่ได้เห็นโรสเติบโตและเปล่งประกายบนเวที จะยังไงก็รักโรสน้าาา ~",
+      "Happy 19th Birthday P'Rose! ขอให้มีความสุขในทุก ๆ วันเลยนะะะ ดีใจมากที่ได้เห็นโรสเติบโตและเปล่งประกายบนเวที จะยังไงก็รักโรสน้าาา ~",
     img: '',
     status: 'approved',
     created_at: '2026-11-01T00:08:00+07:00',
@@ -329,9 +329,9 @@ export const INITIAL_DEMO_WISHES = [
   {
     id: 103,
     bg: 'vintage-airmail',
-    name: 'พิ้งค์กี้โรส ♡',
+    name: 'พิ้งค์กี้โรส',
     message:
-      'ส่งโปสการ์ดใบนี้มาอวยพรวันเกิด 19 ขวบนะคะ ขอให้น้องโรสสุขภาพแข็งแรง ไม่ปวดหลัง ได้กินอาหารญี่ปุ่นกับปิ้งย่างอร่อย ๆ บ่อย ๆ รักรอยยิ้มของโรสที่สุดในโลกเลยยย 💌🌹',
+      'ส่งโปสการ์ดใบนี้มาอวยพรวันเกิด 19 ขวบนะคะ ขอให้น้องโรสสุขภาพแข็งแรง ไม่ปวดหลัง ได้กินอาหารญี่ปุ่นกับปิ้งย่างอร่อย ๆ บ่อย ๆ รักรอยยิ้มของโรสที่สุดในโลกเลยยย',
     img: '',
     status: 'approved',
     created_at: '2026-11-01T00:05:00+07:00',
@@ -341,7 +341,7 @@ export const INITIAL_DEMO_WISHES = [
     bg: 'lavender-note',
     name: 'คนแถวนครปฐม',
     message:
-      'HBD 19th นะครับน้องโรส ภูมิใจในตัวหนูมาก ๆ ตั้งแต่วันเปิดตัวรุ่น 6 จนถึงวันนี้ หนูเก่งขึ้นทุกวันเลย ขอให้สมหวังในทุกสิ่งที่ตั้งใจนะครับ 💜🎉',
+      'HBD 19th นะครับน้องโรส ภูมิใจในตัวหนูมาก ๆ ตั้งแต่วันเปิดตัวรุ่น 6 จนถึงวันนี้ หนูเก่งขึ้นทุกวันเลย ขอให้สมหวังในทุกสิ่งที่ตั้งใจนะครับ',
     img: '',
     status: 'approved',
     created_at: '2026-11-01T00:02:00+07:00',
@@ -351,7 +351,7 @@ export const INITIAL_DEMO_WISHES = [
     bg: 'sage-botanical',
     name: 'GardenKeeper_19',
     message:
-      'ขอให้ดอกกุหลาบดอกนี้เบ่งบานอย่างมีความสุขในทุกฤดูกาลเลยนะ ไม่ว่าจะเจอเรื่องอะไร หันมาเมื่อไหร่ก็จะเจอพวกเราเสมอ สุขสันต์วันเกิดวัย 19 ปีครับ 🌿🌷',
+      'ขอให้ดอกกุหลาบดอกนี้เบ่งบานอย่างมีความสุขในทุกฤดูกาลเลยนะ ไม่ว่าจะเจอเรื่องอะไร หันมาเมื่อไหร่ก็จะเจอพวกเราเสมอ สุขสันต์วันเกิดวัย 19 ปีครับ',
     img: '',
     status: 'approved',
     created_at: '2026-11-01T00:00:10+07:00',
@@ -361,7 +361,7 @@ export const INITIAL_DEMO_WISHES = [
     bg: 'tea-party',
     name: 'แฟนคลับที่รอแอดมินอนุมัติ',
     message:
-      'สุขสันต์วันเกิดครบ 19 ปีนะโรส! (การ์ดใบนี้เป็นตัวอย่างสถานะ "รออนุมัติ" สามารถเข้าไปกดอนุมัติหรือซ่อนได้ที่หน้า /admin เลยครับ 🎂✨)',
+      'สุขสันต์วันเกิดครบ 19 ปีนะโรส! (การ์ดใบนี้เป็นตัวอย่างสถานะ "รออนุมัติ" สามารถเข้าไปกดอนุมัติหรือซ่อนได้ที่หน้า /admin เลยครับ)',
     img: '',
     status: 'pending',
     created_at: '2026-11-01T00:15:00+07:00',

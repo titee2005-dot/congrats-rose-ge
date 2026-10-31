@@ -79,7 +79,7 @@ export default function WishForm({ onAddWish }) {
 
   const handleSubmit = async () => {
     if (!name.trim() || !message.trim()) {
-      setPopupMsg('กรุณากรอกชื่อผู้ส่งและข้อความอวยพรให้ครบถ้วนนะคะ 🌹');
+      setPopupMsg('กรุณากรอกชื่อผู้ส่งและข้อความอวยพรให้ครบถ้วนนะคะ');
       return;
     }
 
@@ -181,10 +181,16 @@ export default function WishForm({ onAddWish }) {
                         onClick={() => setSelectedCard(t.id)}
                       >
                         <span className={`pick-swatch sw-${t.variant}`}>
-                          <span>{t.iconEmoji}</span>
+                          <span>
+                            <PixelIcon name={t.iconName || 'rose'} size={18} />
+                          </span>
                         </span>
                         <span className="pick-name">{t.name}</span>
-                        {active && <span className="pick-check">✔</span>}
+                        {active && (
+                          <span className="pick-check">
+                            <PixelIcon name="check" size={13} />
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -200,7 +206,7 @@ export default function WishForm({ onAddWish }) {
                   type="text"
                   className="px-input"
                   maxLength={40}
-                  placeholder="เช่น กระต่ายน้อยของโรส 🐰"
+                  placeholder="เช่น กระต่ายน้อยของโรส"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -251,7 +257,8 @@ export default function WishForm({ onAddWish }) {
                       className="px-btn sm"
                       onClick={clearSelectedFile}
                     >
-                      ✕ นำรูปออก
+                      <PixelIcon name="close" size={14} />
+                      <span>นำรูปออก</span>
                     </button>
                   </div>
                 )}
@@ -264,7 +271,8 @@ export default function WishForm({ onAddWish }) {
                   disabled={isSubmitting}
                   onClick={handleSubmit}
                 >
-                  {isSubmitting ? 'กำลังส่งการ์ด...' : '♥ ส่งการ์ดให้โรส'}
+                  <PixelIcon name="heart" size={16} />
+                  <span>{isSubmitting ? 'กำลังส่งการ์ด...' : 'ส่งการ์ดให้โรส'}</span>
                 </button>
                 <button
                   type="button"
@@ -311,7 +319,7 @@ export default function WishForm({ onAddWish }) {
               onClick={() => setShowPreviewModal(false)}
               aria-label="ปิด"
             >
-              ✕
+              <PixelIcon name="close" size={16} />
             </button>
             <WishCardView
               bg={selectedCard}
@@ -338,7 +346,7 @@ export default function WishForm({ onAddWish }) {
               <h3>ส่งการ์ดถึงโรสเรียบร้อยแล้ว!</h3>
               <p className="success-note">
                 การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นกำแพงคำอวยพร
-                บันทึกรูปการ์ดเก็บไว้แชร์ได้เลยนะ ♥
+                บันทึกรูปการ์ดเก็บไว้แชร์ได้เลยนะ
               </p>
 
               <div id="rose-recap-card" className="recap-capture">
@@ -357,7 +365,8 @@ export default function WishForm({ onAddWish }) {
                   className="px-btn primary"
                   onClick={handleDownloadRecap}
                 >
-                  ⬇ บันทึกรูปการ์ด (PNG)
+                  <PixelIcon name="download" size={16} />
+                  <span>บันทึกรูปการ์ด (PNG)</span>
                 </button>
                 <button
                   type="button"

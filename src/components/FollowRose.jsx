@@ -59,7 +59,10 @@ export default function FollowRose() {
               <span className="likes-title">สิ่งที่โรสชอบ</span>
               <div className="likes-chips">
                 {ROSE_PROFILE.favorites.map((fav) => (
-                  <span key={fav}>{fav}</span>
+                  <span key={fav.text}>
+                    <PixelIcon name={fav.icon} size={15} />
+                    {fav.text}
+                  </span>
                 ))}
               </div>
             </div>
@@ -83,7 +86,7 @@ export default function FollowRose() {
                   <em>{soc.desc}</em>
                 </span>
                 <span className="px-social-arrow" aria-hidden="true">
-                  ▸
+                  <PixelIcon name="chevron-right" size={18} />
                 </span>
               </a>
             ))}

@@ -117,7 +117,12 @@ textarea {
 .px-page {
   min-height: 100vh;
   position: relative;
-  padding-bottom: 110px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-page {
+  padding-bottom: 64px;
 }
 
 .px-sky {
@@ -242,6 +247,8 @@ textarea {
 .px-main {
   position: relative;
   z-index: 2;
+  flex: 1;
+  width: 100%;
   max-width: 1120px;
   margin: 0 auto;
   padding: 0 22px;
@@ -686,6 +693,9 @@ textarea {
   right: 10px;
   bottom: 10px;
   z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 5px 11px;
   border: none;
   background: rgba(255, 255, 255, 0.94);
@@ -953,7 +963,9 @@ textarea {
 }
 
 .tl-note {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 4px 10px;
   background: var(--pf-tab);
   color: var(--line);
@@ -1405,6 +1417,9 @@ textarea {
 }
 
 .wc-to {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-pixel);
   font-weight: 600;
   color: var(--wc-accent);
@@ -1425,13 +1440,19 @@ textarea {
 }
 
 .wc-has-photo {
-  padding: 1px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
   background: #fff;
   box-shadow: 0 0 0 1px var(--wc-border);
 }
 
 .wc-open {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-weight: 700;
   color: var(--wc-accent);
 }
@@ -1536,13 +1557,11 @@ textarea {
   background: linear-gradient(180deg, #fbfefb 0%, #eef8f1 100%);
 }
 
-.wc-botanical .wc-body::after {
-  content: '🌿';
+.wc-botanical-mark {
   position: absolute;
   right: 12px;
-  top: 8px;
-  font-size: 2rem;
-  opacity: 0.22;
+  top: 10px;
+  opacity: 0.24;
   pointer-events: none;
 }
 
@@ -1589,6 +1608,12 @@ textarea {
 .empty-body p {
   margin: 0;
   color: var(--ink2);
+}
+
+.empty-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* =========================================================
@@ -1654,6 +1679,8 @@ textarea {
   z-index: 5;
   width: 34px;
   height: 34px;
+  display: grid;
+  place-items: center;
   border: none;
   background: var(--pink);
   color: #fff;
@@ -1784,6 +1811,9 @@ textarea {
 }
 
 .likes-chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   margin: 2px;
   padding: 5px 12px;
   background: var(--mint-l);
@@ -1869,14 +1899,23 @@ textarea {
 }
 
 /* =========================================================
-   14. Footer
+   14. Footer (แถบพื้นหลังไล่โทนสีจางๆ แบบละมุน แยกจากพื้นหลังหลัก)
    ========================================================= */
 .px-footer {
   position: relative;
   z-index: 2;
-  margin-top: 30px;
-  padding: 44px 20px 30px;
-  background: repeating-linear-gradient(90deg, #f5a3c3 0 8px, transparent 8px 16px) top / 100% 4px no-repeat;
+  margin-top: 42px;
+  padding: 40px 20px 104px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 250, 253, 0.72) 0%,
+    rgba(255, 232, 242, 0.92) 48%,
+    rgba(244, 226, 248, 0.96) 100%
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(224, 87, 140, 0.18);
+  box-shadow: 0 -6px 24px rgba(224, 87, 140, 0.06);
 }
 
 .px-footer-inner {
@@ -1994,6 +2033,9 @@ textarea {
   --sh: transparent;
   position: absolute;
   bottom: 56px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 4px 10px;
   background: #fff;
   color: var(--line);
@@ -2181,13 +2223,18 @@ textarea {
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: grid;
+  place-items: center;
   border: none;
   background: none;
-  font-size: 1.05rem;
+  color: var(--ink2);
   cursor: pointer;
 }
 
 .admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--pink-d);
@@ -2200,6 +2247,9 @@ textarea {
 
 .admin-db-pill {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 5px 12px;
   background: var(--mint-l);
   color: #3c6b50;
@@ -2227,6 +2277,9 @@ textarea {
 }
 
 .admin-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 9px 14px;
   background: var(--mint-l);
   color: #28613e;
@@ -2267,9 +2320,15 @@ textarea {
   color: var(--ink2);
 }
 
+.cfg-status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .bunny-mode-row .px-tab {
   width: calc(100% - 9px);
-  text-align: center;
+  justify-content: center;
 }
 
 .cfg-mini-label {
@@ -2290,6 +2349,10 @@ textarea {
   --b: 2px;
   --ln: #dcb6c7;
   --sh: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   margin: 2px;
   padding: 8px 4px;
   border: none;
@@ -2381,6 +2444,9 @@ textarea {
   --b: 3px;
   --ln: #dcb6c7;
   --sh: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 3px 6px 6px 3px;
   padding: 8px 14px;
   border: none;
@@ -2392,8 +2458,12 @@ textarea {
   transition: background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
+.px-tab em {
+  font-style: normal;
+}
+
 .px-tab span {
-  margin-left: 4px;
+  margin-left: 2px;
   padding: 1px 8px;
   background: #ffe6ef;
   font-size: 0.76rem;
@@ -2410,8 +2480,23 @@ textarea {
   background: rgba(255, 255, 255, 0.28);
 }
 
-.admin-search {
+.admin-search-wrap {
+  position: relative;
+  width: 100%;
   max-width: 300px;
+}
+
+.admin-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink2);
+  pointer-events: none;
+}
+
+.admin-search {
+  padding-left: 38px;
 }
 
 .admin-card {
@@ -2430,6 +2515,10 @@ textarea {
   --b: 2px;
   --sh: transparent;
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   margin: 2px;
   padding: 8px;
   border: none;
@@ -2562,8 +2651,13 @@ textarea {
 }
 
 @media (max-width: 560px) {
-  .px-page {
-    padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  .admin-page {
+    padding-bottom: 52px;
+  }
+
+  .px-footer {
+    margin-top: 28px;
+    padding: 34px 16px calc(86px + env(safe-area-inset-bottom, 0px));
   }
 
   .px-main {
@@ -2781,7 +2875,7 @@ textarea {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .admin-search {
+  .admin-search-wrap {
     max-width: 100%;
   }
 }

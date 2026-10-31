@@ -1,7 +1,8 @@
 import { resolveCardTheme } from '../data/roseData';
+import { PixelIcon } from './PixelSprites';
 
 // ==========================================
-// การ์ดคำอวยพร 6 ดีไซน์ (กรอบพิกเซลมุมหยัก + ลวดลายเฉพาะของแต่ละแบบ)
+// การ์ดคำอวยพร 6 ดีไซน์ (กรอบพิกเซลมุมหยัก + ไอคอน SVG คมกริบ)
 // ==========================================
 export default function WishCardView({
   bg,
@@ -29,7 +30,7 @@ export default function WishCardView({
 
       <header className="wc-head">
         <span className="wc-icon" aria-hidden="true">
-          {theme.iconEmoji}
+          <PixelIcon name={theme.iconName || 'rose'} size={20} />
         </span>
         <div className="wc-titles">
           <strong>{letterNumber || 'Happy 19th Rose'}</strong>
@@ -54,6 +55,12 @@ export default function WishCardView({
       )}
 
       <div className="wc-body">
+        {v === 'botanical' && (
+          <span className="wc-botanical-mark" aria-hidden="true">
+            <PixelIcon name="leaf" size={32} />
+          </span>
+        )}
+
         {!compact && img && (
           <div className="wc-photo">
             <img src={img} alt="รูปที่แนบมากับการ์ด" />
@@ -63,7 +70,7 @@ export default function WishCardView({
         <div className="wc-msg-row">
           <p className={`wc-msg ${compact ? 'is-clamped' : ''}`}>
             {message ||
-              'เขียนคำอวยพรวันเกิดวัย 19 ปีถึงโรสตรงนี้ได้เลย... 🌹'}
+              'เขียนคำอวยพรวันเกิดวัย 19 ปีถึงโรสตรงนี้ได้เลย...'}
           </p>
           {compact && img && (
             <div className="wc-thumb">
@@ -73,14 +80,25 @@ export default function WishCardView({
         </div>
 
         <div className="wc-sign">
-          <span className="wc-to">To. Rose ♥</span>
+          <span className="wc-to">
+            <span>To. Rose</span>
+            <PixelIcon name="heart" size={13} />
+          </span>
           <span className="wc-from">จาก {name || 'แฟนคลับของโรส'}</span>
         </div>
 
         {showFooterHint && (
           <div className="wc-hint">
-            {img && <span className="wc-has-photo">📷 มีรูปแนบ</span>}
-            <span className="wc-open">กดเพื่ออ่าน ▸</span>
+            {img && (
+              <span className="wc-has-photo">
+                <PixelIcon name="camera" size={13} />
+                <span>มีรูปแนบ</span>
+              </span>
+            )}
+            <span className="wc-open">
+              <span>กดเพื่ออ่าน</span>
+              <PixelIcon name="chevron-right" size={13} />
+            </span>
           </div>
         )}
       </div>

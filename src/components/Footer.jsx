@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { ROSE_PROFILE } from '../data/roseData';
 import { PixelIcon } from './PixelSprites';
 
@@ -23,10 +22,7 @@ export default function Footer() {
           ))}
         </div>
         <p className="footer-credit">
-          Made with ♥ by fans · Unofficial fan project ·{' '}
-          <Link to="/admin" className="footer-admin">
-            Admin
-          </Link>
+          Made by ROLLZYBUNNY · Special Project For Rose BNK48 Birthday
         </p>
       </div>
     </footer>

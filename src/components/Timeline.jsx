@@ -63,7 +63,10 @@ function MemoryCard({ ev, index }) {
 
         <h3 className="tl-title">{ev.title}</h3>
         <p className="tl-body">{ev.body}</p>
-        <span className="tl-note">♡ {ev.polaroidNote}</span>
+        <span className="tl-note">
+          <PixelIcon name="heart" size={14} />
+          <span>{ev.polaroidNote}</span>
+        </span>
       </PixelFrame>
     </ScrollReveal>
   );

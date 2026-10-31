@@ -137,7 +137,11 @@ export default function Hero({ siteConfig }) {
                   onClick={toggleSound}
                   title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
                 >
-                  {isMuted ? '🔇 เปิดเสียง' : '🔊 ปิดเสียง'}
+                  <PixelIcon
+                    name={isMuted ? 'volume-off' : 'volume-on'}
+                    size={15}
+                  />
+                  <span>{isMuted ? 'เปิดเสียง' : 'ปิดเสียง'}</span>
                 </button>
               </>
             ) : (
@@ -163,7 +167,7 @@ export default function Hero({ siteConfig }) {
               <PixelIcon name="cake" size={40} />
               <div>
                 <strong>วันนี้วันเกิดโรส!</strong>
-                <span>HAPPY ROSE DAY ♥ 01.11.2026</span>
+                <span>HAPPY ROSE DAY · 01.11.2026</span>
               </div>
             </div>
           ) : (
@@ -217,7 +221,8 @@ export default function Hero({ siteConfig }) {
               className="px-btn"
               onClick={() => scrollTo('journey')}
             >
-              ดูเส้นทางของโรส ↓
+              <span>ดูเส้นทางของโรส</span>
+              <PixelIcon name="arrow-down" size={16} />
             </button>
           </div>
         </PixelFrame>

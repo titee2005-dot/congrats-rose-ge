@@ -88,7 +88,7 @@ export default function Admin({
               onClick={() => setShowPassword((prev) => !prev)}
               title={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
             >
-              {showPassword ? '🙈' : '👁'}
+              <PixelIcon name={showPassword ? 'eye-off' : 'eye'} size={18} />
             </button>
           </div>
 
@@ -101,7 +101,8 @@ export default function Admin({
           </button>
 
           <Link to="/" className="admin-back-link">
-            ← กลับหน้าแรก
+            <PixelIcon name="arrow-left" size={14} />
+            <span>กลับหน้าแรก</span>
           </Link>
         </PixelFrame>
       </div>
@@ -126,7 +127,7 @@ export default function Admin({
     const ok = await updateSiteConfig({ bunny_mode: 'auto' });
     setIsSavingConfig(false);
     if (ok) {
-      showSavedNotice(`ตั้งเป็นโหมดอัตโนมัติแล้ว (ขณะนี้ ${activeBunnyCount === autoCount ? autoCount : autoCount} ตัว)`);
+      showSavedNotice(`ตั้งเป็นโหมดอัตโนมัติแล้ว (ขณะนี้ ${autoCount} ตัว)`);
     }
   };
 
@@ -206,9 +207,9 @@ export default function Admin({
   };
 
   const TABS = [
-    { key: 'pending', label: '⏳ รออนุมัติ', count: pendingList.length },
-    { key: 'approved', label: '✔ อนุมัติแล้ว', count: approvedList.length },
-    { key: 'hidden', label: '🙈 ซ่อนไว้', count: hiddenList.length },
+    { key: 'pending', label: 'รออนุมัติ', icon: 'clock', count: pendingList.length },
+    { key: 'approved', label: 'อนุมัติแล้ว', icon: 'check', count: approvedList.length },
+    { key: 'hidden', label: 'ซ่อนไว้', icon: 'eye-off', count: hiddenList.length },
   ];
 
   return (
@@ -226,9 +227,15 @@ export default function Admin({
           </Link>
 
           <span className="admin-db-pill">
-            {isSupabaseConfigured
-              ? '🟢 เชื่อมต่อ Supabase แล้ว'
-              : '🌸 โหมดบันทึกในเครื่อง'}
+            <PixelIcon
+              name={isSupabaseConfigured ? 'status-dot' : 'rose'}
+              size={14}
+            />
+            <span>
+              {isSupabaseConfigured
+                ? 'เชื่อมต่อ Supabase แล้ว'
+                : 'โหมดบันทึกในเครื่อง'}
+            </span>
           </span>
 
           <div className="admin-head-actions">
@@ -251,7 +258,12 @@ export default function Admin({
           className="admin-settings-frame"
           bodyClassName="admin-settings-body"
         >
-          {configToast && <div className="admin-toast">✨ {configToast}</div>}
+          {configToast && (
+            <div className="admin-toast">
+              <PixelIcon name="star" size={16} />
+              <span>{configToast}</span>
+            </div>
+          )}
 
           <div className="admin-settings-grid">
             {/* การ์ดตั้งค่าจำนวนกระต่าย */}
@@ -274,7 +286,10 @@ export default function Admin({
                   className={`px-tab ${bunnyMode === 'auto' ? 'is-active' : ''}`}
                   onClick={handleSetAutoMode}
                 >
-                  🪄 อัตโนมัติตามคำอวยพร ({approvedList.length} ใบ → {autoCount} ตัว)
+                  <PixelIcon name="wand" size={15} />
+                  <em>
+                    อัตโนมัติตามคำอวยพร ({approvedList.length} ใบ · {autoCount} ตัว)
+                  </em>
                 </button>
               </div>
 
@@ -291,7 +306,14 @@ export default function Admin({
                         className={`bunny-num-btn ${selected ? 'is-selected' : ''}`}
                         onClick={() => handleSetManualCount(num)}
                       >
-                        {num === 0 ? 'ปิด (0)' : `🐰 ${num}`}
+                        {num === 0 ? (
+                          'ปิด (0)'
+                        ) : (
+                          <>
+                            <PixelIcon name="bunny" size={15} />
+                            <span>{num}</span>
+                          </>
+                        )}
                       </button>
                     );
                   })}
@@ -309,19 +331,31 @@ export default function Admin({
                 <PixelIcon name="cake" size={34} />
                 <div>
                   <h3>วิดีโอช่อง Rose Birthday Party</h3>
-                  <p>
-                    {siteConfig?.party_video_url
-                      ? '🎬 กำลังแสดงวิดีโออยู่ในหน้าแรก'
-                      : '🖼️ กำลังแสดงภาพปกเริ่มต้น (ยังไม่ได้ใส่วิดีโอ)'}
+                  <p className="cfg-status-line">
+                    <PixelIcon
+                      name={siteConfig?.party_video_url ? 'video' : 'image'}
+                      size={15}
+                    />
+                    <span>
+                      {siteConfig?.party_video_url
+                        ? 'กำลังแสดงวิดีโออยู่ในหน้าแรก'
+                        : 'กำลังแสดงภาพปกเริ่มต้น (ยังไม่ได้ใส่วิดีโอ)'}
+                    </span>
                   </p>
                 </div>
               </div>
 
               <div className="video-cfg-controls">
                 <label className="px-btn sm video-upload-btn">
-                  {isUploadingVideo
-                    ? '⏳ กำลังอัปโหลดวิดีโอ...'
-                    : '📤 อัปโหลดไฟล์วิดีโอ (.mp4 / .webm)'}
+                  <PixelIcon
+                    name={isUploadingVideo ? 'clock' : 'upload'}
+                    size={16}
+                  />
+                  <span>
+                    {isUploadingVideo
+                      ? 'กำลังอัปโหลดวิดีโอ...'
+                      : 'อัปโหลดไฟล์วิดีโอ (.mp4 / .webm)'}
+                  </span>
                   <input
                     type="file"
                     hidden
@@ -348,7 +382,8 @@ export default function Admin({
                     disabled={isSavingConfig || isUploadingVideo}
                     onClick={handleSaveVideoUrl}
                   >
-                    ✔ บันทึกวิดีโอ
+                    <PixelIcon name="check" size={15} />
+                    <span>บันทึกวิดีโอ</span>
                   </button>
                   {siteConfig?.party_video_url && (
                     <button
@@ -365,7 +400,8 @@ export default function Admin({
                         }
                       }}
                     >
-                      ✕ นำวิดีโอออก
+                      <PixelIcon name="close" size={14} />
+                      <span>นำวิดีโอออก</span>
                     </button>
                   )}
                 </div>
@@ -391,7 +427,8 @@ export default function Admin({
               className="px-btn primary sm"
               onClick={handleApproveAllPending}
             >
-              ✔ อนุมัติทั้งหมด ({pendingList.length})
+              <PixelIcon name="check" size={15} />
+              <span>อนุมัติทั้งหมด ({pendingList.length})</span>
             </button>
           )}
         </div>
@@ -405,17 +442,22 @@ export default function Admin({
                 className={`px-tab ${tab === t.key ? 'is-active' : ''}`}
                 onClick={() => setTab(t.key)}
               >
-                {t.label} <span>{t.count}</span>
+                <PixelIcon name={t.icon} size={14} />
+                <em>{t.label}</em>
+                <span>{t.count}</span>
               </button>
             ))}
           </div>
-          <input
-            type="text"
-            className="px-input admin-search"
-            placeholder="🔍 ค้นหาชื่อหรือข้อความ..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="admin-search-wrap">
+            <PixelIcon name="search" size={16} className="admin-search-icon" />
+            <input
+              type="text"
+              className="px-input admin-search"
+              placeholder="ค้นหาชื่อหรือข้อความ..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
 
         {filteredWishes.length === 0 ? (
@@ -441,7 +483,8 @@ export default function Admin({
                       className="act-btn approve"
                       onClick={() => updateWishStatus(w.id, 'approved')}
                     >
-                      ✔ อนุมัติ
+                      <PixelIcon name="check" size={14} />
+                      <span>อนุมัติ</span>
                     </button>
                   )}
                   {tab !== 'hidden' && (

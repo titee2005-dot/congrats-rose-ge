@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import ScrollReveal from './ScrollReveal';
 import WishCardView from './WishCardView';
 import PixelFrame, { SectionHeading } from './PixelFrame';
-import { PixelBunnySprite } from './PixelSprites';
+import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
 export default function WishWall({ wishes, isLoading }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -40,7 +40,10 @@ export default function WishWall({ wishes, isLoading }) {
                 {isLoading ? 'กำลังโหลดการ์ด...' : 'ยังไม่มีการ์ดบนกำแพงตอนนี้'}
               </h3>
               {!isLoading && (
-                <p>มาเป็นคนแรกที่เขียนการ์ดอวยพรให้โรสกันนะ ♥</p>
+                <p className="empty-sub">
+                  <span>มาเป็นคนแรกที่เขียนการ์ดอวยพรให้โรสกันนะ</span>
+                  <PixelIcon name="heart" size={14} />
+                </p>
               )}
             </PixelFrame>
           </ScrollReveal>
@@ -90,9 +93,15 @@ export default function WishWall({ wishes, isLoading }) {
                   className="px-btn"
                   onClick={() => setShowAll((prev) => !prev)}
                 >
-                  {showAll
-                    ? 'ย่อกลับ ▴'
-                    : `ดูการ์ดทั้งหมด (${approvedWishes.length} ใบ) ▾`}
+                  <span>
+                    {showAll
+                      ? 'ย่อกลับ'
+                      : `ดูการ์ดทั้งหมด (${approvedWishes.length} ใบ)`}
+                  </span>
+                  <PixelIcon
+                    name={showAll ? 'chevron-up' : 'chevron-down'}
+                    size={15}
+                  />
                 </button>
               </div>
             )}
@@ -109,7 +118,7 @@ export default function WishWall({ wishes, isLoading }) {
               onClick={() => setSelectedIndex(null)}
               aria-label="ปิด"
             >
-              ✕
+              <PixelIcon name="close" size={16} />
             </button>
             <WishCardView
               bg={activeWish.bg}

@@ -95,7 +95,7 @@ export default function Header({ wishCount = 0 }) {
           aria-label="เปิดเมนู"
           onClick={() => setMenuOpen((prev) => !prev)}
         >
-          {menuOpen ? '✕' : '☰'}
+          <PixelIcon name={menuOpen ? 'close' : 'menu'} size={19} />
         </button>
       </header>
     </div>
