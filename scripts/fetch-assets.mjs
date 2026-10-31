@@ -6,8 +6,8 @@ const BASE_URL =
   'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-birthday-assets';
 
 const SOURCE_BUNDLE = {
-  remote: 'source-bundle-v7.json',
-  sha256: '8b9672f213437874e89b4936f8a9e2ccd2884a63061fb6e81c757e9e0381c569',
+  remote: 'source-bundle-v8.json',
+  sha256: '2eb55a00cbca028b4caea48b2b9bd35b64078c8205131f9b4e288e8873be569e',
 };
 
 const ASSETS = [

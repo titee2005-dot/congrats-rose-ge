@@ -14,149 +14,270 @@ export default function MusicPlayer({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [userHasInteracted, setUserHasInteracted] = useState(false);
-  const [userManuallyPaused, setUserManuallyPaused] = useState(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
-  const [ytReady, setYtReady] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [ytApiReady, setYtApiReady] = useState(false);
 
   const currentTrack = playlist[currentIndex] || playlist[0];
-  const playerRef = useRef(null);
-  const audioRef = useRef(null);
-  const hasTriggeredInitialPlay = useRef(false);
 
-  // =========================
-  // โหลด YouTube IFrame API
-  // =========================
+  const wrapRef = useRef(null);
+  const ytHostRef = useRef(null);
+  const playerRef = useRef(null);
+  const playerReadyRef = useRef(false);
+  const audioRef = useRef(null);
+  const wantPlayRef = useRef(false);
+  const userPausedRef = useRef(false);
+  const hasAutoStartedRef = useRef(false);
+  const pendingGesturePlayRef = useRef(false);
+  const loadedIndexRef = useRef(0);
+  const errorCountRef = useRef(0);
+  const errorTimerRef = useRef(null);
+  const fadeTimerRef = useRef(null);
+  const lastAdvanceAtRef = useRef(0);
+  const playlistLenRef = useRef(playlist.length);
+
+  useEffect(() => {
+    playlistLenRef.current = playlist.length;
+  }, [playlist.length]);
+
+  // โหลด YouTube IFrame API ครั้งเดียว
   useEffect(() => {
     if (window.YT && window.YT.Player) {
-      setYtReady(true);
+      setYtApiReady(true);
       return;
     }
 
-    const prevReady = window.onYouTubeIframeAPIReady;
+    const prev = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
-      if (prevReady) prevReady();
-      setYtReady(true);
+      if (typeof prev === 'function') prev();
+      setYtApiReady(true);
     };
 
     if (!document.getElementById('yt-iframe-api-script')) {
       const tag = document.createElement('script');
       tag.id = 'yt-iframe-api-script';
       tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+      document.head.appendChild(tag);
     }
   }, []);
 
-  // ฟังก์ชันเปลี่ยนไปเพลงถัดไป (วนลูปเมื่อครบ)
-  const handleNextTrack = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % playlist.length);
-  }, [playlist.length]);
-
-  const handlePrevTrack = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
-  }, [playlist.length]);
-
-  // =========================
-  // กำหนดการทำงานของ YouTube Player
-  // =========================
+  // ปิดเมนูเลือกเพลงเมื่อคลิกข้างนอกหรือกด Esc
   useEffect(() => {
-    if (!ytReady || currentTrack.audioUrl) return;
-
-    const containerId = 'rose-bgm-yt-player';
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!playerRef.current) {
-      playerRef.current = new window.YT.Player(containerId, {
-        height: '1',
-        width: '1',
-        videoId: currentTrack.youtubeId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          rel: 0,
-        },
-        events: {
-          onReady: (event) => {
-            if (isMuted) event.target.mute();
-            if (isPlaying) {
-              event.target.playVideo();
-            }
-          },
-          onStateChange: (event) => {
-            // YT.PlayerState.ENDED = 0
-            if (event.data === 0) {
-              handleNextTrack();
-            } else if (event.data === 1) {
-              // PLAYING
-              setIsPlaying(true);
-              setAutoplayBlocked(false);
-            } else if (event.data === 2) {
-              // PAUSED
-              setIsPlaying(false);
-            }
-          },
-          onError: (err) => {
-            console.warn('BGM YouTube Player error:', err);
-            // ข้ามไปเพลงถัดไปหากคลิปมีปัญหา
-            handleNextTrack();
-          },
-        },
-      });
-    } else {
-      // โหลดเพลงใหม่เมื่อ currentIndex เปลี่ยน
-      try {
-        if (playerRef.current.loadVideoById) {
-          playerRef.current.loadVideoById(currentTrack.youtubeId);
-          if (isPlaying) {
-            playerRef.current.playVideo();
-          }
-        }
-      } catch (e) {
-        console.warn('Failed to switch video:', e);
+    if (!isMenuOpen) return;
+    const handleOutside = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
       }
-    }
-  }, [ytReady, currentIndex, currentTrack.youtubeId, currentTrack.audioUrl, handleNextTrack]);
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setIsMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [isMenuOpen]);
 
-  // =========================
-  // ควบคุมการเล่น / หยุด
-  // =========================
-  const playTrack = useCallback(() => {
-    setUserManuallyPaused(false);
-    setAutoplayBlocked(false);
-
-    if (currentTrack.audioUrl && audioRef.current) {
-      audioRef.current
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setAutoplayBlocked(true));
+  // ค่อย ๆ เพิ่มระดับเสียงให้นุ่มนวลเวลาเพลงเว็บเริ่มขึ้น
+  const fadeInVolume = useCallback(() => {
+    if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+    const p = playerRef.current;
+    if (!p || typeof p.setVolume !== 'function') return;
+    let vol = 15;
+    try {
+      p.unMute?.();
+      p.setVolume(vol);
+    } catch {
       return;
     }
-
-    if (playerRef.current && playerRef.current.playVideo) {
+    fadeTimerRef.current = setInterval(() => {
+      vol = Math.min(75, vol + 12);
       try {
-        playerRef.current.playVideo();
-        setIsPlaying(true);
+        p.setVolume(vol);
       } catch {
-        setAutoplayBlocked(true);
+        clearInterval(fadeTimerRef.current);
       }
-    } else {
-      setIsPlaying(true);
-    }
-  }, [currentTrack.audioUrl]);
+      if (vol >= 75) clearInterval(fadeTimerRef.current);
+    }, 160);
+  }, []);
 
-  const pauseTrack = useCallback(() => {
-    if (currentTrack.audioUrl && audioRef.current) {
+  const advanceNext = useCallback(() => {
+    const now = Date.now();
+    if (now - lastAdvanceAtRef.current < 800) return;
+    lastAdvanceAtRef.current = now;
+    setCurrentIndex((prev) => (prev + 1) % Math.max(1, playlistLenRef.current));
+  }, []);
+
+  // สร้าง YouTube Player ครั้งเดียว (ขนาด 200x200 ตามข้อกำหนดของ YouTube API)
+  useEffect(() => {
+    if (!ytApiReady || !ytHostRef.current) return;
+
+    let cancelled = false;
+    const host = ytHostRef.current;
+    host.innerHTML = '';
+    const mountEl = document.createElement('div');
+    host.appendChild(mountEl);
+
+    const firstVideoId = playlist[0]?.youtubeId || '';
+    loadedIndexRef.current = 0;
+    playerReadyRef.current = false;
+
+    const instance = new window.YT.Player(mountEl, {
+      width: '200',
+      height: '200',
+      videoId: firstVideoId,
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        playsinline: 1,
+        rel: 0,
+        origin: window.location.origin,
+      },
+      events: {
+        onReady: (e) => {
+          if (cancelled) return;
+          playerReadyRef.current = true;
+          try {
+            e.target.setVolume(75);
+          } catch {
+            // ignore
+          }
+          if (wantPlayRef.current) {
+            try {
+              e.target.playVideo();
+              fadeInVolume();
+            } catch {
+              pendingGesturePlayRef.current = true;
+            }
+          }
+        },
+        onStateChange: (e) => {
+          if (cancelled) return;
+          // 1 = PLAYING, 2 = PAUSED, 0 = ENDED
+          if (e.data === 1) {
+            errorCountRef.current = 0;
+            pendingGesturePlayRef.current = false;
+            setIsPlaying(true);
+          } else if (e.data === 2) {
+            setIsPlaying(false);
+          } else if (e.data === 0) {
+            wantPlayRef.current = true;
+            advanceNext();
+          }
+        },
+        onError: () => {
+          if (cancelled) return;
+          // ป้องกันการเลื่อนเพลงรัว ๆ: ถ้าทุกเพลงติดข้อจำกัดเบราว์เซอร์/เน็ต ให้หยุดทันที
+          errorCountRef.current += 1;
+          if (errorCountRef.current >= playlistLenRef.current) {
+            wantPlayRef.current = false;
+            setIsPlaying(false);
+            return;
+          }
+          if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+          errorTimerRef.current = setTimeout(() => {
+            if (!cancelled) advanceNext();
+          }, 1200);
+        },
+      },
+    });
+
+    playerRef.current = instance;
+
+    return () => {
+      cancelled = true;
+      playerReadyRef.current = false;
+      playerRef.current = null;
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+      try {
+        instance.destroy?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, [ytApiReady, playlist, advanceNext, fadeInVolume]);
+
+  // สลับเพลงเมื่อ currentIndex เปลี่ยน
+  useEffect(() => {
+    if (currentTrack?.audioUrl) return;
+    if (!playerReadyRef.current || !playerRef.current) return;
+    if (loadedIndexRef.current === currentIndex) return;
+
+    loadedIndexRef.current = currentIndex;
+    try {
+      if (wantPlayRef.current) {
+        playerRef.current.loadVideoById(currentTrack.youtubeId);
+      } else {
+        playerRef.current.cueVideoById(currentTrack.youtubeId);
+      }
+    } catch {
+      // ignore
+    }
+  }, [currentIndex, currentTrack]);
+
+  const startPlayback = useCallback(
+    (withFade = false) => {
+      wantPlayRef.current = true;
+
+      if (currentTrack?.audioUrl && audioRef.current) {
+        audioRef.current.volume = 0.75;
+        audioRef.current
+          .play()
+          .then(() => {
+            pendingGesturePlayRef.current = false;
+            setIsPlaying(true);
+          })
+          .catch(() => {
+            pendingGesturePlayRef.current = true;
+          });
+        return;
+      }
+
+      if (playerReadyRef.current && playerRef.current?.playVideo) {
+        try {
+          if (loadedIndexRef.current !== currentIndex) {
+            loadedIndexRef.current = currentIndex;
+            playerRef.current.loadVideoById(currentTrack.youtubeId);
+          } else {
+            playerRef.current.playVideo();
+          }
+          if (withFade) fadeInVolume();
+          // หากเบราว์เซอร์บล็อก Autoplay ก่อนแตะจอ จะรอเล่นทันทีที่ผู้ใช้แตะจอครั้งแรก
+          setTimeout(() => {
+            try {
+              const st = playerRef.current?.getPlayerState?.();
+              if (wantPlayRef.current && st !== 1 && st !== 3) {
+                pendingGesturePlayRef.current = true;
+              }
+            } catch {
+              // ignore
+            }
+          }, 900);
+        } catch {
+          pendingGesturePlayRef.current = true;
+        }
+      } else {
+        pendingGesturePlayRef.current = true;
+      }
+    },
+    [currentIndex, currentTrack, fadeInVolume]
+  );
+
+  const stopPlayback = useCallback(() => {
+    wantPlayRef.current = false;
+    pendingGesturePlayRef.current = false;
+    if (fadeTimerRef.current) clearInterval(fadeTimerRef.current);
+
+    if (audioRef.current) {
       audioRef.current.pause();
     }
-    if (playerRef.current && playerRef.current.pauseVideo) {
+    if (playerReadyRef.current && playerRef.current?.pauseVideo) {
       try {
         playerRef.current.pauseVideo();
       } catch {
@@ -164,309 +285,184 @@ export default function MusicPlayer({
       }
     }
     setIsPlaying(false);
-  }, [currentTrack.audioUrl]);
+  }, []);
 
-  const togglePlay = () => {
-    setUserHasInteracted(true);
-    if (isPlaying) {
-      setUserManuallyPaused(true);
-      pauseTrack();
-    } else {
-      playTrack();
-    }
-  };
-
-  const selectTrack = (index) => {
-    setUserHasInteracted(true);
-    setUserManuallyPaused(false);
-    setCurrentIndex(index);
-    setTimeout(() => {
-      playTrack();
-    }, 60);
-  };
-
-  const toggleMute = () => {
-    setIsMuted((prev) => {
-      const next = !prev;
-      if (playerRef.current) {
-        if (next && playerRef.current.mute) playerRef.current.mute();
-        else if (!next && playerRef.current.unMute) playerRef.current.unMute();
-      }
-      if (audioRef.current) {
-        audioRef.current.muted = next;
-      }
-      return next;
-    });
-  };
-
-  // =========================
-  // เงื่อนไข: วิดีโอหยุดหลังจากเลื่อนผ่านส่วนแรก แล้วเพลงเว็บค่อยขึ้น
-  // =========================
+  // เมื่อเลื่อนผ่านส่วนแรก (Hero) ให้เพลงเว็บค่อย ๆ ขึ้นอัตโนมัติ
   useEffect(() => {
-    if (isScrolledPastHero && !hasTriggeredInitialPlay.current && !userManuallyPaused) {
-      hasTriggeredInitialPlay.current = true;
-      // เริ่มเล่นเพลงเว็บอัตโนมัติ
-      playTrack();
+    if (
+      isScrolledPastHero &&
+      !hasAutoStartedRef.current &&
+      !userPausedRef.current
+    ) {
+      hasAutoStartedRef.current = true;
+      errorCountRef.current = 0;
+      startPlayback(true);
     }
-  }, [isScrolledPastHero, userManuallyPaused, playTrack]);
+  }, [isScrolledPastHero, startPlayback]);
 
-  // หากวิดีโอส่วนบนเปิดเสียงเล่น ให้หยุดเพลงเว็บชั่วคราวเพื่อไม่ให้เสียงตีกัน
+  // หากผู้ใช้แตะจอหลังเบราว์เซอร์บล็อก Autoplay ให้เริ่มเล่นทันที
+  useEffect(() => {
+    const onGesture = () => {
+      if (pendingGesturePlayRef.current && !userPausedRef.current) {
+        pendingGesturePlayRef.current = false;
+        errorCountRef.current = 0;
+        startPlayback(true);
+      }
+    };
+    window.addEventListener('pointerdown', onGesture, { passive: true });
+    return () => window.removeEventListener('pointerdown', onGesture);
+  }, [startPlayback]);
+
+  // ถ้าเปิดเสียงวิดีโอในส่วนแรก ให้พักเพลงเว็บชั่วคราวไม่ให้เสียงชนกัน
   useEffect(() => {
     if (heroVideoActive && isPlaying) {
-      pauseTrack();
+      stopPlayback();
     }
-  }, [heroVideoActive, isPlaying, pauseTrack]);
+  }, [heroVideoActive, isPlaying, stopPlayback]);
 
-  // ตรวจจับการคลิกครั้งแรกของผู้ใช้เพื่อปลดล็อก Autoplay Audio Policy
-  useEffect(() => {
-    const handleFirstGesture = () => {
-      setUserHasInteracted(true);
-      window.removeEventListener('pointerdown', handleFirstGesture);
-      window.removeEventListener('keydown', handleFirstGesture);
-    };
-    window.addEventListener('pointerdown', handleFirstGesture, { passive: true });
-    window.addEventListener('keydown', handleFirstGesture, { passive: true });
-    return () => {
-      window.removeEventListener('pointerdown', handleFirstGesture);
-      window.removeEventListener('keydown', handleFirstGesture);
-    };
-  }, []);
+  const handleTogglePlay = () => {
+    errorCountRef.current = 0;
+    if (isPlaying) {
+      userPausedRef.current = true;
+      stopPlayback();
+    } else {
+      userPausedRef.current = false;
+      hasAutoStartedRef.current = true;
+      startPlayback(false);
+    }
+  };
+
+  const handleNextClick = () => {
+    errorCountRef.current = 0;
+    userPausedRef.current = false;
+    hasAutoStartedRef.current = true;
+    wantPlayRef.current = true;
+    lastAdvanceAtRef.current = Date.now();
+    const nextIdx = (currentIndex + 1) % playlist.length;
+    setCurrentIndex(nextIdx);
+    if (playerReadyRef.current && playerRef.current?.loadVideoById) {
+      loadedIndexRef.current = nextIdx;
+      try {
+        playerRef.current.loadVideoById(playlist[nextIdx].youtubeId);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  const handleSelectSong = (idx) => {
+    errorCountRef.current = 0;
+    userPausedRef.current = false;
+    hasAutoStartedRef.current = true;
+    wantPlayRef.current = true;
+    lastAdvanceAtRef.current = Date.now();
+    setCurrentIndex(idx);
+    setIsMenuOpen(false);
+
+    if (playerReadyRef.current && playerRef.current?.loadVideoById) {
+      loadedIndexRef.current = idx;
+      try {
+        playerRef.current.loadVideoById(playlist[idx].youtubeId);
+      } catch {
+        // ignore
+      }
+    }
+  };
 
   return (
     <>
-      {/* ภาชนะสำหรับซ่อน YouTube Player Iframe (เล่นเฉพาะเสียง) */}
-      <div
-        style={{
-          position: 'fixed',
-          top: -9999,
-          left: -9999,
-          width: 1,
-          height: 1,
-          opacity: 0.001,
-          pointerEvents: 'none',
-          visibility: 'hidden',
-        }}
-        aria-hidden="true"
-      >
-        <div id="rose-bgm-yt-player" />
-      </div>
+      {/* ตัวเล่นเสียง YouTube ซ่อนโปร่งใสขนาดมาตรฐาน API (ห้ามใช้ visibility: hidden) */}
+      <div ref={ytHostRef} className="px-bgm-yt-host" aria-hidden="true" />
 
-      {/* HTML5 Audio Fallback */}
-      {currentTrack.audioUrl && (
+      {currentTrack?.audioUrl && (
         <audio
           ref={audioRef}
           src={currentTrack.audioUrl}
-          onEnded={handleNextTrack}
-          muted={isMuted}
+          onEnded={() => {
+            wantPlayRef.current = true;
+            advanceNext();
+          }}
           playsInline
         />
       )}
 
-      {/* แถบเครื่องเล่นเพลงพิกเซล ลอยที่มุมซ้ายล่าง */}
-      <div className={`px-bgm-bar ${isPlaying ? 'is-playing' : ''}`}>
+      {/* แถบเครื่องเล่นเพลงขนาดมินิ มุมซ้ายล่าง (เฉพาะชื่อเพลง ไม่มีคำอธิบาย) */}
+      <div
+        ref={wrapRef}
+        className={`px-bgm-mini ${isPlaying ? 'is-playing' : ''}`}
+      >
+        {isMenuOpen && (
+          <div
+            className="px-bgm-menu"
+            role="listbox"
+            aria-label="เลือกเพลง"
+          >
+            {playlist.map((track, idx) => {
+              const active = idx === currentIndex;
+              return (
+                <button
+                  key={track.id || idx}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  className={`px-bgm-item ${active ? 'is-active' : ''}`}
+                  onClick={() => handleSelectSong(idx)}
+                >
+                  <span className="px-bgm-item-mark" aria-hidden="true">
+                    {active && isPlaying ? (
+                      <span className="px-bgm-bars">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                    ) : (
+                      <span>{idx + 1}.</span>
+                    )}
+                  </span>
+                  <span className="px-bgm-item-name">{track.title}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <button
           type="button"
-          className="px-bgm-disc-btn"
-          onClick={() => setIsDrawerOpen((v) => !v)}
-          title="เปิดเพลย์ลิสต์เพลง"
-          aria-label="เปิดเพลย์ลิสต์เพลง"
+          className="px-bgm-song-btn"
+          onClick={() => setIsMenuOpen((v) => !v)}
+          title="เลือกเพลง"
+          aria-expanded={isMenuOpen}
         >
-          <span className={`px-bgm-disc ${isPlaying ? 'spin' : ''}`}>
-            <PixelIcon name="disc" size={24} />
+          <span className={`px-bgm-disc-ico ${isPlaying ? 'spin' : ''}`}>
+            <PixelIcon name="disc" size={13} />
           </span>
-          {isPlaying && (
-            <span className="px-bgm-eq" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-          )}
+          <span className="px-bgm-song-name">{currentTrack.title}</span>
+          <PixelIcon
+            name={isMenuOpen ? 'chevron-down' : 'chevron-up'}
+            size={11}
+          />
         </button>
 
-        <div
-          className="px-bgm-info"
-          onClick={() => setIsDrawerOpen(true)}
-          title="คลิกเพื่อเลือกเพลง"
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && setIsDrawerOpen(true)}
+        <button
+          type="button"
+          className="px-bgm-icon-btn is-play"
+          onClick={handleTogglePlay}
+          title={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
+          aria-label={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
         >
-          <span className="px-bgm-tag">{currentTrack.tag || 'BGM'}</span>
-          <span className="px-bgm-title">{currentTrack.title}</span>
-        </div>
+          <PixelIcon name={isPlaying ? 'pause' : 'play'} size={11} />
+        </button>
 
-        <div className="px-bgm-controls">
-          <button
-            type="button"
-            className="px-bgm-btn"
-            onClick={handlePrevTrack}
-            title="เพลงก่อนหน้า"
-            aria-label="เพลงก่อนหน้า"
-          >
-            <PixelIcon name="prev" size={14} />
-          </button>
-
-          <button
-            type="button"
-            className="px-bgm-btn is-main"
-            onClick={togglePlay}
-            title={isPlaying ? 'หยุดเพลงชั่วคราว' : 'เล่นเพลง'}
-            aria-label={isPlaying ? 'หยุดเพลงชั่วคราว' : 'เล่นเพลง'}
-          >
-            <PixelIcon name={isPlaying ? 'pause' : 'play'} size={15} />
-          </button>
-
-          <button
-            type="button"
-            className="px-bgm-btn"
-            onClick={handleNextTrack}
-            title="เพลงถัดไป"
-            aria-label="เพลงถัดไป"
-          >
-            <PixelIcon name="next" size={14} />
-          </button>
-
-          <button
-            type="button"
-            className={`px-bgm-btn ${isDrawerOpen ? 'is-active' : ''}`}
-            onClick={() => setIsDrawerOpen((v) => !v)}
-            title="รายการเพลงทั้งหมด"
-            aria-label="รายการเพลงทั้งหมด"
-          >
-            <PixelIcon name="playlist" size={15} />
-            <span className="px-bgm-badge">{currentIndex + 1}/{playlist.length}</span>
-          </button>
-        </div>
-
-        {/* ป้ายแจ้งเตือนเมื่อเบราว์เซอร์บล็อก Autoplay */}
-        {autoplayBlocked && !isPlaying && (
-          <button
-            type="button"
-            className="px-bgm-prompt"
-            onClick={togglePlay}
-          >
-            <PixelIcon name="music" size={14} />
-            <span>คลิกเพื่อฟังเพลง Happy Birthday</span>
-          </button>
-        )}
+        <button
+          type="button"
+          className="px-bgm-icon-btn"
+          onClick={handleNextClick}
+          title="เพลงถัดไป"
+          aria-label="เพลงถัดไป"
+        >
+          <PixelIcon name="next" size={11} />
+        </button>
       </div>
-
-      {/* หน้าต่างเลือกเพลงแบบพิกเซล (Playlist Drawer / Modal) */}
-      {isDrawerOpen && (
-        <div
-          className="px-bgm-overlay"
-          onClick={() => setIsDrawerOpen(false)}
-        >
-          <div
-            className="px-bgm-drawer"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="เพลย์ลิสต์เพลงของโรส"
-          >
-            <div className="px-bgm-head">
-              <div className="px-bgm-head-title">
-                <PixelIcon name="disc" size={20} />
-                <strong>ROSE 19th PLAYLIST</strong>
-              </div>
-              <button
-                type="button"
-                className="px-modal-close"
-                onClick={() => setIsDrawerOpen(false)}
-                aria-label="ปิดเพลย์ลิสต์"
-              >
-                <PixelIcon name="close" size={16} />
-              </button>
-            </div>
-
-            <p className="px-bgm-sub">
-              เพลง Happy Birthday เป็นเพลงหลัก และเพลงอื่น ๆ ที่น้องโรสร่วมร้อง/เต้น (วนลูปอัตโนมัติ)
-            </p>
-
-            {/* การ์ดเพลงที่กำลังเล่นอยู่ */}
-            <div className="px-bgm-now-playing">
-              <div className={`px-bgm-now-art ${isPlaying ? 'spin' : ''}`}>
-                <PixelIcon name="disc" size={32} />
-              </div>
-              <div className="px-bgm-now-meta">
-                <span className="px-bgm-now-label">
-                  {isPlaying ? 'กำลังเล่น' : 'หยุดชั่วคราว'} • Track {currentIndex + 1}
-                </span>
-                <strong className="px-bgm-now-title">{currentTrack.title}</strong>
-                <span className="px-bgm-now-artist">{currentTrack.artist}</span>
-              </div>
-              <div className="px-bgm-now-actions">
-                <button
-                  type="button"
-                  className="px-btn primary sm"
-                  onClick={togglePlay}
-                >
-                  <PixelIcon name={isPlaying ? 'pause' : 'play'} size={15} />
-                  <span>{isPlaying ? 'หยุด' : 'เล่น'}</span>
-                </button>
-                <button
-                  type="button"
-                  className="px-btn sm"
-                  onClick={toggleMute}
-                  title={isMuted ? 'เปิดเสียง' : 'ปิดเสียง'}
-                >
-                  <PixelIcon name={isMuted ? 'volume-off' : 'volume-on'} size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* รายชื่อเพลงทั้งหมดในเพลย์ลิสต์ */}
-            <div className="px-bgm-tracklist">
-              {playlist.map((track, idx) => {
-                const isActive = idx === currentIndex;
-                return (
-                  <button
-                    key={track.id || idx}
-                    type="button"
-                    className={`px-bgm-track-item ${isActive ? 'is-active' : ''}`}
-                    onClick={() => selectTrack(idx)}
-                  >
-                    <span className="px-bgm-track-idx">
-                      {isActive && isPlaying ? (
-                        <span className="px-bgm-mini-eq">
-                          <i />
-                          <i />
-                          <i />
-                        </span>
-                      ) : (
-                        String(idx + 1).padStart(2, '0')
-                      )}
-                    </span>
-
-                    <div className="px-bgm-track-details">
-                      <div className="px-bgm-track-row1">
-                        <strong className="px-bgm-track-name">{track.title}</strong>
-                        {track.tag && (
-                          <span className={`px-bgm-track-tag tag-${track.tagTone || 'pink'}`}>
-                            {track.tag}
-                          </span>
-                        )}
-                      </div>
-                      <span className="px-bgm-track-desc">
-                        {track.artist} — {track.sub}
-                      </span>
-                    </div>
-
-                    <span className="px-bgm-track-dur">
-                      {isActive && isPlaying ? 'PLAYING' : track.duration || ''}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="px-bgm-footer-note">
-              <PixelIcon name="check" size={13} />
-              <span>เล่นครบทุกเพลงแล้วจะวนกลับมารันเพลงแรกใหม่อัตโนมัติ (Looping)</span>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

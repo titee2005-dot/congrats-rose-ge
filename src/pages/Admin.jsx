@@ -4,7 +4,7 @@ import WishCardView from '../components/WishCardView';
 import PixelFrame from '../components/PixelFrame';
 import { PixelBunnySprite, PixelIcon, TimelineChapterArt } from '../components/PixelSprites';
 import { isSupabaseConfigured } from '../supabase';
-import { computeAutoBunnyCount, ROSE_TIMELINE } from '../data/roseData';
+import { computeAutoBunnyCount, ROSE_TIMELINE, ROSE_PLAYLIST } from '../data/roseData';
 
 function compressImageFile(file) {
   return new Promise((resolve, reject) => {
@@ -601,51 +601,20 @@ export default function Admin({
               </div>
 
               <div className="admin-bgm-summary-list">
-                <div className="admin-bgm-row is-main-track">
-                  <span className="admin-bgm-idx">01</span>
-                  <div className="admin-bgm-meta">
-                    <strong>Happy Birthday (Namida Surprise!)</strong>
-                    <span>BNK48 · เพลงหลักวันเกิด 19 ปี</span>
+                {ROSE_PLAYLIST.map((song, i) => (
+                  <div
+                    key={song.id}
+                    className={`admin-bgm-row ${i === 0 ? 'is-main-track' : ''}`}
+                  >
+                    <span className="admin-bgm-idx">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="admin-bgm-meta">
+                      <strong>{song.title}</strong>
+                    </div>
                   </div>
-                  <span className="admin-bgm-pill pill-pink">เพลงหลัก</span>
-                </div>
-                <div className="admin-bgm-row">
-                  <span className="admin-bgm-idx">02</span>
-                  <div className="admin-bgm-meta">
-                    <strong>จะยังไงก็รักเธอ (Doushitemo Kimi ga Suki da)</strong>
-                    <span>BNK48 รุ่นที่ 6 · เพลงเดบิวต์ของโรส</span>
-                  </div>
-                  <span className="admin-bgm-pill pill-lavender">เดบิวต์</span>
-                </div>
-                <div className="admin-bgm-row">
-                  <span className="admin-bgm-idx">03</span>
-                  <div className="admin-bgm-meta">
-                    <strong>แค่เพียงมีเธอ (Kimi-iru)</strong>
-                    <span>BNK48 · Rose Center Special Project</span>
-                  </div>
-                  <span className="admin-bgm-pill pill-mint">Rose Center</span>
-                </div>
-                <div className="admin-bgm-row">
-                  <span className="admin-bgm-idx">04</span>
-                  <div className="admin-bgm-meta">
-                    <strong>วันแรก (Shonichi)</strong>
-                    <span>BNK48 · เพลงสร้างพลังและหยาดเหงื่อ</span>
-                  </div>
-                  <span className="admin-bgm-pill pill-butter">ให้กำลังใจ</span>
-                </div>
-                <div className="admin-bgm-row">
-                  <span className="admin-bgm-idx">05</span>
-                  <div className="admin-bgm-meta">
-                    <strong>365 วันกับเครื่องบินกระดาษ (2024 ver.)</strong>
-                    <span>BNK48 · บินไปสู่ฝันในวัย 19 ปี</span>
-                  </div>
-                  <span className="admin-bgm-pill pill-pink">อบอุ่น</span>
-                </div>
+                ))}
               </div>
-
-              <small className="cfg-scale-note">
-                ระบบถูกตั้งค่าให้: วิดีโอหยุดเล่นอัตโนมัติเมื่อผู้ใช้เลื่อนจอผ่านส่วนแรก (Hero) แล้วเพลง Happy Birthday จะเริ่มขึ้นทันที โดยผู้ใช้สามารถกดเลือกเปลี่ยนเพลงได้ตลอดเวลาจากเครื่องเล่นมุมซ้ายล่าง
-              </small>
             </div>
           </div>
         </PixelFrame>
