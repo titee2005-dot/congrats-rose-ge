@@ -90,13 +90,16 @@ textarea {
 .px-chip,
 .px-header,
 .px-count,
+.px-tool-btn,
 .px-input,
 .card-pick,
 .wc,
 .px-social,
 .px-modal-close,
 .tl-node,
-.bunny-dock,
+.px-footer-card,
+.footer-tag,
+.footer-top-btn,
 .bunny-bubble,
 .hero-sound-btn,
 .bunny-num-btn,
@@ -571,6 +574,56 @@ textarea {
   box-shadow: inset 0 -3px 0 var(--pink-d);
 }
 
+.px-head-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.px-tool-btn {
+  --b: 2px;
+  --ln: var(--line);
+  --sh: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 32px;
+  margin: 2px;
+  padding: 0 9px;
+  border: none;
+  background: var(--pink-xl);
+  color: var(--line);
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.15s ease;
+}
+
+.px-tool-btn.is-carrot {
+  padding: 0 8px;
+  background: #fff2e5;
+}
+
+.px-tool-btn.is-bunny {
+  background: #ffe3ee;
+  color: var(--pink-d);
+}
+
+.px-tool-btn.is-bunny.is-off {
+  background: #f3edf1;
+  color: var(--ink2);
+  opacity: 0.82;
+}
+
+.px-tool-btn:hover {
+  background: var(--pink-l);
+  transform: translateY(-1px);
+}
+
 .px-count {
   --b: 2px;
   --ln: var(--line);
@@ -578,8 +631,9 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 32px;
   margin: 2px;
-  padding: 5px 10px;
+  padding: 0 10px;
   background: var(--butter-l);
   color: var(--line);
   font-family: var(--font-pixel);
@@ -590,8 +644,8 @@ textarea {
 
 .px-menu-btn {
   display: none;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border: none;
   background: var(--pink-l);
   color: var(--line);
@@ -683,6 +737,10 @@ textarea {
   object-fit: cover;
   border: none;
   display: block;
+}
+
+.hero-video {
+  background: #1b0e16;
 }
 
 .hero-sound-btn {
@@ -1363,8 +1421,10 @@ textarea {
 
 .wc-photo img {
   width: 100%;
-  max-height: 300px;
-  object-fit: cover;
+  max-height: 320px;
+  object-fit: contain;
+  background: #fffafc;
+  margin: 0 auto;
 }
 
 .wc-msg-row {
@@ -1389,6 +1449,9 @@ textarea {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-size: 0.93rem;
+  line-height: 1.72;
+  max-height: calc(1.72em * 4);
 }
 
 .wc-thumb {
@@ -1565,6 +1628,49 @@ textarea {
   pointer-events: none;
 }
 
+/* บังคับให้การ์ดขนาดย่อบนกำแพงคำอวยพรและหน้า Admin มีขนาดเท่ากันเป๊ะทุกใบ */
+.wc.is-compact {
+  width: 100%;
+  height: 312px;
+  overflow: hidden;
+}
+
+.wc.is-compact .wc-head {
+  height: 60px;
+  padding: 8px 14px;
+  flex-shrink: 0;
+}
+
+.wc.is-compact .wc-stamp {
+  width: 38px;
+  height: 42px;
+}
+
+.wc.is-compact .wc-rings {
+  padding: 5px 14px;
+  flex-shrink: 0;
+}
+
+.wc.is-compact .wc-body {
+  flex: 1;
+  min-height: 0;
+  padding: 14px 16px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.wc.is-compact.wc-ribbon-polaroid .wc-body,
+.wc.is-compact.wc-tea-frame .wc-body {
+  margin: 8px;
+  padding: 11px 14px;
+}
+
+.wc.is-compact .wc-msg-row {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 /* =========================================================
    11. กำแพงคำอวยพร
    ========================================================= */
@@ -1572,11 +1678,16 @@ textarea {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 28px 22px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.wall-cell {
+  display: flex;
 }
 
 .wall-trigger {
-  display: block;
+  display: flex;
+  width: 100%;
   cursor: pointer;
   outline: none;
 }
@@ -1622,22 +1733,26 @@ textarea {
 .px-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 400;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 28px 16px 36px;
   overflow-y: auto;
-  background: rgba(79, 42, 61, 0.5);
+  overscroll-behavior: contain;
+  background: rgba(62, 28, 46, 0.56);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   animation: fadeIn 0.2s ease;
 }
 
 .px-modal {
   position: relative;
+  margin: auto;
   width: min(500px, 100%);
-  max-height: 92vh;
-  overflow-y: auto;
-  padding: 16px 8px 8px 6px;
+  max-height: none;
+  overflow: visible;
+  padding: 12px 8px 8px 6px;
   animation: popIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -1715,6 +1830,10 @@ textarea {
   text-align: left;
 }
 
+.recap-capture .wc-photo img {
+  max-height: 250px;
+}
+
 .success-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1734,7 +1853,7 @@ textarea {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
   gap: 30px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .profile-head {
@@ -1826,7 +1945,8 @@ textarea {
 .social-col {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 16px;
   margin-top: 40px;
 }
 
@@ -1834,19 +1954,21 @@ textarea {
   --b: 3px;
   --ln: var(--line);
   --sh: #f6a9c6;
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   margin: 3px 6px 6px 3px;
-  padding: 16px 18px;
+  padding: 18px 20px;
   background: #fff;
   color: var(--ink);
   text-decoration: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .px-social:hover {
   transform: translateY(-3px);
+  background: #fffafc;
 }
 
 .px-social.s-facebook {
@@ -1899,82 +2021,175 @@ textarea {
 }
 
 /* =========================================================
-   14. Footer (แถบพื้นหลังไล่โทนสีจางๆ แบบละมุน แยกจากพื้นหลังหลัก)
+   14. Footer (การ์ดแถบท้ายกรอบพิกเซลไล่โทนสีละมุน เข้าชุดกับ Navbar)
    ========================================================= */
-.px-footer {
+.px-footer-wrap {
   position: relative;
   z-index: 2;
-  margin-top: 42px;
-  padding: 40px 20px 104px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 250, 253, 0.72) 0%,
-    rgba(255, 232, 242, 0.92) 48%,
-    rgba(244, 226, 248, 0.96) 100%
-  );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(224, 87, 140, 0.18);
-  box-shadow: 0 -6px 24px rgba(224, 87, 140, 0.06);
+  width: 100%;
+  max-width: 1120px;
+  margin: 18px auto 0;
+  padding: 0 22px 94px;
 }
 
-.px-footer-inner {
-  max-width: 720px;
-  margin: 0 auto;
+.px-footer-card {
+  --b: 3px;
+  --ln: var(--line);
+  --sh: #f6a9c6;
+  position: relative;
+  margin: 3px 6px 6px 3px;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 253, 254, 0.97) 0%,
+    rgba(255, 237, 246, 0.97) 52%,
+    rgba(241, 232, 255, 0.97) 100%
+  );
+}
+
+.px-footer-card::before {
+  content: '';
+  display: block;
+  height: 7px;
+  background: repeating-linear-gradient(
+    90deg,
+    #ffd3e3 0 28px,
+    #fff3f8 28px 56px,
+    #e6dbff 56px 84px,
+    #dff5e8 84px 112px
+  );
+  border-bottom: 2px solid rgba(110, 58, 85, 0.16);
+}
+
+.px-footer-main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 22px 24px 18px;
   text-align: center;
 }
 
-.footer-icons {
-  display: flex;
-  align-items: flex-end;
+.footer-emblem {
+  display: inline-flex;
+  align-items: center;
   gap: 10px;
 }
 
-.footer-quote {
-  margin: 4px 0 0;
-  font-family: var(--font-hand);
-  font-size: 1.06rem;
+.footer-mini-dot {
+  display: grid;
+  place-items: center;
+  opacity: 0.92;
 }
 
-.footer-dates {
-  margin: 0;
-  font-family: var(--font-pixel);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: var(--pink-d);
+.footer-bunny-badge {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--line), 4px 4px 0 #f6a9c6;
+}
+
+.footer-quote {
+  margin: 2px 0 0;
+  max-width: 640px;
+  font-family: var(--font-body);
+  font-size: 1.12rem;
+  font-weight: 800;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
 
 .footer-tags {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 2px;
 }
 
-.footer-tags span {
+.footer-tag {
+  --b: 2px;
+  --ln: var(--line);
+  --sh: transparent;
   margin: 2px;
   padding: 4px 12px;
   background: #fff;
-  color: var(--pink-d);
+  color: var(--line);
+  font-family: var(--font-pixel);
   font-size: 0.82rem;
   font-weight: 700;
-  box-shadow: 0 0 0 2px var(--pink-l);
+  letter-spacing: 0.03em;
+}
+
+.footer-tag.ft-0 {
+  background: #ffe3ee;
+  color: var(--pink-d);
+}
+
+.footer-tag.ft-1 {
+  background: var(--lav-l);
+  color: #6b46ad;
+}
+
+.footer-tag.ft-2 {
+  background: var(--mint-l);
+  color: #36694b;
+}
+
+.px-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 11px 20px;
+  background: rgba(255, 255, 255, 0.72);
+  border-top: 2px dashed rgba(110, 58, 85, 0.2);
+}
+
+.footer-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--pink-d);
 }
 
 .footer-credit {
-  margin: 6px 0 0;
+  margin: 0;
   font-size: 0.8rem;
+  font-weight: 700;
   color: var(--ink2);
 }
 
-.footer-admin {
-  color: var(--pink-d);
+.footer-top-btn {
+  --b: 2px;
+  --ln: var(--line);
+  --sh: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px;
+  padding: 4px 10px;
+  border: none;
+  background: #fff;
+  color: var(--line);
+  font-size: 0.76rem;
   font-weight: 700;
-  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.15s ease;
+}
+
+.footer-top-btn:hover {
+  background: var(--pink-l);
+  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -1991,8 +2206,7 @@ textarea {
   transition: transform 0.28s ease, opacity 0.25s ease;
 }
 
-.bunny-playground.is-typing-hidden,
-.bunny-dock.is-typing-hidden {
+.bunny-playground.is-typing-hidden {
   transform: translateY(120px);
   opacity: 0;
   pointer-events: none;
@@ -2118,59 +2332,6 @@ textarea {
     opacity: 0;
     transform: translate(-50%, -36px) scale(1.15);
   }
-}
-
-/* ปุ่มควบคุมลอยอยู่เหนือเลนวิ่งของกระต่าย เพื่อไม่ให้บังตัวกระต่ายตอนวิ่งผ่าน */
-.bunny-dock {
-  --b: 3px;
-  --ln: var(--line);
-  --sh: #f6a9c6;
-  position: fixed;
-  right: 16px;
-  bottom: 74px;
-  z-index: 55;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px;
-  background: rgba(255, 255, 255, 0.96);
-  transition: transform 0.28s ease, opacity 0.25s ease;
-}
-
-.bunny-dock-btn,
-.bunny-dock-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 9px;
-  border: none;
-  background: var(--pink-xl);
-  color: var(--ink);
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.18s ease;
-}
-
-.bunny-dock-toggle {
-  background: var(--pink-l);
-  color: var(--line);
-}
-
-.bunny-dock-toggle.is-muted {
-  background: var(--butter-l);
-}
-
-.dock-count {
-  font-family: var(--font-pixel);
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: var(--pink-d);
-}
-
-.bunny-dock-btn:hover,
-.bunny-dock-toggle:hover {
-  background: #ffc2d9;
 }
 
 /* =========================================================
@@ -2502,6 +2663,7 @@ textarea {
 .admin-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   gap: 10px;
 }
 
@@ -2583,7 +2745,6 @@ textarea {
   .px-menu-btn {
     display: grid;
     place-items: center;
-    margin-left: auto;
   }
 
   .px-nav {
@@ -2610,12 +2771,11 @@ textarea {
     padding: 10px;
   }
 
-  .px-count {
-    margin-left: auto;
-  }
-
-  .px-count + .px-menu-btn {
-    margin-left: 0;
+  .px-footer-bar {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 16px;
   }
 
   /* Timeline คอลัมน์เดียว */
@@ -2655,9 +2815,33 @@ textarea {
     padding-bottom: 52px;
   }
 
-  .px-footer {
-    margin-top: 28px;
-    padding: 34px 16px calc(86px + env(safe-area-inset-bottom, 0px));
+  .px-footer-wrap {
+    margin-top: 12px;
+    padding: 0 12px calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .px-footer-main {
+    padding: 18px 14px 14px;
+    gap: 10px;
+  }
+
+  .footer-quote {
+    font-size: 0.98rem;
+  }
+
+  .px-head-tools {
+    gap: 4px;
+  }
+
+  .px-tool-btn,
+  .px-count {
+    height: 30px;
+    padding: 0 7px;
+    font-size: 0.78rem;
+  }
+
+  .wc.is-compact {
+    height: 296px;
   }
 
   .px-main {
@@ -2839,24 +3023,6 @@ textarea {
     bottom: 44px;
     font-size: 0.7rem;
     padding: 3px 8px;
-  }
-
-  .bunny-dock {
-    --b: 2px;
-    right: 10px;
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
-    padding: 3px;
-    gap: 4px;
-  }
-
-  .bunny-dock .dock-label {
-    display: none;
-  }
-
-  .bunny-dock-btn,
-  .bunny-dock-toggle {
-    font-size: 0.74rem;
-    padding: 5px 7px;
   }
 
   /* หน้า Admin บนมือถือ */

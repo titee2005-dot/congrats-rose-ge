@@ -31,8 +31,9 @@ export const ROSE_PROFILE = {
 // ตั้งค่ามีเดียช่อง Rose Birthday Party (วางไฟล์วิดีโอในโค้ด หรือตั้งค่าผ่านหน้า /admin ได้)
 // ==========================================
 export const ROSE_PARTY_MEDIA = {
-  // หากวางไฟล์วิดีโอในโปรเจกต์ เช่น public/assets/rose_party.mp4 ให้ใส่ '/assets/rose_party.mp4'
-  defaultVideoUrl: '',
+  // วิดีโอวันเกิด Rose BNK48 (สามารถเปลี่ยนหรืออัปโหลดใหม่ผ่านหน้า /admin ได้ตลอดเวลา)
+  defaultVideoUrl:
+    'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/rose_party_19th.mp4',
   posterUrl: '/assets/hero_garden_party.jpg',
 };
 
@@ -283,21 +284,18 @@ export const ROSE_SOCIALS = [
     key: 'instagram',
     platform: 'Instagram',
     handle: '@rose.bnk48office',
-    desc: 'ภาพถ่าย โมเมนต์น่ารัก ๆ และสตอรี่ประจำวันของโรส',
     href: 'https://www.instagram.com/rose.bnk48office/',
   },
   {
     key: 'facebook',
     platform: 'Facebook',
     handle: 'Rose BNK48',
-    desc: 'อัปเดตข่าวสาร กิจกรรม และโพสต์พูดคุยกับแฟนคลับ',
     href: 'https://www.facebook.com/rose.bnk48official',
   },
   {
     key: 'tiktok',
     platform: 'TikTok',
     handle: '@rose.bnk48official',
-    desc: 'คลิปเต้นและรอยยิ้มสดใสที่ดูเมื่อไหร่ก็ใจฟู',
     href: 'https://www.tiktok.com/@rose.bnk48official',
   },
 ];

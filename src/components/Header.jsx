@@ -9,7 +9,13 @@ const NAV_ITEMS = [
   { id: 'follow', label: 'ติดตามโรส' },
 ];
 
-export default function Header({ wishCount = 0 }) {
+export default function Header({
+  wishCount = 0,
+  bunnyCount = 0,
+  bunniesVisible = true,
+  onToggleBunnies,
+  onDropCarrot,
+}) {
   const [isShrunk, setIsShrunk] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
@@ -79,24 +85,56 @@ export default function Header({ wishCount = 0 }) {
           ))}
         </nav>
 
-        <a
-          href="#wall"
-          className="px-count"
-          onClick={(e) => scrollToSection(e, 'wall')}
-          title="จำนวนการ์ดบนกำแพง"
-        >
-          <PixelIcon name="envelope" size={18} />
-          <span>{wishCount}</span>
-        </a>
+        <div className="px-head-tools">
+          {bunnyCount > 0 && (
+            <>
+              {bunniesVisible && (
+                <button
+                  type="button"
+                  className="px-tool-btn is-carrot"
+                  onClick={onDropCarrot}
+                  title="โยนแครอทให้น้องกระต่าย"
+                  aria-label="โยนแครอทให้น้องกระต่าย"
+                >
+                  <PixelIcon name="carrot" size={16} />
+                </button>
+              )}
+              <button
+                type="button"
+                className={`px-tool-btn is-bunny ${!bunniesVisible ? 'is-off' : ''}`}
+                onClick={onToggleBunnies}
+                title={
+                  bunniesVisible
+                    ? 'ซ่อนน้องกระต่ายชั่วคราว'
+                    : 'เรียกน้องกระต่ายออกมาวิ่งเล่น'
+                }
+                aria-label={bunniesVisible ? 'ซ่อนกระต่าย' : 'แสดงกระต่าย'}
+              >
+                <PixelIcon name="bunny" size={17} />
+                <span>×{bunnyCount}</span>
+              </button>
+            </>
+          )}
 
-        <button
-          type="button"
-          className="px-menu-btn"
-          aria-label="เปิดเมนู"
-          onClick={() => setMenuOpen((prev) => !prev)}
-        >
-          <PixelIcon name={menuOpen ? 'close' : 'menu'} size={19} />
-        </button>
+          <a
+            href="#wall"
+            className="px-count"
+            onClick={(e) => scrollToSection(e, 'wall')}
+            title="จำนวนการ์ดบนกำแพง"
+          >
+            <PixelIcon name="envelope" size={17} />
+            <span>{wishCount}</span>
+          </a>
+
+          <button
+            type="button"
+            className="px-menu-btn"
+            aria-label="เปิดเมนู"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <PixelIcon name={menuOpen ? 'close' : 'menu'} size={19} />
+          </button>
+        </div>
       </header>
     </div>
   );

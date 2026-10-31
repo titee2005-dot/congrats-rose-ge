@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import html2canvas from 'html2canvas';
 import { CARD_THEMES } from '../data/roseData';
 import ScrollReveal from './ScrollReveal';
@@ -309,101 +310,117 @@ export default function WishForm({ onAddWish }) {
         </ScrollReveal>
       </section>
 
-      {/* Modal ดูตัวอย่างเต็มใบ */}
-      {showPreviewModal && (
-        <div className="px-modal-backdrop" onClick={() => setShowPreviewModal(false)}>
-          <div className="px-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="px-modal-close"
-              onClick={() => setShowPreviewModal(false)}
-              aria-label="ปิด"
-            >
-              <PixelIcon name="close" size={16} />
-            </button>
-            <WishCardView
-              bg={selectedCard}
-              name={name}
-              message={message}
-              img={previewImgUrl}
-              letterNumber="ตัวอย่างการ์ดของคุณ"
-            />
-          </div>
-        </div>
-      )}
+      {/* Modal ดูตัวอย่างเต็มใบ (Portal ออกนอก main เพื่อไม่ให้ติด Navbar) */}
+      {showPreviewModal &&
+        createPortal(
+          <div
+            className="px-modal-backdrop"
+            onClick={() => setShowPreviewModal(false)}
+          >
+            <div className="px-modal" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="px-modal-close"
+                onClick={() => setShowPreviewModal(false)}
+                aria-label="ปิด"
+              >
+                <PixelIcon name="close" size={16} />
+              </button>
+              <WishCardView
+                bg={selectedCard}
+                name={name}
+                message={message}
+                img={previewImgUrl}
+                letterNumber="ตัวอย่างการ์ดของคุณ"
+              />
+            </div>
+          </div>,
+          document.body
+        )}
 
       {/* Modal ส่งสำเร็จ + ดาวน์โหลด PNG */}
-      {showSuccessModal && recapData && (
-        <div className="px-modal-backdrop" onClick={() => setShowSuccessModal(false)}>
-          <div className="px-modal wide" onClick={(e) => e.stopPropagation()}>
-            <PixelFrame
-              label="Sent!"
-              icon="heart"
-              tone="mint"
-              bodyClassName="success-body"
+      {showSuccessModal &&
+        recapData &&
+        createPortal(
+          <div
+            className="px-modal-backdrop"
+            onClick={() => setShowSuccessModal(false)}
+          >
+            <div className="px-modal wide" onClick={(e) => e.stopPropagation()}>
+              <PixelFrame
+                label="Sent!"
+                icon="heart"
+                tone="mint"
+                bodyClassName="success-body"
+              >
+                <PixelBunnySprite variant="party-19" frame="hop" size={56} />
+                <h3>ส่งการ์ดถึงโรสเรียบร้อยแล้ว!</h3>
+                <p className="success-note">
+                  การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นกำแพงคำอวยพร
+                  บันทึกรูปการ์ดเก็บไว้แชร์ได้เลยนะ
+                </p>
+
+                <div id="rose-recap-card" className="recap-capture">
+                  <WishCardView
+                    bg={recapData.bg}
+                    name={recapData.name}
+                    message={recapData.message}
+                    img={recapData.img}
+                    letterNumber="Happy 19th Birthday Rose"
+                  />
+                </div>
+
+                <div className="success-actions">
+                  <button
+                    type="button"
+                    className="px-btn primary"
+                    onClick={handleDownloadRecap}
+                  >
+                    <PixelIcon name="download" size={16} />
+                    <span>บันทึกรูปการ์ด (PNG)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="px-btn"
+                    onClick={() => setShowSuccessModal(false)}
+                  >
+                    ปิด
+                  </button>
+                </div>
+              </PixelFrame>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* Modal แจ้งเตือน */}
+      {popupMsg &&
+        createPortal(
+          <div className="px-modal-backdrop" onClick={() => setPopupMsg(null)}>
+            <div
+              className="px-modal narrow"
+              onClick={(e) => e.stopPropagation()}
             >
-              <PixelBunnySprite variant="party-19" frame="hop" size={60} />
-              <h3>ส่งการ์ดถึงโรสเรียบร้อยแล้ว!</h3>
-              <p className="success-note">
-                การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นกำแพงคำอวยพร
-                บันทึกรูปการ์ดเก็บไว้แชร์ได้เลยนะ
-              </p>
-
-              <div id="rose-recap-card" className="recap-capture">
-                <WishCardView
-                  bg={recapData.bg}
-                  name={recapData.name}
-                  message={recapData.message}
-                  img={recapData.img}
-                  letterNumber="Happy 19th Birthday Rose"
-                />
-              </div>
-
-              <div className="success-actions">
+              <PixelFrame
+                label="Notice"
+                icon="bunny"
+                tone="butter"
+                bodyClassName="alert-body"
+              >
+                <PixelBunnySprite variant="pink-rose" frame="idle" size={52} />
+                <p>{popupMsg}</p>
                 <button
                   type="button"
                   className="px-btn primary"
-                  onClick={handleDownloadRecap}
+                  onClick={() => setPopupMsg(null)}
                 >
-                  <PixelIcon name="download" size={16} />
-                  <span>บันทึกรูปการ์ด (PNG)</span>
+                  ตกลง
                 </button>
-                <button
-                  type="button"
-                  className="px-btn"
-                  onClick={() => setShowSuccessModal(false)}
-                >
-                  ปิด
-                </button>
-              </div>
-            </PixelFrame>
-          </div>
-        </div>
-      )}
-
-      {/* Modal แจ้งเตือน */}
-      {popupMsg && (
-        <div className="px-modal-backdrop" onClick={() => setPopupMsg(null)}>
-          <div className="px-modal narrow" onClick={(e) => e.stopPropagation()}>
-            <PixelFrame
-              label="Notice"
-              icon="bunny"
-              tone="butter"
-              bodyClassName="alert-body"
-            >
-              <PixelBunnySprite variant="pink-rose" frame="idle" size={52} />
-              <p>{popupMsg}</p>
-              <button
-                type="button"
-                className="px-btn primary"
-                onClick={() => setPopupMsg(null)}
-              >
-                ตกลง
-              </button>
-            </PixelFrame>
-          </div>
-        </div>
-      )}
+              </PixelFrame>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

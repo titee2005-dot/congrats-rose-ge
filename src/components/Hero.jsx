@@ -128,7 +128,7 @@ export default function Hero({ siteConfig }) {
                   loop
                   muted={isMuted}
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   onError={() => setVideoError(true)}
                 />
                 <button

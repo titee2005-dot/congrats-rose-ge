@@ -39,12 +39,18 @@ const TWINKLES = [
 
 export default function Home({ wishes, addWish, isLoading, siteConfig }) {
   const [bunniesVisible, setBunniesVisible] = useState(true);
+  const [carrotSignal, setCarrotSignal] = useState(0);
   const approvedCount = wishes.filter((w) => w.status === 'approved').length;
   const autoBunnyCount = computeAutoBunnyCount(approvedCount);
   const targetBunnyCount =
     siteConfig?.bunny_mode === 'manual'
       ? Math.max(0, Math.min(5, Number(siteConfig.bunny_manual_count ?? autoBunnyCount)))
       : autoBunnyCount;
+
+  const handleDropCarrot = () => {
+    if (!bunniesVisible) setBunniesVisible(true);
+    setCarrotSignal((n) => n + 1);
+  };
 
   return (
     <div className="px-page">
@@ -79,7 +85,13 @@ export default function Home({ wishes, addWish, isLoading, siteConfig }) {
         ))}
       </div>
 
-      <Header wishCount={approvedCount} />
+      <Header
+        wishCount={approvedCount}
+        bunnyCount={targetBunnyCount}
+        bunniesVisible={bunniesVisible}
+        onToggleBunnies={() => setBunniesVisible((v) => !v)}
+        onDropCarrot={handleDropCarrot}
+      />
 
       <main className="px-main">
         <Hero siteConfig={siteConfig} />
@@ -95,7 +107,7 @@ export default function Home({ wishes, addWish, isLoading, siteConfig }) {
       <PixelBunnies
         targetCount={targetBunnyCount}
         visible={bunniesVisible}
-        onToggleVisible={() => setBunniesVisible((v) => !v)}
+        carrotSignal={carrotSignal}
       />
     </div>
   );

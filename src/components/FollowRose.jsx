@@ -83,7 +83,6 @@ export default function FollowRose() {
                 <span className="px-social-info">
                   <small>{soc.platform}</small>
                   <strong>{soc.handle}</strong>
-                  <em>{soc.desc}</em>
                 </span>
                 <span className="px-social-arrow" aria-hidden="true">
                   <PixelIcon name="chevron-right" size={18} />

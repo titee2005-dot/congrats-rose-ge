@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import ScrollReveal from './ScrollReveal';
 import WishCardView from './WishCardView';
 import PixelFrame, { SectionHeading } from './PixelFrame';
@@ -109,27 +110,32 @@ export default function WishWall({ wishes, isLoading }) {
         )}
       </section>
 
-      {activeWish && (
-        <div className="px-modal-backdrop" onClick={() => setSelectedIndex(null)}>
-          <div className="px-modal" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="px-modal-close"
-              onClick={() => setSelectedIndex(null)}
-              aria-label="ปิด"
-            >
-              <PixelIcon name="close" size={16} />
-            </button>
-            <WishCardView
-              bg={activeWish.bg}
-              name={activeWish.name}
-              message={activeWish.message}
-              img={activeWish.img}
-              letterNumber={`การ์ดใบที่ ${approvedWishes.length - selectedIndex}`}
-            />
-          </div>
-        </div>
-      )}
+      {activeWish &&
+        createPortal(
+          <div
+            className="px-modal-backdrop"
+            onClick={() => setSelectedIndex(null)}
+          >
+            <div className="px-modal" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="px-modal-close"
+                onClick={() => setSelectedIndex(null)}
+                aria-label="ปิด"
+              >
+                <PixelIcon name="close" size={16} />
+              </button>
+              <WishCardView
+                bg={activeWish.bg}
+                name={activeWish.name}
+                message={activeWish.message}
+                img={activeWish.img}
+                letterNumber={`การ์ดใบที่ ${approvedWishes.length - selectedIndex}`}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

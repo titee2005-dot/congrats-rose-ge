@@ -47,7 +47,7 @@ function buildInitialBunnies(count) {
 export default function PixelBunnies({
   targetCount = 1,
   visible = true,
-  onToggleVisible,
+  carrotSignal = 0,
 }) {
   const safeTarget = Math.max(0, Math.min(5, Math.round(Number(targetCount) || 0)));
 
@@ -61,10 +61,29 @@ export default function PixelBunnies({
 
   const nextIdRef = useRef(10);
   const carrotRef = useRef(null);
+  const lastCarrotSignalRef = useRef(carrotSignal);
 
   useEffect(() => {
     carrotRef.current = carrot;
   }, [carrot]);
+
+  const spawnBurst = (xPercent) => {
+    const id = Date.now() + Math.random();
+    setBursts((prev) => [...prev.slice(-8), { id, x: xPercent }]);
+    setTimeout(() => {
+      setBursts((prev) => prev.filter((item) => item.id !== id));
+    }, 950);
+  };
+
+  // รับคำสั่งโยนแครอทจากปุ่มบนแถบเมนูด้านบน (Navbar)
+  useEffect(() => {
+    if (carrotSignal > 0 && carrotSignal !== lastCarrotSignalRef.current) {
+      lastCarrotSignalRef.current = carrotSignal;
+      const randomX = 18 + Math.floor(Math.random() * 64);
+      setCarrot({ x: randomX, ticks: 42 });
+      spawnBurst(randomX);
+    }
+  }, [carrotSignal]);
 
   // ปรับขนาดกระต่ายตามความกว้างหน้าจอ (มือถือ vs คอม)
   useEffect(() => {
@@ -254,15 +273,7 @@ export default function PixelBunnies({
     return () => clearInterval(interval);
   }, [visible, safeTarget, isTyping]);
 
-  if (safeTarget <= 0) return null;
-
-  const spawnBurst = (xPercent) => {
-    const id = Date.now() + Math.random();
-    setBursts((prev) => [...prev.slice(-8), { id, x: xPercent }]);
-    setTimeout(() => {
-      setBursts((prev) => prev.filter((item) => item.id !== id));
-    }, 950);
-  };
+  if (safeTarget <= 0 || !visible) return null;
 
   const handleClickBunny = (bunnyId) => {
     setBunnies((prev) =>
@@ -284,106 +295,69 @@ export default function PixelBunnies({
     );
   };
 
-  const handleDropCarrot = () => {
-    const randomX = 18 + Math.floor(Math.random() * 64);
-    setCarrot({ x: randomX, ticks: 42 });
-    spawnBurst(randomX);
-  };
-
   const spriteSize = isMobile ? 38 : 50;
 
   return (
-    <>
-      {visible && (
+    <div
+      className={`bunny-playground ${isTyping ? 'is-typing-hidden' : ''}`}
+      aria-hidden="false"
+    >
+      {carrot && (
         <div
-          className={`bunny-playground ${isTyping ? 'is-typing-hidden' : ''}`}
-          aria-hidden="false"
+          className="bunny-carrot-drop"
+          style={{ left: `${carrot.x}%` }}
+          aria-hidden="true"
         >
-          {carrot && (
-            <div
-              className="bunny-carrot-drop"
-              style={{ left: `${carrot.x}%` }}
-              aria-hidden="true"
-            >
-              <PixelIcon name="carrot" size={isMobile ? 24 : 30} />
-            </div>
-          )}
-
-          {bursts.map((burst) => (
-            <div
-              key={burst.id}
-              className="bunny-heart-burst"
-              style={{ left: `${burst.x}%` }}
-              aria-hidden="true"
-            >
-              <PixelIcon name="heart" size={16} />
-              <PixelIcon name="rose" size={18} />
-              <PixelIcon name="star" size={14} />
-            </div>
-          ))}
-
-          {bunnies.map((b) => {
-            const bubbleEdgeClass =
-              b.x < 24 ? 'bubble-left' : b.x > 76 ? 'bubble-right' : '';
-            return (
-              <button
-                key={b.id}
-                type="button"
-                className={`running-bunny ${b.state === 'jump' ? 'is-jumping' : ''}`}
-                style={{
-                  left: `${b.x}%`,
-                  transform: `translate(-50%, -${b.jumpOffset}px)`,
-                }}
-                onClick={() => handleClickBunny(b.id)}
-                title="จิ้มน้องกระต่ายเพื่อทักทาย!"
-                aria-label="น้องกระต่ายอวยพรวันเกิดโรส"
-              >
-                {b.speech && (
-                  <span className={`bunny-bubble ${bubbleEdgeClass}`}>
-                    <span>{b.speech.text}</span>
-                    {b.speech.icon && (
-                      <PixelIcon name={b.speech.icon} size={13} />
-                    )}
-                  </span>
-                )}
-                <PixelBunnySprite
-                  variant={b.variant}
-                  frame={b.frame}
-                  size={spriteSize}
-                  flip={b.dir < 0}
-                />
-              </button>
-            );
-          })}
+          <PixelIcon name="carrot" size={isMobile ? 24 : 30} />
         </div>
       )}
 
-      {/* ปุ่มมินิลอยอยู่เหนือเลนวิ่งของกระต่าย (ใช้ไอคอน SVG ล้วน) */}
-      <div className={`bunny-dock ${isTyping ? 'is-typing-hidden' : ''}`}>
-        {visible && (
-          <button
-            type="button"
-            className="bunny-dock-btn"
-            onClick={handleDropCarrot}
-            title="โยนแครอทเรียกน้องกระต่าย"
-            aria-label="โยนแครอทเรียกน้องกระต่าย"
-          >
-            <PixelIcon name="carrot" size={18} />
-            <span className="dock-label">แครอท</span>
-          </button>
-        )}
-        <button
-          type="button"
-          className={`bunny-dock-toggle ${!visible ? 'is-muted' : ''}`}
-          onClick={onToggleVisible}
-          title={visible ? 'ซ่อนน้องกระต่ายชั่วคราว' : 'เรียกน้องกระต่ายออกมาวิ่งเล่น'}
-          aria-label={visible ? 'ซ่อนกระต่าย' : 'แสดงกระต่าย'}
+      {bursts.map((burst) => (
+        <div
+          key={burst.id}
+          className="bunny-heart-burst"
+          style={{ left: `${burst.x}%` }}
+          aria-hidden="true"
         >
-          <PixelIcon name="bunny" size={18} />
-          <span className="dock-count">×{safeTarget}</span>
-          <span className="dock-label">{visible ? 'ซ่อน' : 'แสดง'}</span>
-        </button>
-      </div>
-    </>
+          <PixelIcon name="heart" size={16} />
+          <PixelIcon name="rose" size={18} />
+          <PixelIcon name="star" size={14} />
+        </div>
+      ))}
+
+      {bunnies.map((b) => {
+        const bubbleEdgeClass =
+          b.x < 24 ? 'bubble-left' : b.x > 76 ? 'bubble-right' : '';
+        return (
+          <button
+            key={b.id}
+            type="button"
+            className={`running-bunny ${b.state === 'jump' ? 'is-jumping' : ''}`}
+            style={{
+              left: `${b.x}%`,
+              transform: `translate(-50%, -${b.jumpOffset}px)`,
+            }}
+            onClick={() => handleClickBunny(b.id)}
+            title="จิ้มน้องกระต่ายเพื่อทักทาย!"
+            aria-label="น้องกระต่ายอวยพรวันเกิดโรส"
+          >
+            {b.speech && (
+              <span className={`bunny-bubble ${bubbleEdgeClass}`}>
+                <span>{b.speech.text}</span>
+                {b.speech.icon && (
+                  <PixelIcon name={b.speech.icon} size={13} />
+                )}
+              </span>
+            )}
+            <PixelBunnySprite
+              variant={b.variant}
+              frame={b.frame}
+              size={spriteSize}
+              flip={b.dir < 0}
+            />
+          </button>
+        );
+      })}
+    </div>
   );
 }
