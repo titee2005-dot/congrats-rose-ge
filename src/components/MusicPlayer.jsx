@@ -15,6 +15,7 @@ export default function MusicPlayer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [ytApiReady, setYtApiReady] = useState(false);
 
   const currentTrack = playlist[currentIndex] || playlist[0];
@@ -60,16 +61,18 @@ export default function MusicPlayer({
     }
   }, []);
 
-  // ปิดเมนูเลือกเพลงเมื่อคลิกข้างนอกหรือกด Esc
+  // ปิดเมนู/พับแผ่นเสียงเมื่อคลิกข้างนอกหรือกด Esc
   useEffect(() => {
-    if (!isMenuOpen) return;
+    if (!isMenuOpen && !isExpanded) return;
+    const closeAll = () => {
+      setIsMenuOpen(false);
+      setIsExpanded(false);
+    };
     const handleOutside = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        setIsMenuOpen(false);
-      }
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) closeAll();
     };
     const handleEsc = (e) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
+      if (e.key === 'Escape') closeAll();
     };
     document.addEventListener('pointerdown', handleOutside);
     document.addEventListener('keydown', handleEsc);
@@ -77,7 +80,7 @@ export default function MusicPlayer({
       document.removeEventListener('pointerdown', handleOutside);
       document.removeEventListener('keydown', handleEsc);
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isExpanded]);
 
   // ค่อย ๆ เพิ่มระดับเสียงให้นุ่มนวลเวลาเพลงเว็บเริ่มขึ้น
   const fadeInVolume = useCallback(() => {
@@ -386,11 +389,33 @@ export default function MusicPlayer({
         />
       )}
 
-      {/* แถบเครื่องเล่นเพลงขนาดมินิ มุมซ้ายล่าง (เฉพาะชื่อเพลง ไม่มีคำอธิบาย) */}
+      {/* แผ่นเสียงพิกเซลจิ๋วแบบพับได้: ปกติเห็นแค่แผ่นเสียง แตะแล้วสไลด์ชื่อเพลง+ปุ่มควบคุมออกมา */}
       <div
         ref={wrapRef}
-        className={`px-bgm-mini ${isPlaying ? 'is-playing' : ''}`}
+        className={`px-bgm-mini ${isPlaying ? 'is-playing' : ''} ${isExpanded ? 'is-expanded' : ''}`}
       >
+        <button
+          type="button"
+          className="px-bgm-vinyl"
+          onClick={() => {
+            setIsExpanded((v) => !v);
+            setIsMenuOpen(false);
+          }}
+          title={isExpanded ? 'พับเครื่องเล่นเพลง' : 'เปิดเครื่องเล่นเพลง'}
+          aria-label={isExpanded ? 'พับเครื่องเล่นเพลง' : 'เปิดเครื่องเล่นเพลง'}
+          aria-expanded={isExpanded}
+        >
+          <span className={`px-bgm-disc-ico ${isPlaying ? 'spin' : ''}`}>
+            <PixelIcon name="disc" size={20} />
+          </span>
+          {isPlaying && !isExpanded && (
+            <span className="px-bgm-vinyl-note" aria-hidden="true">
+              <PixelIcon name="music" size={10} />
+            </span>
+          )}
+        </button>
+
+        <div className="px-bgm-panel" aria-hidden={!isExpanded}>
         {isMenuOpen && (
           <div
             className="px-bgm-menu"
@@ -432,10 +457,8 @@ export default function MusicPlayer({
           onClick={() => setIsMenuOpen((v) => !v)}
           title="เลือกเพลง"
           aria-expanded={isMenuOpen}
+          tabIndex={isExpanded ? 0 : -1}
         >
-          <span className={`px-bgm-disc-ico ${isPlaying ? 'spin' : ''}`}>
-            <PixelIcon name="disc" size={13} />
-          </span>
           <span className="px-bgm-song-name">{currentTrack.title}</span>
           <PixelIcon
             name={isMenuOpen ? 'chevron-down' : 'chevron-up'}
@@ -449,6 +472,7 @@ export default function MusicPlayer({
           onClick={handleTogglePlay}
           title={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
           aria-label={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
+          tabIndex={isExpanded ? 0 : -1}
         >
           <PixelIcon name={isPlaying ? 'pause' : 'play'} size={11} />
         </button>
@@ -459,9 +483,11 @@ export default function MusicPlayer({
           onClick={handleNextClick}
           title="เพลงถัดไป"
           aria-label="เพลงถัดไป"
+          tabIndex={isExpanded ? 0 : -1}
         >
           <PixelIcon name="next" size={11} />
         </button>
+        </div>
       </div>
     </>
   );

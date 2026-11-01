@@ -3351,7 +3351,7 @@ textarea {
 }
 
 /* =========================================================
-   18. เครื่องเล่นเพลงขนาดมินิบน Header (Header Mini BGM Player)
+   18. แผ่นเสียงพิกเซลจิ๋วแบบพับได้ (Floating Mini Vinyl BGM)
    ========================================================= */
 .px-bgm-yt-host {
   position: fixed;
@@ -3365,18 +3365,19 @@ textarea {
   overflow: hidden;
 }
 
+/* ลอยมุมซ้ายล่าง เหนือสนามหญ้าและหัวน้องกระต่าย */
 .px-bgm-mini {
-  position: relative;
-  display: inline-flex;
+  position: fixed;
+  left: 12px;
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  z-index: 56;
+  display: flex;
   align-items: center;
-  gap: 3px;
-  height: 32px;
-  margin: 2px;
-  padding: 0 6px 0 4px;
-  background: #fff;
+  height: 34px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.97);
   border: 2px solid var(--line);
   box-shadow: 2px 2px 0 0 var(--line);
-  flex-shrink: 0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -3385,12 +3386,91 @@ textarea {
   box-shadow: 2px 2px 0 0 var(--pink-d);
 }
 
+/* ปุ่มแผ่นเสียง (มองเห็นตลอด) */
+.px-bgm-vinyl {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: var(--pink-xl);
+  color: var(--pink-d);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.px-bgm-vinyl:hover {
+  background: var(--pink-l);
+}
+
+.px-bgm-mini.is-playing .px-bgm-vinyl {
+  animation: bgmWiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes bgmWiggle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1px) rotate(-4deg); }
+  75% { transform: translateY(-1px) rotate(4deg); }
+}
+
+.px-bgm-vinyl-note {
+  position: absolute;
+  top: -9px;
+  right: -7px;
+  color: var(--pink-d);
+  pointer-events: none;
+  animation: bgmNoteFloat 1.8s ease-in-out infinite;
+}
+
+@keyframes bgmNoteFloat {
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.8); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(4px, -6px) scale(1.05); }
+}
+
+.px-bgm-disc-ico {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.px-bgm-disc-ico.spin {
+  animation: bgmSpin 3.2s linear infinite;
+}
+
+@keyframes bgmSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* แผงที่สไลด์ออกมาเมื่อแตะแผ่นเสียง */
+.px-bgm-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding: 0;
+  transition: max-width 0.28s ease, opacity 0.2s ease, padding 0.28s ease;
+}
+
+.px-bgm-mini.is-expanded .px-bgm-panel {
+  max-width: 260px;
+  opacity: 1;
+  padding: 0 4px 0 3px;
+  overflow: visible;
+}
+
 .px-bgm-song-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 100%;
-  padding: 0 4px 0 2px;
+  gap: 4px;
+  height: 26px;
+  padding: 0 4px;
   border: none;
   background: transparent;
   color: var(--ink);
@@ -3403,27 +3483,11 @@ textarea {
   color: var(--pink-d);
 }
 
-.px-bgm-disc-ico {
-  display: grid;
-  place-items: center;
-  color: var(--pink-d);
-  flex-shrink: 0;
-}
-
-.px-bgm-disc-ico.spin {
-  animation: bgmSpin 3.6s linear infinite;
-}
-
-@keyframes bgmSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .px-bgm-song-name {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 700;
   line-height: 1.2;
-  max-width: 112px;
+  max-width: 130px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3456,13 +3520,13 @@ textarea {
   color: var(--line);
 }
 
-/* ป๊อปอัปเลือกเพลงขนาดกะทัดรัด (กางลงมาจาก Header) */
+/* รายชื่อเพลง (เด้งขึ้นด้านบนแผ่นเสียง) */
 .px-bgm-menu {
   position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  width: 216px;
-  max-width: min(280px, calc(100vw - 20px));
+  bottom: calc(100% + 8px);
+  left: -33px;
+  width: 210px;
+  max-width: calc(100vw - 24px);
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -3470,19 +3534,13 @@ textarea {
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid var(--line);
   box-shadow: 3px 3px 0 0 var(--line);
-  z-index: 100;
-  animation: bgmMenuDrop 0.15s ease-out;
+  z-index: 2;
+  animation: bgmMenuPop 0.15s ease-out;
 }
 
-@keyframes bgmMenuDrop {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes bgmMenuPop {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .px-bgm-item {
@@ -3557,21 +3615,21 @@ textarea {
   text-overflow: ellipsis;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 560px) {
   .px-bgm-mini {
-    height: 30px;
-    padding: 0 4px;
-    gap: 2px;
+    left: 8px;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    height: 32px;
+  }
+
+  .px-bgm-vinyl {
+    width: 28px;
+    height: 28px;
   }
 
   .px-bgm-song-name {
     font-size: 0.7rem;
-    max-width: 72px;
-  }
-
-  .px-bgm-icon-btn {
-    width: 21px;
-    height: 21px;
+    max-width: 104px;
   }
 
   .px-bgm-menu {
@@ -3579,17 +3637,10 @@ textarea {
   }
 }
 
-@media (max-width: 440px) {
-  .px-bgm-mini {
-    height: 30px;
-    padding: 0 3px;
-  }
-
-  .px-bgm-song-name {
-    display: none;
-  }
-
-  .px-bgm-icon-btn.is-next {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .px-bgm-mini.is-playing .px-bgm-vinyl,
+  .px-bgm-vinyl-note,
+  .px-bgm-disc-ico.spin {
+    animation: none;
   }
 }

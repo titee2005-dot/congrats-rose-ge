@@ -7,6 +7,7 @@ import WishWall from '../components/WishWall';
 import FollowRose from '../components/FollowRose';
 import Footer from '../components/Footer';
 import PixelBunnies from '../components/PixelBunnies';
+import MusicPlayer from '../components/MusicPlayer';
 import { PixelIcon } from '../components/PixelSprites';
 import { computeAutoBunnyCount } from '../data/roseData';
 
@@ -100,8 +101,6 @@ export default function Home({
         bunniesVisible={bunniesVisible}
         onToggleBunnies={() => setBunniesVisible((v) => !v)}
         onDropCarrot={handleDropCarrot}
-        isScrolledPastHero={isScrolledPastHero}
-        heroVideoActive={heroVideoActive}
       />
 
       <main className="px-main">
@@ -117,6 +116,12 @@ export default function Home({
       </main>
 
       <Footer />
+
+      {/* แผ่นเสียงพิกเซลจิ๋วแบบพับได้ ลอยมุมซ้ายล่างเหนือสนามหญ้า */}
+      <MusicPlayer
+        isScrolledPastHero={isScrolledPastHero}
+        heroVideoActive={heroVideoActive}
+      />
 
       {/* ลูกเล่นน้องกระต่าย Pixel Art วิ่งเล่นบนสนามหญ้าด้านล่างจอ */}
       <PixelBunnies
