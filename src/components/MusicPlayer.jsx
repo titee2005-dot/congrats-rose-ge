@@ -455,7 +455,7 @@ export default function MusicPlayer({
 
         <button
           type="button"
-          className="px-bgm-icon-btn"
+          className="px-bgm-icon-btn is-next"
           onClick={handleNextClick}
           title="เพลงถัดไป"
           aria-label="เพลงถัดไป"

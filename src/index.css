@@ -3351,7 +3351,7 @@ textarea {
 }
 
 /* =========================================================
-   18. เครื่องเล่นเพลงขนาดมินิ (Compact Mini BGM Player)
+   18. เครื่องเล่นเพลงขนาดมินิบน Header (Header Mini BGM Player)
    ========================================================= */
 .px-bgm-yt-host {
   position: fixed;
@@ -3366,19 +3366,17 @@ textarea {
 }
 
 .px-bgm-mini {
-  position: fixed;
-  left: 12px;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  z-index: 55;
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  height: 28px;
-  padding: 2px 4px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1.5px solid var(--line);
+  height: 32px;
+  margin: 2px;
+  padding: 0 6px 0 4px;
+  background: #fff;
+  border: 2px solid var(--line);
   box-shadow: 2px 2px 0 0 var(--line);
-  max-width: calc(100vw - 24px);
+  flex-shrink: 0;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -3391,8 +3389,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 22px;
-  padding: 0 5px 0 3px;
+  height: 100%;
+  padding: 0 4px 0 2px;
   border: none;
   background: transparent;
   color: var(--ink);
@@ -3422,10 +3420,10 @@ textarea {
 }
 
 .px-bgm-song-name {
-  font-size: 0.73rem;
+  font-size: 0.76rem;
   font-weight: 700;
   line-height: 1.2;
-  max-width: 126px;
+  max-width: 112px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3434,8 +3432,8 @@ textarea {
 .px-bgm-icon-btn {
   display: grid;
   place-items: center;
-  width: 21px;
-  height: 21px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: 1.5px solid var(--line);
   background: #fff;
@@ -3458,13 +3456,13 @@ textarea {
   color: var(--line);
 }
 
-/* ป๊อปอัปเลือกเพลงขนาดกะทัดรัด (แสดงเฉพาะชื่อเพลง) */
+/* ป๊อปอัปเลือกเพลงขนาดกะทัดรัด (กางลงมาจาก Header) */
 .px-bgm-menu {
   position: absolute;
-  bottom: calc(100% + 6px);
-  left: 0;
-  width: 206px;
-  max-width: calc(100vw - 24px);
+  top: calc(100% + 6px);
+  right: 0;
+  width: 216px;
+  max-width: min(280px, calc(100vw - 20px));
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -3472,13 +3470,14 @@ textarea {
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid var(--line);
   box-shadow: 3px 3px 0 0 var(--line);
-  animation: bgmMenuPop 0.15s ease-out;
+  z-index: 100;
+  animation: bgmMenuDrop 0.15s ease-out;
 }
 
-@keyframes bgmMenuPop {
+@keyframes bgmMenuDrop {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
@@ -3558,26 +3557,39 @@ textarea {
   text-overflow: ellipsis;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 680px) {
   .px-bgm-mini {
-    left: 8px;
-    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-    height: 26px;
-    padding: 2px 3px;
+    height: 30px;
+    padding: 0 4px;
     gap: 2px;
   }
 
   .px-bgm-song-name {
     font-size: 0.7rem;
-    max-width: 92px;
+    max-width: 72px;
   }
 
   .px-bgm-icon-btn {
-    width: 20px;
-    height: 20px;
+    width: 21px;
+    height: 21px;
   }
 
   .px-bgm-menu {
-    width: 192px;
+    width: 196px;
+  }
+}
+
+@media (max-width: 440px) {
+  .px-bgm-mini {
+    height: 30px;
+    padding: 0 3px;
+  }
+
+  .px-bgm-song-name {
+    display: none;
+  }
+
+  .px-bgm-icon-btn.is-next {
+    display: none;
   }
 }

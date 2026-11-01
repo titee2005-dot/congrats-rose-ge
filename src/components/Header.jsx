@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PixelIcon } from './PixelSprites';
+import MusicPlayer from './MusicPlayer';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'หน้าแรก' },
@@ -15,6 +16,8 @@ export default function Header({
   bunniesVisible = true,
   onToggleBunnies,
   onDropCarrot,
+  isScrolledPastHero = false,
+  heroVideoActive = false,
 }) {
   const [isShrunk, setIsShrunk] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -86,6 +89,11 @@ export default function Header({
         </nav>
 
         <div className="px-head-tools">
+          <MusicPlayer
+            isScrolledPastHero={isScrolledPastHero}
+            heroVideoActive={heroVideoActive}
+          />
+
           {bunnyCount > 0 && (
             <>
               {bunniesVisible && (
