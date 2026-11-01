@@ -103,7 +103,8 @@ export default function Hero({
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const togglePlay = () => {
+  const togglePlay = (e) => {
+    e?.stopPropagation?.();
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
@@ -115,7 +116,8 @@ export default function Hero({
     }
   };
 
-  const toggleSound = () => {
+  const toggleSound = (e) => {
+    e?.stopPropagation?.();
     setIsMuted((prev) => {
       const next = !prev;
       if (videoRef.current) {
@@ -157,7 +159,19 @@ export default function Hero({
           className="hero-photo-frame"
           bodyClassName="hero-photo-body"
         >
-          <div className="hero-media-wrap">
+          <div
+            className="hero-media-wrap"
+            onClick={togglePlay}
+            role="button"
+            tabIndex={0}
+            aria-label={isPaused ? 'แตะเพื่อเล่นวิดีโอต่อ' : 'แตะเพื่อหยุดวิดีโอ'}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                togglePlay(e);
+              }
+            }}
+          >
             {youtubeId ? (
               <iframe
                 className="hero-video-embed"
@@ -177,33 +191,33 @@ export default function Hero({
                   loop
                   muted={isMuted}
                   playsInline
+                  webkit-playsinline="true"
+                  controlsList="nodownload nofullscreen noremoteplayback"
+                  disablePictureInPicture
                   preload="auto"
-                  onClick={togglePlay}
                   onPlay={() => setIsPaused(false)}
                   onPause={() => setIsPaused(true)}
                   onError={() => setVideoError(true)}
                 />
 
                 {isPaused && (
-                  <button
-                    type="button"
-                    className="hero-pause-overlay"
-                    onClick={togglePlay}
-                    aria-label="เล่นวิดีโอต่อ"
-                    title="คลิกเพื่อเล่นวิดีโอต่อ"
-                  >
+                  <div className="hero-pause-overlay" aria-hidden="true">
                     <span className="hero-pause-badge">
-                      <PixelIcon name="play" size={24} />
+                      <PixelIcon name="play" size={26} />
                     </span>
-                  </button>
+                  </div>
                 )}
 
-                <div className="hero-video-controls">
+                <div
+                  className="hero-video-controls"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <button
                     type="button"
-                    className="hero-sound-btn"
+                    className="hero-sound-btn hero-play-btn"
                     onClick={togglePlay}
                     title={isPaused ? 'เล่นวิดีโอต่อ' : 'หยุดวิดีโอชั่วคราว'}
+                    aria-label={isPaused ? 'เล่นวิดีโอต่อ' : 'หยุดวิดีโอชั่วคราว'}
                   >
                     <PixelIcon name={isPaused ? 'play' : 'pause'} size={14} />
                     <span>{isPaused ? 'เล่น' : 'หยุด'}</span>
@@ -214,6 +228,7 @@ export default function Hero({
                     className="hero-sound-btn"
                     onClick={toggleSound}
                     title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
+                    aria-label={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
                   >
                     <PixelIcon
                       name={isMuted ? 'volume-off' : 'volume-on'}

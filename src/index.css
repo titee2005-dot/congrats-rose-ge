@@ -728,6 +728,7 @@ textarea {
   background: #1b0e16;
   box-shadow: 0 0 0 3px var(--line);
   overflow: hidden;
+  cursor: pointer;
 }
 
 .hero-photo,
@@ -3156,6 +3157,11 @@ textarea {
     right: 6px;
     bottom: 6px;
     gap: 5px;
+  }
+
+  /* บนมือถือ: ซ่อนปุ่มเล่น/หยุดในมุมวิดีโอ ให้แตะบนตัววิดีโอโดยตรงเพื่อหยุด/เล่นต่อ */
+  .hero-play-btn {
+    display: none !important;
   }
 
   .hero-sound-btn {
