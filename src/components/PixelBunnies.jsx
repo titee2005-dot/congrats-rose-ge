@@ -20,7 +20,13 @@ const VARIANTS = [
   'lop-cream',
 ];
 
-const SPAWN_SLOTS = [24, 68, 46, 84, 12];
+const SPAWN_SLOTS = [28, 68, 48, 86, 38];
+
+// คำนวณขอบเขตด้านซ้ายเพื่อให้กระต่ายไม่เดินไปชนหรือทับแผ่นเสียงที่มุมซ้ายล่าง
+function getMinBunnyX() {
+  if (typeof window === 'undefined') return 16;
+  return Math.max(14, (72 / window.innerWidth) * 100);
+}
 
 function createBunny(id, variantIndex, startX, withGreeting = false) {
   return {
@@ -75,11 +81,13 @@ export default function PixelBunnies({
     }, 950);
   };
 
-  // รับคำสั่งโยนแครอทจากปุ่มบนแถบเมนูด้านบน (Navbar)
+  // รับคำสั่งโยนแครอทจากปุ่มบนแถบเมนูด้านบน (Navbar) — โยนห่างจากแผ่นเสียงเสมอ
   useEffect(() => {
     if (carrotSignal > 0 && carrotSignal !== lastCarrotSignalRef.current) {
       lastCarrotSignalRef.current = carrotSignal;
-      const randomX = 18 + Math.floor(Math.random() * 64);
+      const minX = getMinBunnyX();
+      const minCarrotX = Math.round(minX + 6);
+      const randomX = minCarrotX + Math.floor(Math.random() * Math.max(10, 88 - minCarrotX));
       setCarrot({ x: randomX, ticks: 42 });
       spawnBurst(randomX);
     }
@@ -188,7 +196,7 @@ export default function PixelBunnies({
                 speechTicks = 18;
               }
             }
-            x = Math.max(6, Math.min(94, x));
+            x = Math.max(getMinBunnyX(), Math.min(94, x));
             return {
               ...b,
               x,
@@ -237,8 +245,9 @@ export default function PixelBunnies({
 
           if (state === 'run') {
             x += dir * 0.78;
-            if (x <= 6) {
-              x = 6;
+            const minX = getMinBunnyX();
+            if (x <= minX) {
+              x = minX;
               dir = 1;
             } else if (x >= 94) {
               x = 94;

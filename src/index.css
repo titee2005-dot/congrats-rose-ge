@@ -3365,15 +3365,15 @@ textarea {
   overflow: hidden;
 }
 
-/* ลอยมุมซ้ายล่าง เหนือสนามหญ้าและหัวน้องกระต่าย */
+/* วางที่มุมซ้ายล่างระดับเดียวกับขอบสนามหญ้า (ไม่ลอยสูง) */
 .px-bgm-mini {
   position: fixed;
   left: 12px;
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 56;
   display: flex;
   align-items: center;
-  height: 34px;
+  height: 32px;
   padding: 0;
   background: rgba(255, 255, 255, 0.97);
   border: 2px solid var(--line);
@@ -3618,8 +3618,8 @@ textarea {
 @media (max-width: 560px) {
   .px-bgm-mini {
     left: 8px;
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-    height: 32px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    height: 30px;
   }
 
   .px-bgm-vinyl {
