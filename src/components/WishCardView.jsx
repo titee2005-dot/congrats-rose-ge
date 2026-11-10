@@ -1,24 +1,35 @@
-import { resolveCardTheme } from '../data/roseData';
+import { resolveCardTheme, resolveCardStamp } from '../data/roseData';
 import { PixelIcon } from './PixelSprites';
 
 // ==========================================
-// การ์ดคำอวยพร 6 ดีไซน์ (กรอบพิกเซลมุมหยัก + ไอคอน SVG คมกริบ)
+// การ์ดแสดงความยินดี 6 ดีไซน์ + ตราประทับเกียรติยศ (Honor Stamp) + ปุ่มหัวใจ
 // ==========================================
 export default function WishCardView({
   bg,
+  stamp = 'crown-gold',
   name,
   message,
   img,
   letterNumber,
+  likes = 0,
+  isFeatured = false,
+  isLiked = false,
+  onLikeClick,
   compact = false,
   showFooterHint = false,
 }) {
   const theme = resolveCardTheme(bg);
+  const stampInfo = resolveCardStamp(stamp);
   const v = theme.variant;
+
+  const handleHeartClick = (e) => {
+    e.stopPropagation();
+    onLikeClick?.();
+  };
 
   return (
     <article
-      className={`wc wc-${v} ${compact ? 'is-compact' : 'is-full'}`}
+      className={`wc wc-${v} ${compact ? 'is-compact' : 'is-full'} ${isFeatured ? 'is-hall-of-fame' : ''}`}
       style={{
         '--wc-accent': theme.accent,
         '--wc-bg': theme.softBg,
@@ -30,20 +41,34 @@ export default function WishCardView({
 
       <header className="wc-head">
         <span className="wc-icon" aria-hidden="true">
-          <PixelIcon name={theme.iconName || 'rose'} size={20} />
+          <PixelIcon name={theme.iconName || 'bouquet'} size={20} />
         </span>
         <div className="wc-titles">
-          <strong>{letterNumber || 'Happy 19th Rose'}</strong>
+          <strong>
+            {letterNumber || 'Congrats Rose BNK48'}
+            {isFeatured && (
+              <span className="wc-hof-pill" title="การ์ดหอเกียรติยศ (Hall of Fame)">
+                <PixelIcon name="crown" size={12} />
+                <span>STAR</span>
+              </span>
+            )}
+          </strong>
           <small>{theme.sub || theme.name}</small>
         </div>
-        {v === 'airmail' ? (
-          <div className="wc-stamp" aria-hidden="true">
-            <span>ROSE</span>
-            <b>19</b>
-          </div>
-        ) : (
-          <span className="wc-badge">{theme.sealText}</span>
-        )}
+
+        {/* ตราประทับเกียรติยศที่ผู้ส่งเลือก */}
+        <div
+          className="wc-honor-stamp"
+          style={{
+            '--st-bg': stampInfo.bg,
+            '--st-border': stampInfo.border,
+            '--st-color': stampInfo.color,
+          }}
+          title={`ตราประทับ: ${stampInfo.titleTh}`}
+        >
+          <PixelIcon name={stampInfo.icon} size={15} />
+          <span>{stampInfo.code}</span>
+        </div>
       </header>
 
       {v === 'grid-diary' && (
@@ -70,7 +95,7 @@ export default function WishCardView({
         <div className="wc-msg-row">
           <p className={`wc-msg ${compact ? 'is-clamped' : ''}`}>
             {message ||
-              'เขียนคำอวยพรวันเกิดวัย 19 ปีถึงโรสตรงนี้ได้เลย...'}
+              'เขียนคำแสดงความยินดีและกำลังใจถึงน้องโรสตรงนี้ได้เลย...'}
           </p>
           {compact && img && (
             <div className="wc-thumb">
@@ -81,20 +106,33 @@ export default function WishCardView({
 
         <div className="wc-sign">
           <span className="wc-to">
-            <span>To. Rose</span>
-            <PixelIcon name="heart" size={13} />
+            <PixelIcon name={stampInfo.icon} size={14} />
+            <span>{stampInfo.titleTh}</span>
           </span>
           <span className="wc-from">จาก {name || 'แฟนคลับของโรส'}</span>
         </div>
 
         {showFooterHint && (
           <div className="wc-hint">
-            {img && (
-              <span className="wc-has-photo">
-                <PixelIcon name="camera" size={13} />
-                <span>มีรูปแนบ</span>
-              </span>
-            )}
+            <div className="wc-hint-left">
+              {onLikeClick && (
+                <button
+                  type="button"
+                  className={`wc-like-btn ${isLiked ? 'is-liked' : ''}`}
+                  onClick={handleHeartClick}
+                  title="กดส่งหัวใจให้การ์ดใบนี้"
+                >
+                  <PixelIcon name="heart" size={13} />
+                  <span>{Number(likes) || 0}</span>
+                </button>
+              )}
+              {img && (
+                <span className="wc-has-photo">
+                  <PixelIcon name="camera" size={13} />
+                  <span>โพลาลอยด์</span>
+                </span>
+              )}
+            </div>
             <span className="wc-open">
               <span>กดเพื่ออ่าน</span>
               <PixelIcon name="chevron-right" size={13} />

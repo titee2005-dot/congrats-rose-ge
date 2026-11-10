@@ -12,24 +12,24 @@ export default function Footer() {
         <div className="px-footer-main">
           <div className="footer-emblem" aria-hidden="true">
             <span className="footer-mini-dot">
-              <PixelIcon name="heart" size={15} />
+              <PixelIcon name="crown" size={16} />
             </span>
             <span className="footer-mini-dot">
-              <PixelIcon name="rose" size={19} />
+              <PixelIcon name="bouquet" size={19} />
             </span>
             <span className="footer-bunny-badge">
-              <PixelBunnySprite variant="pink-rose" frame="idle" size={38} />
+              <PixelBunnySprite variant="crown-ge" frame="idle" size={38} />
             </span>
             <span className="footer-mini-dot">
-              <PixelIcon name="rose" size={19} />
+              <PixelIcon name="trophy" size={19} />
             </span>
             <span className="footer-mini-dot">
-              <PixelIcon name="heart" size={15} />
+              <PixelIcon name="rose" size={16} />
             </span>
           </div>
 
           <p className="footer-quote">
-            ขอให้วัย 19 ของโรสเต็มไปด้วยความสุขและรอยยิ้มในทุก ๆ วันนะ
+            ทุกก้าวที่โรสเดินมา มีสวนกุหลาบเดินเคียงข้างเสมอ
           </p>
 
           <div className="footer-tags">
@@ -43,12 +43,12 @@ export default function Footer() {
 
         <div className="px-footer-bar">
           <span className="footer-dates">
-            <PixelIcon name="sparkle" size={13} />
-            <span>ROSE BNK48 · 01.11.2007 — 01.11.2026</span>
+            <PixelIcon name="trophy" size={13} />
+            <span>CONGRATULATIONS ROSE BNK48 · GENERAL ELECTION</span>
           </span>
 
           <p className="footer-credit">
-            Made by ROLLZYBUNNY · Special Project For Rose BNK48 Birthday
+            Made by ROLLZYBUNNY · Rose BNK48 General Election Celebration
           </p>
 
           <button

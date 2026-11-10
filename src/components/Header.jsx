@@ -3,10 +3,13 @@ import { PixelIcon } from './PixelSprites';
 
 const NAV_ITEMS = [
   { id: 'home', label: 'หน้าแรก' },
+  { id: 'milestone', label: 'เกียรติยศ GE' },
+  { id: 'cheer', label: 'ฟาร์มกระต่าย' },
   { id: 'journey', label: 'เส้นทางของโรส' },
   { id: 'wish', label: 'เขียนการ์ด' },
-  { id: 'wall', label: 'กำแพงคำอวยพร' },
+  { id: 'wall', label: 'หอเกียรติยศ' },
   { id: 'follow', label: 'ติดตามโรส' },
+  { id: 'supporters', label: 'Supporters' },
 ];
 
 export default function Header({
@@ -15,6 +18,7 @@ export default function Header({
   bunniesVisible = true,
   onToggleBunnies,
   onDropCarrot,
+  onLaunchConfetti,
 }) {
   const [isShrunk, setIsShrunk] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,7 +42,7 @@ export default function Header({
         window.innerHeight + Math.round(window.scrollY) >=
           document.documentElement.scrollHeight - 24
       ) {
-        current = 'follow';
+        current = 'supporters';
       }
       setActiveSection(current);
     };
@@ -64,15 +68,14 @@ export default function Header({
           onClick={(e) => scrollToSection(e, 'home')}
         >
           <span className="px-brand-icon">
-            <PixelIcon name="rose" size={24} />
+            <PixelIcon name="crown" size={24} />
           </span>
           <span className="px-brand-text">
-            <strong>ROSE</strong>
-            <em>Sweet 19th</em>
+            <strong>CONGRATS ROSE BNK48</strong>
           </span>
         </a>
 
-        <nav className={`px-nav ${menuOpen ? 'show' : ''}`}>
+        <nav id="main-navigation" aria-label="เมนูหลัก" className={`px-nav ${menuOpen ? 'show' : ''}`}>
           {NAV_ITEMS.map((item) => (
             <a
               key={item.id}
@@ -86,41 +89,33 @@ export default function Header({
         </nav>
 
         <div className="px-head-tools">
-          {bunnyCount > 0 && (
-            <>
-              {bunniesVisible && (
-                <button
-                  type="button"
-                  className="px-tool-btn is-carrot"
-                  onClick={onDropCarrot}
-                  title="โยนแครอทให้น้องกระต่าย"
-                  aria-label="โยนแครอทให้น้องกระต่าย"
-                >
-                  <PixelIcon name="carrot" size={16} />
-                </button>
-              )}
-              <button
-                type="button"
-                className={`px-tool-btn is-bunny ${!bunniesVisible ? 'is-off' : ''}`}
-                onClick={onToggleBunnies}
-                title={
-                  bunniesVisible
-                    ? 'ซ่อนน้องกระต่ายชั่วคราว'
-                    : 'เรียกน้องกระต่ายออกมาวิ่งเล่น'
-                }
-                aria-label={bunniesVisible ? 'ซ่อนกระต่าย' : 'แสดงกระต่าย'}
-              >
-                <PixelIcon name="bunny" size={17} />
-                <span>×{bunnyCount}</span>
-              </button>
-            </>
+          <button
+            type="button"
+            className="px-tool-btn is-confetti"
+            onClick={onLaunchConfetti}
+            title="จุดพลุฉลองแสดงความยินดี"
+            aria-label="จุดพลุฉลองแสดงความยินดี"
+          >
+            <PixelIcon name="firework" size={16} />
+          </button>
+
+          {bunnyCount > 0 && bunniesVisible && (
+            <button
+              type="button"
+              className="px-tool-btn is-carrot"
+              onClick={onDropCarrot}
+              title="โยนแครอทให้น้องกระต่าย"
+              aria-label="โยนแครอทให้น้องกระต่าย"
+            >
+              <PixelIcon name="carrot" size={16} />
+            </button>
           )}
 
           <a
             href="#wall"
             className="px-count"
             onClick={(e) => scrollToSection(e, 'wall')}
-            title="จำนวนการ์ดบนกำแพง"
+            title="จำนวนการ์ดแสดงความยินดีบนกำแพง"
           >
             <PixelIcon name="envelope" size={17} />
             <span>{wishCount}</span>
@@ -130,6 +125,8 @@ export default function Header({
             type="button"
             className="px-menu-btn"
             aria-label="เปิดเมนู"
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
             onClick={() => setMenuOpen((prev) => !prev)}
           >
             <PixelIcon name={menuOpen ? 'close' : 'menu'} size={19} />

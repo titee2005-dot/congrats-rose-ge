@@ -1,6 +1,7 @@
 // ==========================================
-// ข้อมูลหลักของเว็บวันเกิดครบ 19 ปี Rose BNK48 (ปาณิสรา บูรณาภา)
-// ธีม: Pastel Pixel Bunny Garden (#19thBloomingRose)
+// ข้อมูลหลักของเว็บแสดงความยินดี Rose BNK48 — General Election Celebration
+// ธีม: Royal Rose & Pixel Bunny Victory Garden (#CongratsRoseBNK48)
+// ข้อมูลแยกขาดจากเว็บวันเกิด 100%
 // ==========================================
 
 export const ROSE_PROFILE = {
@@ -9,12 +10,13 @@ export const ROSE_PROFILE = {
   fullNameTh: 'ปาณิสรา บูรณาภา',
   fullNameEn: 'Panisara Buranapha',
   group: 'BNK48 6th Generation',
-  status: 'BNK48 Trainee',
+  status: 'BNK48 Shining Idol',
   birthDateISO: '2007-11-01',
   birthDateDisplay: '01.11.2007',
   birthDateThai: '1 พฤศจิกายน 2550',
-  celebrationDateDisplay: '01.11.2026',
-  celebrationISO: '2026-11-01T00:00:00+07:00',
+  debutDateISO: '2025-05-31T00:00:00+07:00',
+  debutDateDisplay: '31.05.2025',
+  celebrationTitle: 'BNK48 & CGM48 General Election',
   hometown: 'นครปฐม',
   height: '167 cm',
   bloodGroup: 'B',
@@ -24,21 +26,114 @@ export const ROSE_PROFILE = {
     { text: 'อาหารญี่ปุ่น ปิ้งย่าง และส้มตำ', icon: 'food' },
     { text: 'ดูซีรีส์ เล่นเกม และช็อปปิ้ง', icon: 'ribbon' },
   ],
-  hashtags: ['#19thBloomingRose', '#RoseBNK48', '#BNK486thGen'],
+  hashtags: ['#CongratsRoseBNK48', '#RoseBNK48', '#BNK486thGen'],
 };
 
 // ==========================================
-// ตั้งค่ามีเดียช่อง Rose Birthday Party (วางไฟล์วิดีโอในโค้ด หรือตั้งค่าผ่านหน้า /admin ได้)
+// ตั้งค่ามีเดียช่อง Rose Victory Stage (วางไฟล์วิดีโอในโค้ด หรือตั้งค่าผ่านหน้า /admin ได้)
 // ==========================================
 export const ROSE_PARTY_MEDIA = {
-  // วิดีโอวันเกิด Rose BNK48 (สามารถเปลี่ยนหรืออัปโหลดใหม่ผ่านหน้า /admin ได้ตลอดเวลา)
   defaultVideoUrl:
     'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/rose_party_19th.mp4',
   posterUrl: '',
 };
 
-// คำนวณจำนวนกระต่ายตามจำนวนคำอวยพรที่อนุมัติแล้ว:
-// การ์ด 7 ใบต่อกระต่าย 1 ตัว (1–7 ใบ = 1 ตัว, 8–14 = 2 ตัว, 15–21 = 3 ตัว, 22–28 = 4 ตัว, 29+ = 5 ตัว) สูงสุด 5 ตัว
+// ==========================================
+// ข้อมูลป้ายประกาศรางวัล & ความสำเร็จ General Election (แก้ไขผ่านหน้า /admin ได้)
+// ==========================================
+export const DEFAULT_GE_MILESTONE = {
+  eventTitle: 'BNK48 & CGM48 General Election',
+  rankBadge: 'SHINING ROSE OF GE',
+  rankNumber: 'GE',
+  imageUrl: '',
+  unitTitle: 'Rose Garden Victory Milestone',
+  voteScore: 'พลังรักจากสวนกุหลาบ',
+  quote:
+    'ทุกคะแนนโหวตและทุกข้อความจากสวนกุหลาบ คือดอกไม้ที่ทำให้โรสเปล่งประกายบนเวทีแห่งความฝัน ขอบคุณที่สู้ไปด้วยกันในทุกก้าวนะคะ',
+  goalTarget: 500,
+};
+
+export const GE_MILESTONE_BADGES = [
+  {
+    id: 'prelim-star',
+    icon: 'trophy',
+    tone: 'butter',
+    tag: 'MILESTONE 01',
+    title: 'Rising Star in General Election',
+    desc: 'สร้างปรากฏการณ์ความประทับใจตั้งแต่ผลด่วนด้วยพลังซัพพอร์ตจากแฟนคลับ',
+  },
+  {
+    id: 'garden-unity',
+    icon: 'bouquet',
+    tone: 'pink',
+    tag: 'MILESTONE 02',
+    title: 'Power of Rose Garden',
+    desc: 'หัวใจทุกดวงของชาวสวนกุหลาบที่รวมพลังโหวตและส่งกำลังใจเคียงข้างโรส',
+  },
+  {
+    id: 'center-shine',
+    icon: 'crown',
+    tone: 'lavender',
+    tag: 'MILESTONE 03',
+    title: 'Shining 6th Generation Pride',
+    desc: 'เติบโตอย่างสง่างามจากแคนดิเดตสู่น้องโรสที่เปล่งประกายบนทุกเวที',
+  },
+  {
+    id: 'never-give-up',
+    icon: 'medal',
+    tone: 'mint',
+    tag: 'MILESTONE 04',
+    title: 'Effort Never Betrays',
+    desc: 'ความพยายามที่ไม่เคยทรยศใคร ผลิบานเป็นความภูมิใจของพวกเราทุกคน',
+  },
+];
+
+// ==========================================
+// ซุ้มส่งช่อดอกไม้และของขวัญฉลอง (Interactive Cheer Pavilion)
+// ==========================================
+export const DEFAULT_CHEER_STATS = {
+  bouquet: 19,
+  crown: 12,
+  trophy: 15,
+  carrot: 24,
+};
+
+export const CHEER_ITEMS = [
+  {
+    key: 'bouquet',
+    label: 'ส่งช่อกุหลาบ',
+    sub: 'Rose Bouquet',
+    icon: 'bouquet',
+    tone: 'pink',
+    accent: '#e64980',
+  },
+  {
+    key: 'crown',
+    label: 'มอบมงกุฎคนเก่ง',
+    sub: 'Golden Crown',
+    icon: 'crown',
+    tone: 'butter',
+    accent: '#d98a00',
+  },
+  {
+    key: 'trophy',
+    label: 'ชูถ้วยรางวัล',
+    sub: 'Victory Trophy',
+    icon: 'trophy',
+    tone: 'lavender',
+    accent: '#8558b5',
+  },
+  {
+    key: 'carrot',
+    label: 'เลี้ยงแครอทกระต่าย',
+    sub: 'Bunny Treat',
+    icon: 'carrot',
+    tone: 'mint',
+    accent: '#3a8f5e',
+  },
+];
+
+// คำนวณจำนวนกระต่ายตามจำนวนการ์ดที่อนุมัติแล้ว (1–7 ใบ = 1 ตัว ... สูงสุด 5 ตัว)
 export function computeAutoBunnyCount(wishCount = 0) {
   const n = Math.max(0, Number(wishCount) || 0);
   if (n <= 7) return 1;
@@ -46,125 +141,196 @@ export function computeAutoBunnyCount(wishCount = 0) {
 }
 
 // ==========================================
-// 6 ดีไซน์การ์ดโปสการ์ดและสมุดภาพให้แฟนคลับเลือก (ใช้ไอคอน Vector SVG ทั้งหมด)
+// 6 ดีไซน์การ์ดแสดงความยินดี (Congratulations Card Themes)
 // ==========================================
 export const CARD_THEMES = [
   {
-    id: 'pressed-rose',
-    name: 'Pressed Rose Letter',
-    sub: 'Pressed Rose Letter',
+    id: 'royal-rose',
+    name: 'Royal Rose Victory',
+    sub: 'Royal Rose Letter',
     variant: 'wax-letter',
     accent: '#c94a76',
     softBg: '#fff8fa',
     headerTone: '#f8cddc',
     borderTone: '#eab3c7',
     tapeTone: 'pink-plaid',
-    sealText: 'Rose',
-    iconName: 'rose',
+    sealText: 'CONGRATS',
+    iconName: 'bouquet',
   },
   {
-    id: 'bunny-polaroid',
-    name: 'Bunny Ribbon Note',
-    sub: 'Bunny Ribbon Note',
+    id: 'bunny-crown',
+    name: 'Bunny Crown Note',
+    sub: 'Bunny Crown Note',
     variant: 'ribbon-polaroid',
     accent: '#df5c8e',
     softBg: '#fffdf9',
     headerTone: '#ffdbe9',
     borderTone: '#f2bed2',
     tapeTone: 'rose-dot',
-    sealText: 'BUNNY',
-    iconName: 'bunny',
+    sealText: 'CROWN',
+    iconName: 'crown',
   },
   {
-    id: 'vintage-airmail',
-    name: 'Rose Garden Postcard',
-    sub: 'Rose Garden Postcard',
+    id: 'victory-airmail',
+    name: 'Victory Express Postcard',
+    sub: 'Victory Express Postcard',
     variant: 'airmail',
     accent: '#b84a6e',
     softBg: '#fdfaf5',
     headerTone: '#f4d5de',
     borderTone: '#d9b8c4',
     tapeTone: 'sage-stripe',
-    sealText: 'POST',
+    sealText: 'VICTORY',
     iconName: 'envelope',
   },
   {
-    id: 'lavender-note',
-    name: 'Wisteria Diary Page',
-    sub: 'Wisteria Diary Page',
+    id: 'starlight-diary',
+    name: 'Starlight GE Diary',
+    sub: 'Starlight GE Diary',
     variant: 'grid-diary',
     accent: '#8558b5',
     softBg: '#fcf9ff',
     headerTone: '#e5d4fa',
     borderTone: '#cbb3eb',
     tapeTone: 'lavender-check',
-    sealText: 'GEN6',
+    sealText: 'SHINING',
     iconName: 'heart-purple',
   },
   {
-    id: 'tea-party',
-    name: 'Sweet 19 Tea Party',
-    sub: 'Sweet 19 Tea Party',
+    id: 'golden-trophy',
+    name: 'Golden Trophy Ribbon',
+    sub: 'Golden Trophy Ribbon',
     variant: 'tea-frame',
-    accent: '#cf6178',
-    softBg: '#fffaf6',
-    headerTone: '#fdd9ce',
-    borderTone: '#f0bcae',
+    accent: '#cf7132',
+    softBg: '#fffcf5',
+    headerTone: '#ffe8b8',
+    borderTone: '#f0cf8e',
     tapeTone: 'pink-plaid',
-    sealText: '19TH',
-    iconName: 'cake',
+    sealText: 'TROPHY',
+    iconName: 'trophy',
   },
   {
-    id: 'sage-botanical',
-    name: 'Botanical Greenhouse',
-    sub: 'Botanical Greenhouse',
+    id: 'blooming-medal',
+    name: 'Blooming Garden Medal',
+    sub: 'Blooming Garden Medal',
     variant: 'botanical',
     accent: '#59876b',
     softBg: '#f9fcf9',
     headerTone: '#d8eadc',
     borderTone: '#b4d4bd',
     tapeTone: 'sage-stripe',
-    sealText: 'BLOOM',
-    iconName: 'leaf',
+    sealText: 'PROUD',
+    iconName: 'medal',
   },
 ];
 
-// รองรับทั้ง id ใหม่ และ id/hex เดิมทั้งหมด
+// รองรับทั้ง id ใหม่ และ id เดิมทั้งหมด
 export function resolveCardTheme(bgValue) {
   if (!bgValue) return CARD_THEMES[0];
   const direct = CARD_THEMES.find((t) => t.id === bgValue);
   if (direct) return direct;
 
   const legacyMap = {
+    'pressed-rose': CARD_THEMES[0],
+    'bunny-polaroid': CARD_THEMES[1],
+    'vintage-airmail': CARD_THEMES[2],
+    'lavender-note': CARD_THEMES[3],
+    'tea-party': CARD_THEMES[4],
+    'sage-botanical': CARD_THEMES[5],
     'rose-garden': CARD_THEMES[0],
     'rollzy-bunny': CARD_THEMES[1],
     'pixel-mail': CARD_THEMES[2],
     'sweet-lavender': CARD_THEMES[3],
     'strawberry-cake': CARD_THEMES[4],
     'cotton-sky': CARD_THEMES[5],
-    '#ffd9ea': CARD_THEMES[0],
-    '#ffe0ed': CARD_THEMES[1],
-    '#e8dcff': CARD_THEMES[3],
-    '#fff0d5': CARD_THEMES[4],
-    '#dcecff': CARD_THEMES[5],
   };
 
   return legacyMap[bgValue] || CARD_THEMES[0];
 }
 
 // ==========================================
-// บันทึกการผลิบานทั้ง 9 ความทรงจำ (Timeline)
-// วางรูปจริงของโรสได้ที่ public/assets/timeline/ch1.jpg ถึง ch9.jpg
+// 6 ตราประทับและสติกเกอร์เกียรติยศบนการ์ด (Stamp & Badge Sticker)
+// ==========================================
+export const CARD_STAMPS = [
+  {
+    id: 'crown-gold',
+    label: 'Golden Crown',
+    titleTh: 'มงกุฎคนเก่ง',
+    code: 'OUR QUEEN',
+    icon: 'crown',
+    bg: '#fff3bf',
+    border: '#f59f00',
+    color: '#8a5200',
+  },
+  {
+    id: 'trophy-star',
+    label: 'Victory Trophy',
+    titleTh: 'ถ้วยรางวัลภูมิใจ',
+    code: 'SO PROUD',
+    icon: 'trophy',
+    bg: '#ffe3ef',
+    border: '#e64980',
+    color: '#8a234b',
+  },
+  {
+    id: 'rose-bouquet',
+    label: 'Rose Bouquet',
+    titleTh: 'ช่อกุหลาบฉลอง',
+    code: 'FULL BLOOM',
+    icon: 'bouquet',
+    bg: '#ffdbe9',
+    border: '#d6336c',
+    color: '#7a1c40',
+  },
+  {
+    id: 'medal-no1',
+    label: 'Honor Medal',
+    titleTh: 'เหรียญแห่งความพยายาม',
+    code: 'BEST EFFORT',
+    icon: 'medal',
+    bg: '#ece3ff',
+    border: '#845ef7',
+    color: '#492b8c',
+  },
+  {
+    id: 'bunny-cheer',
+    label: 'Cheer Bunny',
+    titleTh: 'กระต่ายส่งใจ',
+    code: 'WITH ROSE',
+    icon: 'bunny',
+    bg: '#fff0f6',
+    border: '#ff6b9d',
+    color: '#7a2848',
+  },
+  {
+    id: 'wing-star',
+    label: 'Shining Wings',
+    titleTh: 'ติดปีกโบยบิน',
+    code: 'FLY HIGH',
+    icon: 'wing',
+    bg: '#dff5e8',
+    border: '#40916c',
+    color: '#1b4332',
+  },
+];
+
+export function resolveCardStamp(stampId) {
+  if (!stampId) return CARD_STAMPS[0];
+  return CARD_STAMPS.find((s) => s.id === stampId) || CARD_STAMPS[0];
+}
+
+// ==========================================
+// บันทึกเส้นทางสู่ความสำเร็จทั้ง 9 บท (Victory Timeline)
 // ==========================================
 export const ROSE_TIMELINE = [
   {
     chapter: 1,
-    seasonLabel: 'Memory 01',
+    seasonLabel: 'Milestone 01',
     date: '1 November 2007',
-    title: 'วันที่เมล็ดพันธุ์ดอกกุหลาบถือกำเนิด',
-    body: 'จุดเริ่มต้นของเรื่องราวแสนอบอุ่น วันที่เด็กสาวชื่อ “โรส — ปาณิสรา บูรณาภา” ลืมตาดูโลก ณ จังหวัดนครปฐม พร้อมรอยยิ้มอ่อนโยนและความฝันเล็ก ๆ ในหัวใจที่จะได้ส่งต่อความสุขผ่านเสียงเพลง',
-    polaroidNote: 'Little Rose · Nakhon Pathom',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch1.jpg'
+    title: 'จุดเริ่มต้นของเมล็ดพันธุ์ดอกกุหลาบ',
+    body: '“โรส — ปาณิสรา บูรณาภา” ลืมตาดูโลก ณ จังหวัดนครปฐม พร้อมความฝันอันยิ่งใหญ่ที่จะก้าวขึ้นเป็นศิลปินที่ส่งต่อรอยยิ้มและความสุขให้ทุกคน',
+    polaroidNote: 'Baby Rose · Nakhon Pathom',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch1_1793503643189.jpeg',
     scene: 'seed',
     tape: 'pink-plaid',
     bloomCount: 1,
@@ -172,12 +338,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 2,
-    seasonLabel: 'Memory 02',
+    seasonLabel: 'Milestone 02',
     date: 'May 2025',
     title: 'หัวใจที่ไม่เคยยอมแพ้ — แคนดิเดต BNK48 รุ่นที่ 6',
-    body: 'แม้เคยผ่านความผิดหวังจากการออดิชันมาก่อน แต่โรสไม่เคยหยุดพัฒนาตัวเอง เธอกลับมาสู้อีกครั้งในฐานะแคนดิเดต BNK48 รุ่นที่ 6 จนหลายคนตกหลุมรักในความตั้งใจและแววตาที่มุ่งมั่นของเธอ',
-    polaroidNote: 'Never Give Up on Your Dream',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch2.jpg'
+    body: 'ถึงแม้จะผ่านบททดสอบจากการออดิชันหลายครั้ง แต่โรสก็ยังลุกขึ้นสู้ต่อไปจนกลายเป็น Candidates รุ่นที่ 6 พิสูจน์ให้เห็นถึงความมุ่งมั่นที่ไม่เคยลดลง',
+    polaroidNote: 'Candidate NO.1054',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch2_1793501954479.jpeg',
     scene: 'sprout',
     tape: 'sage-stripe',
     bloomCount: 2,
@@ -185,12 +351,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 3,
-    seasonLabel: 'Memory 03',
+    seasonLabel: 'Milestone 03',
     date: '31 May 2025',
-    title: 'ก้าวสู่สมาชิก BNK48 รุ่นที่ 6 อย่างเป็นทางการ',
-    body: 'วินาทีที่ความพยายามผลิดอกออกผลในงานครบรอบ 8 ปีของ BNK48 การได้ก้าวขึ้นยืนบนเวทีเคียงข้างเพื่อนร่วมรุ่นที่ 6 คือจุดเริ่มต้นอย่างเต็มภาคภูมิของ “โรส BNK48”',
-    polaroidNote: 'Welcome Rose BNK48 6th Gen!',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch3.jpg'
+    title: 'เปิดตัวสมาชิก BNK48 รุ่นที่ 6 อย่างเป็นทางการ',
+    body: 'จุดเริ่มต้นอย่างเป็นทางการของ Rose BNK48 ความพยายามที่ไม่เคยทรยศใครพาโรสก้าวขึ้นสู่เวทีในฐานะไอดอลเต็มตัว',
+    polaroidNote: 'Effort Does Not Betray',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch3_1793502018036.jpeg',
     scene: 'ribbon',
     tape: 'lavender-check',
     bloomCount: 2,
@@ -198,12 +364,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 4,
-    seasonLabel: 'Memory 04',
+    seasonLabel: 'Milestone 04',
     date: '23 August 2025',
     title: 'CHAPTER: NEXT — คอนเสิร์ตใหญ่ครั้งแรกในชีวิต',
-    body: 'เวทีคอนเสิร์ตใหญ่ที่เปิดโอกาสให้โรสได้เปล่งประกายเคียงข้างรุ่นพี่และเพื่อน ๆ ทุกหยาดเหงื่อจากการฝึกซ้อมแปรเปลี่ยนเป็นรอยยิ้มและความสุขที่ส่งไปถึงผู้ชมทุกที่นั่ง',
-    polaroidNote: 'Shining Under the Stage Lights',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch4.jpg'
+    body: 'เวทีคอนเสิร์ตใหญ่ที่เปิดโอกาสให้โรสได้เปล่งประกายเคียงข้างรุ่นพี่และเพื่อน ๆ ทุกหยาดเหงื่อจากการซ้อมกลายเป็นพลังที่ส่งถึงแฟนคลับ',
+    polaroidNote: 'CHAPTER: NEXT',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch4_1793503071982.jpeg',
     scene: 'stage',
     tape: 'rose-dot',
     bloomCount: 3,
@@ -211,12 +377,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 5,
-    seasonLabel: 'Memory 05',
+    seasonLabel: 'Milestone 05',
     date: '11 October 2025',
     title: 'BNK48 6th Generation Debut Stage',
-    body: 'สเตจเดบิวต์อย่างเป็นทางการ ณ MBK Center กับเพลงประจำรุ่น “Doushitemo Kimi ga Suki da (จะยังไงก็รักเธอ)” วันสำคัญที่พิสูจน์ว่าดอกกุหลาบดอกนี้พร้อมเบ่งบานบนเส้นทางไอดอลอย่างงดงาม',
+    body: 'สเตจเดบิวต์อย่างเป็นทางการที่ MBK Center กับเพลง “Doushitemo Kimi ga Suki da (จะยังไงก็รักเธอ)” ก้าวสำคัญที่ทำให้ทุกคนหลงรักรอยยิ้มของโรส',
     polaroidNote: 'Doushitemo Kimi ga Suki da',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch5.jpg'
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch5_1793503160845.jpeg',
     scene: 'debut',
     tape: 'pink-plaid',
     bloomCount: 3,
@@ -224,12 +390,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 6,
-    seasonLabel: 'Memory 06',
+    seasonLabel: 'Milestone 06',
     date: 'January 2026',
-    title: '(N)EXTENSION — สมุดบันทึกเบื้องหลังการเติบโต',
-    body: 'สารคดีที่พาแฟนคลับไปสัมผัสตัวตนของโรสให้ลึกซึ้งยิ่งขึ้น ทั้งความอ่อนโยน ความฝันของเด็กสาวที่รักกระต่าย ชอบแต่งนิยาย และไม่เคยหยุดเรียนรู้ในทุก ๆ วัน',
-    polaroidNote: 'Every Page Tells Her Story',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch6.jpg'
+    title: '(N)EXTENSION — เรื่องราวเบื้องหลังการเติบโต',
+    body: 'สารคดีที่พาแฟนคลับไปสัมผัสตัวตนและความตั้งใจของโรสให้ลึกซึ้งยิ่งขึ้น ทั้งความอ่อนโยนและหัวใจที่พร้อมพัฒนาตัวเองเสมอ',
+    polaroidNote: 'Documentary Story',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch6_1793503277973.jpeg',
     scene: 'diary',
     tape: 'sage-stripe',
     bloomCount: 4,
@@ -237,12 +403,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 7,
-    seasonLabel: 'Memory 07',
+    seasonLabel: 'Milestone 07',
     date: 'March 2026',
     title: 'Center เพลงพิเศษ “แค่เพียงมีเธอ (Kimi ga Iru Dake de)”',
-    body: 'อีกหนึ่งก้าวสำคัญที่น่าภูมิใจสุด ๆ กับการรับตำแหน่ง Center ในโปรเจกต์พิเศษ Collaboration ไทย–ญี่ปุ่น ถ่ายทอดเสียงร้องใสละมุนและเสน่ห์ที่สะกดใจผู้ฟังในวงกว้าง',
-    polaroidNote: 'Our Shining Center Rose',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch7.jpg'
+    body: 'ความทรงจำสุดภูมิใจกับการยืนตำแหน่ง Center ในโปรเจกต์พิเศษ Collaboration ไทย–ญี่ปุ่น ถ่ายทอดเสน่ห์และเสียงร้องที่อบอุ่นหัวใจ',
+    polaroidNote: 'Shining Center Position',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch7_1793503378228.jpeg',
     scene: 'center',
     tape: 'rose-dot',
     bloomCount: 4,
@@ -250,12 +416,12 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 8,
-    seasonLabel: 'Memory 08',
+    seasonLabel: 'Milestone 08',
     date: 'October 2026',
-    title: 'พลังรักจากสวนกุหลาบ — General Election 2026',
-    body: 'แรงซัพพอร์ตอันท่วมท้นจากแฟนคลับทุกคนที่ร่วมเดินเคียงข้าง สร้างโมเมนต์สุดประทับใจในการประกาศผลด่วน เป็นเครื่องยืนยันว่าความตั้งใจของโรสมีผู้คนมากมายคอยโอบกอดอยู่เสมอ',
-    polaroidNote: 'Together in Rose’s Garden',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch8.jpg'
+    title: 'First Preliminary Results — พลังรักจากสวนกุหลาบ',
+    body: 'แรงซัพพอร์ตจากแฟนคลับทุกคนที่ร่วมแรงร่วมใจสร้างโมเมนต์สุดประทับใจในการประกาศผลด่วน ก้าวแรกที่งดงามบนสมรภูมิ General Election!',
+    polaroidNote: 'Thank You GARDENs!',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch8_1793503428608.jpeg',
     scene: 'bouquet',
     tape: 'lavender-check',
     bloomCount: 5,
@@ -263,16 +429,16 @@ export const ROSE_TIMELINE = [
   },
   {
     chapter: 9,
-    seasonLabel: 'Memory 09',
-    date: '1 November 2026',
-    title: 'Blooming Nineteen — สุขสันต์วันเกิดครบ 19 ปีนะโรส!',
-    body: 'ก้าวเข้าสู่วัย 19 ปีอย่างงดงาม ขอบคุณที่เติบโตมาอย่างดีและเป็นรอยยิ้มที่แสนอบอุ่นให้พวกเราเสมอ ขอให้ฤดูกาลที่ 19 ของโรสเต็มไปด้วยความสุข สุขภาพแข็งแรง ได้กินของอร่อยเยอะ ๆ และเบ่งบานในแบบที่เป็นตัวเองตลอดไป',
-    polaroidNote: 'Happy 19th Birthday, Dear Rose!',
-    img: '', // วางรูปจริงได้ที่ '/assets/timeline/ch9.jpg'
-    scene: 'birthday19',
+    seasonLabel: 'Victory Finale',
+    date: 'General Election 2026',
+    title: 'Congratulations Rose! — ชัยชนะแห่งความพยายามและสวนกุหลาบ',
+    body: 'ขอแสดงความยินดีกับโรสในงาน General Election! ทุกหยาดเหงื่อของโรสและทุกพลังโหวตจากแฟนคลับได้ผลิบานเป็นความสำเร็จที่น่าภาคภูมิใจที่สุด พวกเราจะเดินเคียงข้างโรสต่อไปในทุกเส้นทางนะ!',
+    polaroidNote: 'Congratulations Our Shining Rose!',
+    img: 'https://ctimhxkwpzsebodbtptx.supabase.co/storage/v1/object/public/rose-party-media/timeline_ch9_1793503787742.jpeg',
+    scene: 'victory',
     tape: 'pink-plaid',
     bloomCount: 5,
-    bloomText: 'Full Bloom • 19 Yrs',
+    bloomText: 'GE Victory Bloom',
   },
 ];
 
@@ -301,91 +467,63 @@ export const ROSE_SOCIALS = [
 ];
 
 // ==========================================
-// คำอวยพรตัวอย่างสำหรับโหมด Local (ก่อนเชื่อมต่อ Supabase จริง)
+// การ์ดแสดงความยินดีตัวอย่างสำหรับโหมด Local (แยกจากเว็บวันเกิด)
 // ==========================================
 export const INITIAL_DEMO_WISHES = [
   {
-    id: 105,
-    bg: 'pressed-rose',
-    name: 'กระต่ายในสวนกุหลาบ',
+    id: 201,
+    bg: 'royal-rose',
+    stamp: 'crown-gold',
+    name: 'ชาวสวนกุหลาบของโรส',
     message:
-      'สุขสันต์วันเกิดครบ 19 ปีนะน้องโรส! ขอบคุณที่ไม่ยอมแพ้กับความฝันจนได้มาเจอกันนะ ขอให้ปีที่ 19 เป็นปีที่ใจดีกับโรสมาก ๆ ยิ้มเยอะ ๆ กินอิ่มนอนหลับ พวกเราจะคอยเป็นสวนกุหลาบที่อบอุ่นให้โรสอยู่ตรงนี้เสมอเลย',
+      'ขอแสดงความยินดีกับน้องโรสสำหรับความสำเร็จในงาน General Election ครั้งนี้ด้วยนะ! ขอบคุณที่ตั้งใจซ้อมและสู้อย่างเต็มที่มาตลอด พวกเราภูมิใจในตัวโรสที่สุดเลย จะคอยซัพพอร์ตโรสในทุกก้าวต่อไปนะ!',
     img: '',
+    likes: 19,
+    is_featured: true,
     status: 'approved',
-    created_at: '2026-11-01T00:12:00+07:00',
+    created_at: '2026-11-10T00:12:00+07:00',
   },
   {
-    id: 104,
-    bg: 'bunny-polaroid',
-    name: 'BunnyLover48',
+    id: 202,
+    bg: 'bunny-crown',
+    stamp: 'trophy-star',
+    name: 'BunnyGuard48',
     message:
-      "Happy 19th Birthday P'Rose! ขอให้มีความสุขในทุก ๆ วันเลยนะะะ ดีใจมากที่ได้เห็นโรสเติบโตและเปล่งประกายบนเวที จะยังไงก็รักโรสน้าาา ~",
+      'Congratulations นะคะคนเก่ง! ทุกหยาดเหงื่อและความพยายามของโรสไม่เคยทรยศเลยจริง ๆ ดีใจที่ได้ร่วมเดินทางและโหวตให้โรสใน GE ครั้งนี้นะ เปล่งประกายบนเวทีให้เต็มที่เลยน้า~',
     img: '',
+    likes: 14,
+    is_featured: true,
     status: 'approved',
-    created_at: '2026-11-01T00:08:00+07:00',
+    created_at: '2026-11-10T00:08:00+07:00',
   },
   {
-    id: 103,
-    bg: 'vintage-airmail',
-    name: 'พิ้งค์กี้โรส',
+    id: 203,
+    bg: 'golden-trophy',
+    stamp: 'rose-bouquet',
+    name: 'RoseGarden_OfficialFan',
     message:
-      'ส่งโปสการ์ดใบนี้มาอวยพรวันเกิด 19 ขวบนะคะ ขอให้น้องโรสสุขภาพแข็งแรง ไม่ปวดหลัง ได้กินอาหารญี่ปุ่นกับปิ้งย่างอร่อย ๆ บ่อย ๆ รักรอยยิ้มของโรสที่สุดในโลกเลยยย',
+      'ส่งช่อดอกกุหลาบและการ์ดใบนี้มาแสดงความยินดีนะโรส เก่งมาก ๆ เลย ขอบคุณที่เป็นรอยยิ้มและพลังบวกให้พวกเราเสมอ ขอให้เส้นทางข้างหน้าของโรสโรยด้วยกลีบกุหลาบและความสุขนะ!',
     img: '',
+    likes: 11,
+    is_featured: false,
     status: 'approved',
-    created_at: '2026-11-01T00:05:00+07:00',
-  },
-  {
-    id: 102,
-    bg: 'lavender-note',
-    name: 'คนแถวนครปฐม',
-    message:
-      'HBD 19th นะครับน้องโรส ภูมิใจในตัวหนูมาก ๆ ตั้งแต่วันเปิดตัวรุ่น 6 จนถึงวันนี้ หนูเก่งขึ้นทุกวันเลย ขอให้สมหวังในทุกสิ่งที่ตั้งใจนะครับ',
-    img: '',
-    status: 'approved',
-    created_at: '2026-11-01T00:02:00+07:00',
-  },
-  {
-    id: 101,
-    bg: 'sage-botanical',
-    name: 'GardenKeeper_19',
-    message:
-      'ขอให้ดอกกุหลาบดอกนี้เบ่งบานอย่างมีความสุขในทุกฤดูกาลเลยนะ ไม่ว่าจะเจอเรื่องอะไร หันมาเมื่อไหร่ก็จะเจอพวกเราเสมอ สุขสันต์วันเกิดวัย 19 ปีครับ',
-    img: '',
-    status: 'approved',
-    created_at: '2026-11-01T00:00:10+07:00',
-  },
-  {
-    id: 106,
-    bg: 'tea-party',
-    name: 'แฟนคลับที่รอแอดมินอนุมัติ',
-    message:
-      'สุขสันต์วันเกิดครบ 19 ปีนะโรส! (การ์ดใบนี้เป็นตัวอย่างสถานะ "รออนุมัติ" สามารถเข้าไปกดอนุมัติหรือซ่อนได้ที่หน้า /admin เลยครับ)',
-    img: '',
-    status: 'pending',
-    created_at: '2026-11-01T00:15:00+07:00',
+    created_at: '2026-11-10T00:05:00+07:00',
   },
 ];
 
 // ==========================================
-// เพลย์ลิสต์เพลงประจำเว็บวันเกิด Rose BNK48 19th
-// ลำดับ: เพลง Happy Birthday ของ BNK48 -> เพลงที่น้องโรสร่วมร้อง -> วนลูปใหม่
+// เพลย์ลิสต์เพลงฉลองความสำเร็จของ Rose BNK48
 // ==========================================
 export const ROSE_PLAYLIST = [
   {
-    id: 'hbd-bnk48',
-    title: 'Happy Birthday (Namida Surprise!)',
-    youtubeId: 'L8I5_Ir7hKw',
-    audioUrl: '',
-  },
-  {
     id: 'kimi-ga-suki',
-    title: 'จะยังไงก็รักเธอ',
+    title: 'จะยังไงก็รักเธอ (Doushitemo Kimi ga Suki da)',
     youtubeId: 'CDSCbCJRdQM',
     audioUrl: '',
   },
   {
     id: 'kimi-iru',
-    title: 'แค่เพียงมีเธอ',
+    title: 'แค่เพียงมีเธอ (Kimi ga Iru Dake de)',
     youtubeId: 'ijhKKAgQggY',
     audioUrl: '',
   },

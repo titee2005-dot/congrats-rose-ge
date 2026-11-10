@@ -58,7 +58,17 @@ export function PixelBunnySprite({
       bowCenter: '#ffe066',
       outline: '#5e2b47',
       cheek: '#ff85b3',
-      prop: 'hat',
+      prop: 'crown',
+    },
+    'crown-ge': {
+      fur: '#fffdf7',
+      furShade: '#ffebf3',
+      earInner: '#ff94bd',
+      bow: '#f5b841',
+      bowCenter: '#ff4d88',
+      outline: '#5e2b47',
+      cheek: '#ff70a6',
+      prop: 'crown',
     },
   };
 
@@ -89,13 +99,15 @@ export function PixelBunnySprite({
       />
 
       <g transform={isHop ? 'translate(0, -2)' : 'translate(0, 0)'}>
-        {/* หมวกปาร์ตี้วันเกิด (เฉพาะ party-19) */}
-        {p.prop === 'hat' && (
+        {/* มงกุฎทองฉลองชัยชนะ (crown-ge / party-19) */}
+        {(p.prop === 'hat' || p.prop === 'crown') && (
           <g>
-            <rect x="8" y="0" width="2" height="1" fill="#ffe066" />
-            <rect x="8" y="1" width="2" height="1" fill="#ff5c9e" />
-            <rect x="7" y="2" width="4" height="2" fill="#ff85b3" />
-            <rect x="8" y="2" width="1" height="1" fill="#ffffff" />
+            <rect x="6" y="0" width="1" height="2" fill="#f5b841" />
+            <rect x="9" y="0" width="1" height="2" fill="#f5b841" />
+            <rect x="12" y="0" width="1" height="2" fill="#f5b841" />
+            <rect x="6" y="1" width="7" height="2" fill="#ffd166" />
+            <rect x="9" y="1" width="1" height="1" fill="#ff4d88" />
+            <rect x="7" y="2" width="1" height="1" fill="#fff9db" />
           </g>
         )}
 
@@ -856,6 +868,99 @@ export function PixelIcon({ name = 'rose', size = 24, className = '' }) {
           <rect x="6" y="9" width="3" height="3" fill="#ffffff" />
         </>
       )}
+
+      {name === 'crown' && (
+        <>
+          <rect x="1" y="4" width="14" height="9" fill="#5e2b47" />
+          <rect x="2" y="3" width="2" height="2" fill="#5e2b47" />
+          <rect x="7" y="2" width="2" height="3" fill="#5e2b47" />
+          <rect x="12" y="3" width="2" height="2" fill="#5e2b47" />
+          <rect x="2" y="5" width="12" height="6" fill="#ffd166" />
+          <rect x="2" y="4" width="2" height="2" fill="#ffe899" />
+          <rect x="7" y="3" width="2" height="3" fill="#ffe899" />
+          <rect x="12" y="4" width="2" height="2" fill="#ffe899" />
+          <rect x="2" y="10" width="12" height="2" fill="#f59f00" />
+          <rect x="7" y="7" width="2" height="2" fill="#f43f7a" />
+          <rect x="4" y="8" width="1" height="1" fill="#ffffff" />
+          <rect x="11" y="8" width="1" height="1" fill="#9f67ff" />
+        </>
+      )}
+
+      {name === 'trophy' && (
+        <>
+          <rect x="3" y="2" width="10" height="7" fill="#5e2b47" />
+          <rect x="1" y="3" width="2" height="4" fill="#5e2b47" />
+          <rect x="13" y="3" width="2" height="4" fill="#5e2b47" />
+          <rect x="6" y="9" width="4" height="3" fill="#5e2b47" />
+          <rect x="4" y="12" width="8" height="3" fill="#5e2b47" />
+          <rect x="4" y="3" width="8" height="5" fill="#ffd166" />
+          <rect x="5" y="3" width="2" height="4" fill="#fff3bf" />
+          <rect x="2" y="4" width="1" height="2" fill="#ffd166" />
+          <rect x="13" y="4" width="1" height="2" fill="#ffd166" />
+          <rect x="7" y="8" width="2" height="4" fill="#f59f00" />
+          <rect x="5" y="13" width="6" height="1" fill="#f43f7a" />
+          <rect x="7" y="5" width="2" height="2" fill="#f43f7a" />
+        </>
+      )}
+
+      {name === 'bouquet' && (
+        <>
+          <rect x="3" y="2" width="10" height="7" fill="#5e2b47" />
+          <rect x="4" y="9" width="8" height="5" fill="#5e2b47" />
+          <rect x="4" y="3" width="3" height="3" fill="#f43f7a" />
+          <rect x="9" y="3" width="3" height="3" fill="#ff75a0" />
+          <rect x="6" y="4" width="4" height="3" fill="#ff4d88" />
+          <rect x="5" y="2" width="2" height="1" fill="#ffc2db" />
+          <rect x="10" y="2" width="2" height="1" fill="#ffc2db" />
+          <rect x="3" y="6" width="2" height="2" fill="#4eb879" />
+          <rect x="11" y="6" width="2" height="2" fill="#4eb879" />
+          <rect x="5" y="8" width="6" height="5" fill="#fff0f6" />
+          <rect x="6" y="10" width="4" height="2" fill="#ff5c9e" />
+        </>
+      )}
+
+      {name === 'medal' && (
+        <>
+          <rect x="4" y="1" width="3" height="5" fill="#f43f7a" />
+          <rect x="9" y="1" width="3" height="5" fill="#9f67ff" />
+          <rect x="4" y="5" width="8" height="9" fill="#5e2b47" />
+          <rect x="3" y="6" width="10" height="7" fill="#5e2b47" />
+          <rect x="5" y="6" width="6" height="7" fill="#ffd166" />
+          <rect x="4" y="7" width="8" height="5" fill="#ffd166" />
+          <rect x="7" y="7" width="2" height="5" fill="#fff3bf" />
+          <rect x="6" y="8" width="4" height="3" fill="#f59f00" />
+          <rect x="7" y="9" width="2" height="1" fill="#ffffff" />
+        </>
+      )}
+
+      {name === 'wing' && (
+        <>
+          <rect x="1" y="4" width="6" height="7" fill="#5e2b47" />
+          <rect x="9" y="4" width="6" height="7" fill="#5e2b47" />
+          <rect x="2" y="5" width="4" height="5" fill="#ffffff" />
+          <rect x="10" y="5" width="4" height="5" fill="#ffffff" />
+          <rect x="3" y="7" width="3" height="3" fill="#ffd6e7" />
+          <rect x="10" y="7" width="3" height="3" fill="#ffd6e7" />
+          <rect x="6" y="5" width="4" height="6" fill="#ffd166" />
+          <rect x="7" y="4" width="2" height="8" fill="#ffd166" />
+          <rect x="7" y="7" width="2" height="2" fill="#f43f7a" />
+        </>
+      )}
+
+      {name === 'firework' && (
+        <>
+          <rect x="7" y="1" width="2" height="3" fill="#ffd166" />
+          <rect x="7" y="12" width="2" height="3" fill="#ffd166" />
+          <rect x="1" y="7" width="3" height="2" fill="#ff5c9e" />
+          <rect x="12" y="7" width="3" height="2" fill="#ff5c9e" />
+          <rect x="3" y="3" width="2" height="2" fill="#9f67ff" />
+          <rect x="11" y="3" width="2" height="2" fill="#9f67ff" />
+          <rect x="3" y="11" width="2" height="2" fill="#6ee7f5" />
+          <rect x="11" y="11" width="2" height="2" fill="#6ee7f5" />
+          <rect x="6" y="6" width="4" height="4" fill="#f43f7a" />
+          <rect x="7" y="7" width="2" height="2" fill="#ffffff" />
+        </>
+      )}
     </svg>
   );
 }
@@ -930,19 +1035,28 @@ export function TimelineChapterArt({ scene = 'birth', chapter = 1 }) {
       bgTop: '#ffc4dd',
       bgBottom: '#efe3ff',
       badge: 'ROSE GARDEN POWER',
-      mainIcon: 'heart',
+      mainIcon: 'bouquet',
       subIcon: 'rose',
-      bunnyVariant: 'party-19',
+      bunnyVariant: 'crown-ge',
       caption: 'WALKING TOGETHER',
     },
+    victory: {
+      bgTop: '#ffe8b3',
+      bgBottom: '#ffd9ec',
+      badge: 'CONGRATS GE!',
+      mainIcon: 'trophy',
+      subIcon: 'crown',
+      bunnyVariant: 'crown-ge',
+      caption: 'BLOOMING VICTORY ROSE',
+    },
     birthday19: {
-      bgTop: '#ffb8d6',
-      bgBottom: '#fff3f8',
-      badge: 'HAPPY 19TH HBD!',
-      mainIcon: 'cake',
-      subIcon: 'rose',
-      bunnyVariant: 'party-19',
-      caption: '19TH BLOOMING ROSE',
+      bgTop: '#ffe8b3',
+      bgBottom: '#ffd9ec',
+      badge: 'CONGRATS GE!',
+      mainIcon: 'trophy',
+      subIcon: 'crown',
+      bunnyVariant: 'crown-ge',
+      caption: 'BLOOMING VICTORY ROSE',
     },
   };
 

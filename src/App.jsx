@@ -1,25 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 import { supabase, isSupabaseConfigured } from './supabase';
-import { INITIAL_DEMO_WISHES, ROSE_TIMELINE } from './data/roseData';
+import {
+  INITIAL_DEMO_WISHES,
+  ROSE_TIMELINE,
+  DEFAULT_CHEER_STATS,
+  DEFAULT_GE_MILESTONE,
+} from './data/roseData';
 
 // =========================
-// IndexedDB & Local Fallback Helpers
+// IndexedDB & Local Fallback Helpers (แยกขาดจากเว็บวันเกิด 100%)
 // =========================
-const DB_NAME = 'Rose19BirthdayWishesDB';
-const STORE_NAME = 'wishes_cache_store';
-const LOCAL_FALLBACK_KEY = 'rose19_wishes_local_v2';
-const LOCAL_CONFIG_KEY = 'rose19_site_config_v1';
-const LOCAL_TIMELINE_KEY = 'rose19_timeline_items_v2';
-const WISHES_TABLE = import.meta.env.VITE_SUPABASE_TABLE || 'rose_wishes';
-const SETTINGS_TABLE = 'rose_settings';
-const PARTY_MEDIA_BUCKET = 'rose-party-media';
+const DB_NAME = 'RoseGECongratsWishesDB';
+const STORE_NAME = 'ge_wishes_cache_store';
+const LOCAL_FALLBACK_KEY = 'rose_ge_wishes_local_v1';
+const LOCAL_CONFIG_KEY = 'rose_ge_site_config_v1';
+const LOCAL_TIMELINE_KEY = 'rose_ge_timeline_items_v1';
+const LOCAL_CHEERS_KEY = 'rose_ge_cheer_stats_v1';
+const LOCAL_MILESTONE_KEY = 'rose_ge_milestone_v1';
+
+// ป้องกันไม่ให้ชื่อตารางชนกับ rose_wishes หรือ rose_settings ของเว็บวันเกิดโดยเด็ดขาด
+const rawEnvTable = import.meta.env.VITE_SUPABASE_TABLE;
+const WISHES_TABLE =
+  rawEnvTable && rawEnvTable !== 'rose_wishes'
+    ? rawEnvTable
+    : 'rose_ge_wishes';
+const SETTINGS_TABLE =
+  import.meta.env.VITE_SUPABASE_SETTINGS_TABLE &&
+  import.meta.env.VITE_SUPABASE_SETTINGS_TABLE !== 'rose_settings'
+    ? import.meta.env.VITE_SUPABASE_SETTINGS_TABLE
+    : 'rose_ge_settings';
+const PARTY_MEDIA_BUCKET =
+  import.meta.env.VITE_SUPABASE_MEDIA_BUCKET || 'rose-ge-media';
 
 export const DEFAULT_SITE_CONFIG = {
   bunny_mode: 'auto', // 'auto' | 'manual'
-  bunny_manual_count: 3, // 0..5
+  bunny_manual_count: 5, // 0..5
   party_video_url: '',
   bgm_enabled: true,
   bgm_auto_start_on_scroll: true,
@@ -41,6 +59,52 @@ const loadLocalTimeline = () => {
 const saveLocalTimeline = (items) => {
   try {
     localStorage.setItem(LOCAL_TIMELINE_KEY, JSON.stringify(items));
+  } catch {
+    // ignore
+  }
+};
+
+const loadLocalCheers = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_CHEERS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return { ...DEFAULT_CHEER_STATS, ...parsed };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_CHEER_STATS;
+};
+
+const saveLocalCheers = (stats) => {
+  try {
+    localStorage.setItem(LOCAL_CHEERS_KEY, JSON.stringify(stats));
+  } catch {
+    // ignore
+  }
+};
+
+const loadLocalMilestone = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_MILESTONE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        return { ...DEFAULT_GE_MILESTONE, ...parsed };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_GE_MILESTONE;
+};
+
+const saveLocalMilestone = (ms) => {
+  try {
+    localStorage.setItem(LOCAL_MILESTONE_KEY, JSON.stringify(ms));
   } catch {
     // ignore
   }
@@ -139,7 +203,14 @@ export default function App() {
   const [wishes, setWishes] = useState([]);
   const [siteConfig, setSiteConfig] = useState(loadLocalSiteConfig);
   const [timelineItems, setTimelineItems] = useState(loadLocalTimeline);
+  const [cheerStats, setCheerStats] = useState(loadLocalCheers);
+  const [geMilestone, setGeMilestone] = useState(loadLocalMilestone);
   const [isLoading, setIsLoading] = useState(true);
+
+  const cheerStatsRef = useRef(cheerStats);
+  useEffect(() => {
+    cheerStatsRef.current = cheerStats;
+  }, [cheerStats]);
 
   const sortWishes = (items) =>
     [...items].sort(
@@ -147,7 +218,7 @@ export default function App() {
     );
 
   // =========================
-  // โหลดข้อมูลคำอวยพร + ตั้งค่าเว็บ (กระต่าย & วิดีโอ) + ไทม์ไลน์ แบบ Real-time
+  // โหลดข้อมูลการ์ดแสดงความยินดี + ตั้งค่า + ซุ้มส่งดอกไม้ + รางวัล GE แบบ Real-time
   // =========================
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
@@ -155,6 +226,8 @@ export default function App() {
       setWishes(initial);
       setSiteConfig(loadLocalSiteConfig());
       setTimelineItems(loadLocalTimeline());
+      setCheerStats(loadLocalCheers());
+      setGeMilestone(loadLocalMilestone());
       setIsLoading(false);
 
       const onStorage = (e) => {
@@ -166,6 +239,12 @@ export default function App() {
         }
         if (e.key === LOCAL_TIMELINE_KEY) {
           setTimelineItems(loadLocalTimeline());
+        }
+        if (e.key === LOCAL_CHEERS_KEY) {
+          setCheerStats(loadLocalCheers());
+        }
+        if (e.key === LOCAL_MILESTONE_KEY) {
+          setGeMilestone(loadLocalMilestone());
         }
       };
       window.addEventListener('storage', onStorage);
@@ -185,21 +264,12 @@ export default function App() {
 
       try {
         if (!hasCache && isMounted) setIsLoading(true);
-        const [wishesRes, settingsRes, timelineRes] = await Promise.all([
+        const [wishesRes, settingsRes] = await Promise.all([
           supabase
             .from(WISHES_TABLE)
             .select('*')
             .order('created_at', { ascending: false }),
-          supabase
-            .from(SETTINGS_TABLE)
-            .select('value')
-            .eq('key', 'site_config')
-            .maybeSingle(),
-          supabase
-            .from(SETTINGS_TABLE)
-            .select('value')
-            .eq('key', 'timeline_items')
-            .maybeSingle(),
+          supabase.from(SETTINGS_TABLE).select('key, value'),
         ]);
 
         if (!wishesRes.error && isMounted) {
@@ -208,20 +278,32 @@ export default function App() {
           saveToIDB(list);
         }
 
-        if (!settingsRes.error && settingsRes.data?.value && isMounted) {
-          const merged = { ...DEFAULT_SITE_CONFIG, ...settingsRes.data.value };
-          setSiteConfig(merged);
-          saveLocalSiteConfig(merged);
-        }
-
-        if (
-          !timelineRes.error &&
-          Array.isArray(timelineRes.data?.value) &&
-          timelineRes.data.value.length > 0 &&
-          isMounted
-        ) {
-          setTimelineItems(timelineRes.data.value);
-          saveLocalTimeline(timelineRes.data.value);
+        if (!settingsRes.error && Array.isArray(settingsRes.data) && isMounted) {
+          for (const row of settingsRes.data) {
+            if (row.key === 'site_config' && row.value) {
+              const merged = { ...DEFAULT_SITE_CONFIG, ...row.value };
+              setSiteConfig(merged);
+              saveLocalSiteConfig(merged);
+            }
+            if (
+              row.key === 'timeline_items' &&
+              Array.isArray(row.value) &&
+              row.value.length > 0
+            ) {
+              setTimelineItems(row.value);
+              saveLocalTimeline(row.value);
+            }
+            if (row.key === 'cheer_stats' && row.value) {
+              const mergedCheers = { ...DEFAULT_CHEER_STATS, ...row.value };
+              setCheerStats(mergedCheers);
+              saveLocalCheers(mergedCheers);
+            }
+            if (row.key === 'ge_milestone' && row.value) {
+              const mergedMs = { ...DEFAULT_GE_MILESTONE, ...row.value };
+              setGeMilestone(mergedMs);
+              saveLocalMilestone(mergedMs);
+            }
+          }
         }
       } catch (err) {
         console.error('Unexpected fetch error:', err);
@@ -233,7 +315,7 @@ export default function App() {
     fetchInitialData();
 
     const channel = supabase
-      .channel('rose-live-sync')
+      .channel('rose-ge-live-sync')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: WISHES_TABLE },
@@ -295,6 +377,16 @@ export default function App() {
             setTimelineItems(payload.new.value);
             saveLocalTimeline(payload.new.value);
           }
+          if (payload.new?.key === 'cheer_stats' && payload.new?.value) {
+            const mergedCheers = { ...DEFAULT_CHEER_STATS, ...payload.new.value };
+            setCheerStats(mergedCheers);
+            saveLocalCheers(mergedCheers);
+          }
+          if (payload.new?.key === 'ge_milestone' && payload.new?.value) {
+            const mergedMs = { ...DEFAULT_GE_MILESTONE, ...payload.new.value };
+            setGeMilestone(mergedMs);
+            saveLocalMilestone(mergedMs);
+          }
         }
       )
       .subscribe();
@@ -306,7 +398,68 @@ export default function App() {
   }, []);
 
   // =========================
-  // อัปเดตตั้งค่าเว็บจากหน้า /admin (จำนวนกระต่าย & วิดีโอ Rose Birthday Party)
+  // กดส่งดอกไม้/มงกุฎ/ถ้วยรางวัล/แครอทในซุ้ม Cheer Pavilion
+  // =========================
+  const sendCheer = async (cheerKey) => {
+    if (!cheerKey) return;
+    const current = cheerStatsRef.current || DEFAULT_CHEER_STATS;
+    const nextStats = {
+      ...current,
+      [cheerKey]: (Number(current[cheerKey]) || 0) + 1,
+    };
+    cheerStatsRef.current = nextStats;
+    setCheerStats(nextStats);
+    saveLocalCheers(nextStats);
+
+    if (!isSupabaseConfigured || !supabase) return;
+
+    try {
+      await supabase.from(SETTINGS_TABLE).upsert(
+        {
+          key: 'cheer_stats',
+          value: nextStats,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      );
+    } catch (err) {
+      console.warn('Cheer sync warning:', err);
+    }
+  };
+
+  // =========================
+  // อัปเดตข้อมูลป้ายประกาศรางวัล GE จากหน้า /admin
+  // =========================
+  const updateGeMilestone = async (patch) => {
+    const nextMs = { ...geMilestone, ...patch };
+    setGeMilestone(nextMs);
+    saveLocalMilestone(nextMs);
+
+    if (!isSupabaseConfigured || !supabase) return true;
+
+    try {
+      const { error } = await supabase.from(SETTINGS_TABLE).upsert(
+        {
+          key: 'ge_milestone',
+          value: nextMs,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'key' }
+      );
+      if (error) {
+        console.error('Error saving ge_milestone:', error);
+        alert('บันทึกข้อมูลรางวัล GE ไม่สำเร็จ กรุณาลองใหม่');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Save ge_milestone error:', err);
+      return false;
+    }
+  };
+
+  // =========================
+  // อัปเดตตั้งค่าเว็บจากหน้า /admin
   // =========================
   const updateSiteConfig = async (patch) => {
     const nextConfig = { ...siteConfig, ...patch };
@@ -338,7 +491,7 @@ export default function App() {
     }
   };
 
-  // อัปโหลดไฟล์วิดีโอขึ้น Supabase Storage โดยตรงจากหน้า /admin
+  // อัปโหลดไฟล์วิดีโอขึ้น Supabase Storage (rose-ge-media)
   const uploadPartyVideo = async (file) => {
     if (!file) return null;
     if (!isSupabaseConfigured || !supabase) {
@@ -347,7 +500,7 @@ export default function App() {
     }
 
     const ext = (file.name.split('.').pop() || 'mp4').toLowerCase();
-    const filePath = `party_${Date.now()}.${ext}`;
+    const filePath = `victory_${Date.now()}.${ext}`;
 
     const { error } = await supabase.storage
       .from(PARTY_MEDIA_BUCKET)
@@ -375,14 +528,17 @@ export default function App() {
   };
 
   // =========================
-  // เพิ่มคำอวยพรใหม่ (ตั้งสถานะเป็น pending เพื่อรอแอดมินอนุมัติ)
+  // เพิ่มการ์ดแสดงความยินดีใหม่ (พร้อมตราประทับ stamp)
   // =========================
   const addWish = async (wishData) => {
     const newPayload = {
       bg: wishData.bg,
+      stamp: wishData.stamp || 'crown-gold',
       name: wishData.name,
       message: wishData.message,
       img: wishData.img || null,
+      likes: 0,
+      is_featured: false,
       status: 'pending',
     };
 
@@ -409,7 +565,7 @@ export default function App() {
 
       if (error) {
         console.error('Error inserting wish:', error);
-        alert('เกิดข้อผิดพลาดในการบันทึกคำอวยพร กรุณาลองใหม่อีกครั้ง');
+        alert('เกิดข้อผิดพลาดในการบันทึกการ์ด กรุณาลองใหม่อีกครั้ง');
         return false;
       }
 
@@ -421,7 +577,78 @@ export default function App() {
       return true;
     } catch (err) {
       console.error('Add wish error:', err);
-      alert('เกิดข้อผิดพลาดในการบันทึกคำอวยพร');
+      alert('เกิดข้อผิดพลาดในการบันทึกการ์ด');
+      return false;
+    }
+  };
+
+  // =========================
+  // กดส่งหัวใจให้การ์ดบนกำแพง (Like Card)
+  // =========================
+  const likeWish = async (id, delta = 1) => {
+    if (!id) return;
+    const target = wishes.find((w) => w.id === id);
+    if (!target) return;
+
+    const nextLikes = Math.max(0, (Number(target.likes) || 0) + delta);
+
+    setWishes((prev) => {
+      const next = prev.map((w) =>
+        w.id === id ? { ...w, likes: nextLikes } : w
+      );
+      if (!isSupabaseConfigured || !supabase) {
+        saveLocalFallbackWishes(next);
+      }
+      return next;
+    });
+
+    if (!isSupabaseConfigured || !supabase) return;
+
+    try {
+      await supabase
+        .from(WISHES_TABLE)
+        .update({ likes: nextLikes })
+        .eq('id', id);
+    } catch (err) {
+      console.warn('Like wish error:', err);
+    }
+  };
+
+  // =========================
+  // ปักหมุด / ถอนหมุดการ์ดขึ้น Hall of Fame สำหรับหน้า /admin
+  // =========================
+  const toggleFeaturedWish = async (id, nextFeatured) => {
+    if (!id) return false;
+
+    if (!isSupabaseConfigured || !supabase) {
+      setWishes((prev) => {
+        const next = prev.map((w) =>
+          w.id === id ? { ...w, is_featured: nextFeatured } : w
+        );
+        saveLocalFallbackWishes(next);
+        return next;
+      });
+      return true;
+    }
+
+    try {
+      const { error } = await supabase
+        .from(WISHES_TABLE)
+        .update({ is_featured: nextFeatured })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating featured status:', error);
+        alert('ไม่สามารถอัปเดตสถานะ Hall of Fame ได้');
+        return false;
+      }
+
+      setWishes((prev) =>
+        prev.map((w) => (w.id === id ? { ...w, is_featured: nextFeatured } : w))
+      );
+      return true;
+    } catch (err) {
+      console.error('Featured toggle error:', err);
       return false;
     }
   };
@@ -467,7 +694,7 @@ export default function App() {
   };
 
   // =========================
-  // ลบคำอวยพร สำหรับหน้า /admin
+  // ลบการ์ด สำหรับหน้า /admin
   // =========================
   const deleteWish = async (id) => {
     if (!id) return false;
@@ -488,7 +715,7 @@ export default function App() {
         .eq('id', id);
       if (error) {
         console.error('Error deleting wish:', error);
-        alert('เกิดข้อผิดพลาดในการลบคำอวยพร');
+        alert('เกิดข้อผิดพลาดในการลบการ์ด');
         return false;
       }
 
@@ -496,7 +723,7 @@ export default function App() {
       return true;
     } catch (err) {
       console.error('Delete wish error:', err);
-      alert('เกิดข้อผิดพลาดในการลบคำอวยพร');
+      alert('เกิดข้อผิดพลาดในการลบการ์ด');
       return false;
     }
   };
@@ -533,7 +760,7 @@ export default function App() {
     }
   };
 
-  // อัปโหลดรูปภาพความทรงจำ Timeline ขึ้น Supabase Storage
+  // อัปโหลดรูปภาพความทรงจำ Timeline ขึ้น Supabase Storage (rose-ge-media)
   const uploadTimelineImage = async (file, chapter) => {
     if (!file) return null;
     if (!isSupabaseConfigured || !supabase) {
@@ -541,7 +768,7 @@ export default function App() {
     }
 
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-    const filePath = `timeline_ch${chapter || 'x'}_${Date.now()}.${ext}`;
+    const filePath = `timeline_ge_ch${chapter || 'x'}_${Date.now()}.${ext}`;
 
     const { error } = await supabase.storage
       .from(PARTY_MEDIA_BUCKET)
@@ -573,9 +800,13 @@ export default function App() {
             <Home
               wishes={wishes}
               addWish={addWish}
+              likeWish={likeWish}
               isLoading={isLoading}
               siteConfig={siteConfig}
               timelineItems={timelineItems}
+              cheerStats={cheerStats}
+              sendCheer={sendCheer}
+              geMilestone={geMilestone}
             />
           }
         />
@@ -585,6 +816,7 @@ export default function App() {
             <Admin
               wishes={wishes}
               updateWishStatus={updateWishStatus}
+              toggleFeaturedWish={toggleFeaturedWish}
               deleteWish={deleteWish}
               siteConfig={siteConfig}
               updateSiteConfig={updateSiteConfig}
@@ -592,6 +824,8 @@ export default function App() {
               timelineItems={timelineItems}
               updateTimelineItems={updateTimelineItems}
               uploadTimelineImage={uploadTimelineImage}
+              geMilestone={geMilestone}
+              updateGeMilestone={updateGeMilestone}
             />
           }
         />

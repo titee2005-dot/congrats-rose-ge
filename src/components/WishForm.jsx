@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import html2canvas from 'html2canvas';
-import { CARD_THEMES } from '../data/roseData';
+import { CARD_THEMES, CARD_STAMPS } from '../data/roseData';
 import ScrollReveal from './ScrollReveal';
 import WishCardView from './WishCardView';
 import PixelFrame, { SectionHeading } from './PixelFrame';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
+
+const QUICK_PROMPTS = [
+  'ขอแสดงความยินดีกับน้องโรสสำหรับความสำเร็จในงาน General Election ครั้งนี้ด้วยนะ! ภูมิใจในตัวโรสที่สุดเลย',
+  'ทุกหยาดเหงื่อและความพยายามของโรสผลิบานอย่างงดงามแล้วนะ พวกเราจะคอยซัพพอร์ตโรสในทุกก้าวต่อไปเสมอ!',
+  'Congratulations นะคะคนเก่ง! ขอบคุณที่สู้อย่างเต็มที่และเป็นรอยยิ้มที่แสนอบอุ่นให้ชาวสวนกุหลาบนะ',
+];
 
 function compressImageFile(file) {
   return new Promise((resolve, reject) => {
@@ -41,8 +47,9 @@ function compressImageFile(file) {
   });
 }
 
-export default function WishForm({ onAddWish }) {
+export default function WishForm({ onAddWish, onLaunchConfetti }) {
   const [selectedCard, setSelectedCard] = useState(CARD_THEMES[0].id);
+  const [selectedStamp, setSelectedStamp] = useState(CARD_STAMPS[0].id);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [previewImgUrl, setPreviewImgUrl] = useState('');
@@ -78,9 +85,17 @@ export default function WishForm({ onAddWish }) {
     setPreviewImgUrl('');
   };
 
+  const handleApplyQuickPrompt = (text) => {
+    setMessage((prev) => {
+      if (!prev.trim()) return text;
+      const combined = `${prev.trim()} ${text}`;
+      return combined.slice(0, 500);
+    });
+  };
+
   const handleSubmit = async () => {
     if (!name.trim() || !message.trim()) {
-      setPopupMsg('กรุณากรอกชื่อผู้ส่งและข้อความอวยพรให้ครบถ้วนนะคะ');
+      setPopupMsg('กรุณากรอกชื่อผู้ส่งและข้อความแสดงความยินดีให้ครบถ้วนนะคะ');
       return;
     }
 
@@ -91,6 +106,7 @@ export default function WishForm({ onAddWish }) {
 
       const ok = await onAddWish({
         bg: selectedCard,
+        stamp: selectedStamp,
         name: name.trim(),
         message: message.trim(),
         img: compressedImg,
@@ -103,6 +119,7 @@ export default function WishForm({ onAddWish }) {
 
       setRecapData({
         bg: selectedCard,
+        stamp: selectedStamp,
         name: name.trim(),
         message: message.trim(),
         img: compressedImg || previewImgUrl || '',
@@ -114,6 +131,7 @@ export default function WishForm({ onAddWish }) {
       setPreviewImgUrl('');
       setShowPreviewModal(false);
       setShowSuccessModal(true);
+      onLaunchConfetti?.();
     } catch (err) {
       console.error(err);
       setPopupMsg('เกิดข้อผิดพลาดในการเตรียมรูปภาพ กรุณาลองใหม่อีกครั้งนะคะ');
@@ -132,7 +150,7 @@ export default function WishForm({ onAddWish }) {
         useCORS: true,
       });
       const link = document.createElement('a');
-      link.download = `rose_19th_card_${recapData.name}.png`;
+      link.download = `rose_ge_congrats_${recapData.name}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
@@ -146,10 +164,10 @@ export default function WishForm({ onAddWish }) {
       <section className="px-section" id="wish">
         <ScrollReveal>
           <SectionHeading
-            chip="WRITE A WISH"
+            chip="SEND CONGRATS CARD"
             icon="envelope"
-            title="เขียนการ์ดอวยพรวันเกิดให้โรส"
-            desc="เลือกการ์ดที่ชอบ เขียนคำอวยพรจากใจ แล้วส่งถึงโรสได้เลย (การ์ดทุกใบจะรอแอดมินตรวจสอบก่อนขึ้นกำแพงนะคะ)"
+            title="เขียนการ์ดแสดงความยินดีให้โรส"
+            desc="เลือกแบบการ์ด ประทับตราเกียรติยศ แล้วส่งความภูมิใจถึงน้องโรสได้เลย (การ์ดทุกใบจะรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศนะคะ)"
           />
         </ScrollReveal>
 
@@ -157,14 +175,14 @@ export default function WishForm({ onAddWish }) {
           <div className="wish-layout">
             {/* ฟอร์มเขียนการ์ด */}
             <PixelFrame
-              label="Wish Letter"
-              icon="envelope"
+              label="Congrats Letter"
+              icon="crown"
               tone="pink"
               bodyClassName="wish-form-body"
             >
               <div className="field">
                 <span className="field-label">
-                  <i>1</i> เลือกแบบการ์ด
+                  <i>1</i> เลือกแบบการ์ดฉลอง
                 </span>
                 <div className="card-picker">
                   {CARD_THEMES.map((t) => {
@@ -185,7 +203,7 @@ export default function WishForm({ onAddWish }) {
                       >
                         <span className={`pick-swatch sw-${t.variant}`}>
                           <span>
-                            <PixelIcon name={t.iconName || 'rose'} size={18} />
+                            <PixelIcon name={t.iconName || 'bouquet'} size={18} />
                           </span>
                         </span>
                         {active && (
@@ -200,15 +218,45 @@ export default function WishForm({ onAddWish }) {
               </div>
 
               <div className="field">
+                <span className="field-label">
+                  <i>2</i> เลือกตราประทับเกียรติยศ (Honor Stamp)
+                </span>
+                <div className="stamp-picker">
+                  {CARD_STAMPS.map((st) => {
+                    const active = selectedStamp === st.id;
+                    return (
+                      <button
+                        key={st.id}
+                        type="button"
+                        className={`stamp-pick-btn ${active ? 'is-active' : ''}`}
+                        style={{
+                          '--st-bg': st.bg,
+                          '--st-border': st.border,
+                          '--st-color': st.color,
+                        }}
+                        onClick={() => setSelectedStamp(st.id)}
+                      >
+                        <PixelIcon name={st.icon} size={17} />
+                        <span className="stamp-pick-text">
+                          <strong>{st.titleTh}</strong>
+                          <small>{st.code}</small>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="field">
                 <label className="field-label" htmlFor="sender-name-inp">
-                  <i>2</i> ชื่อ / นามแฝงผู้ส่ง
+                  <i>3</i> ชื่อ / นามแฝงผู้ส่ง
                 </label>
                 <input
                   id="sender-name-inp"
                   type="text"
                   className="px-input"
                   maxLength={40}
-                  placeholder="เช่น กระต่ายน้อยของโรส"
+                  placeholder="เช่น ชาวสวนกุหลาบของโรส"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -217,7 +265,7 @@ export default function WishForm({ onAddWish }) {
               <div className="field">
                 <div className="field-label-row">
                   <label className="field-label" htmlFor="wish-msg-inp">
-                    <i>3</i> คำอวยพร
+                    <i>4</i> ข้อความแสดงความยินดี
                   </label>
                   <span
                     className={`char-count ${message.length >= 460 ? 'near' : ''}`}
@@ -229,21 +277,38 @@ export default function WishForm({ onAddWish }) {
                   id="wish-msg-inp"
                   className="px-input px-textarea"
                   maxLength={500}
-                  placeholder="อยากบอกอะไรกับโรสในวันเกิดครบ 19 ปี..."
+                  placeholder="ร่วมเขียนข้อความแสดงความยินดีและส่งกำลังใจให้น้องโรสในงาน General Election..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
+
+                <div className="quick-prompts-bar">
+                  <span className="qp-label">ประโยคแนะนำ:</span>
+                  <div className="qp-chips">
+                    {QUICK_PROMPTS.map((qp, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className="qp-chip"
+                        onClick={() => handleApplyQuickPrompt(qp)}
+                      >
+                        <PixelIcon name="sparkle" size={12} />
+                        <span>แบบที่ {idx + 1}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="field">
                 <span className="field-label">
-                  <i>4</i> แนบรูป (ไม่บังคับ)
+                  <i>5</i> แนบรูปโพลาลอยด์ที่ระลึก (ไม่บังคับ)
                 </span>
                 {!previewImgUrl ? (
                   <label className="upload-drop">
-                    <PixelIcon name="gift" size={26} />
-                    <strong>คลิกเพื่อเลือกรูปภาพ</strong>
-                    <small>JPG, PNG, WEBP ไม่เกิน 25MB</small>
+                    <PixelIcon name="camera" size={26} />
+                    <strong>คลิกเพื่อเลือกรูปภาพประทับใจ</strong>
+                    <small>JPG, PNG, WEBP ไม่เกิน 25MB (จะจัดแสดงในหมวดโพลาลอยด์ด้วย)</small>
                     <input
                       type="file"
                       hidden
@@ -273,8 +338,10 @@ export default function WishForm({ onAddWish }) {
                   disabled={isSubmitting}
                   onClick={handleSubmit}
                 >
-                  <PixelIcon name="heart" size={16} />
-                  <span>{isSubmitting ? 'กำลังส่งการ์ด...' : 'ส่งการ์ดให้โรส'}</span>
+                  <PixelIcon name="bouquet" size={16} />
+                  <span>
+                    {isSubmitting ? 'กำลังส่งการ์ด...' : 'ส่งการ์ดแสดงความยินดี'}
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -289,21 +356,22 @@ export default function WishForm({ onAddWish }) {
             {/* พรีวิวการ์ดแบบสด */}
             <div className="wish-preview-col">
               <PixelFrame
-                label="Preview"
+                label="Live Preview"
                 icon="sparkle"
                 tone="lavender"
                 bodyClassName="wish-preview-body"
               >
                 <WishCardView
                   bg={selectedCard}
+                  stamp={selectedStamp}
                   name={name}
                   message={message}
                   img={previewImgUrl}
-                  letterNumber="Happy 19th Rose"
+                  letterNumber="Congrats Rose GE"
                 />
                 <div className="preview-bunny" aria-hidden="true">
-                  <PixelBunnySprite variant="pink-rose" frame="idle" size={44} />
-                  <span>การ์ดจะหน้าตาแบบนี้นะ!</span>
+                  <PixelBunnySprite variant="crown-ge" frame="idle" size={44} />
+                  <span>การ์ดที่ระลึกของคุณจะหน้าตาแบบนี้นะ!</span>
                 </div>
               </PixelFrame>
             </div>
@@ -311,7 +379,7 @@ export default function WishForm({ onAddWish }) {
         </ScrollReveal>
       </section>
 
-      {/* Modal ดูตัวอย่างเต็มใบ (Portal ออกนอก main เพื่อไม่ให้ติด Navbar) */}
+      {/* Modal ดูตัวอย่างเต็มใบ */}
       {showPreviewModal &&
         createPortal(
           <div
@@ -329,10 +397,11 @@ export default function WishForm({ onAddWish }) {
               </button>
               <WishCardView
                 bg={selectedCard}
+                stamp={selectedStamp}
                 name={name}
                 message={message}
                 img={previewImgUrl}
-                letterNumber="ตัวอย่างการ์ดของคุณ"
+                letterNumber="ตัวอย่างการ์ดแสดงความยินดี"
               />
             </div>
           </div>,
@@ -349,25 +418,26 @@ export default function WishForm({ onAddWish }) {
           >
             <div className="px-modal wide" onClick={(e) => e.stopPropagation()}>
               <PixelFrame
-                label="Sent!"
-                icon="heart"
+                label="Congrats Sent!"
+                icon="trophy"
                 tone="mint"
                 bodyClassName="success-body"
               >
-                <PixelBunnySprite variant="party-19" frame="hop" size={56} />
-                <h3>ส่งการ์ดถึงโรสเรียบร้อยแล้ว!</h3>
+                <PixelBunnySprite variant="crown-ge" frame="hop" size={56} />
+                <h3>ส่งการ์ดแสดงความยินดีถึงโรสเรียบร้อยแล้ว!</h3>
                 <p className="success-note">
-                  การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นกำแพงคำอวยพร
-                  บันทึกรูปการ์ดเก็บไว้แชร์ได้เลยนะ
+                  การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศ
+                  สามารถบันทึกรูปการ์ดที่ระลึกเก็บไว้แชร์ลงโซเชียลได้เลยนะ!
                 </p>
 
                 <div id="rose-recap-card" className="recap-capture">
                   <WishCardView
                     bg={recapData.bg}
+                    stamp={recapData.stamp}
                     name={recapData.name}
                     message={recapData.message}
                     img={recapData.img}
-                    letterNumber="Happy 19th Birthday Rose"
+                    letterNumber="Congratulations Rose BNK48"
                   />
                 </div>
 
@@ -378,14 +448,14 @@ export default function WishForm({ onAddWish }) {
                     onClick={handleDownloadRecap}
                   >
                     <PixelIcon name="download" size={16} />
-                    <span>บันทึกรูปการ์ด (PNG)</span>
+                    <span>บันทึกรูปการ์ดที่ระลึก (PNG)</span>
                   </button>
                   <button
                     type="button"
                     className="px-btn"
                     onClick={() => setShowSuccessModal(false)}
                   >
-                    ปิด
+                    ปิดหน้าต่าง
                   </button>
                 </div>
               </PixelFrame>
@@ -408,7 +478,7 @@ export default function WishForm({ onAddWish }) {
                 tone="butter"
                 bodyClassName="alert-body"
               >
-                <PixelBunnySprite variant="pink-rose" frame="idle" size={52} />
+                <PixelBunnySprite variant="crown-ge" frame="idle" size={52} />
                 <p>{popupMsg}</p>
                 <button
                   type="button"

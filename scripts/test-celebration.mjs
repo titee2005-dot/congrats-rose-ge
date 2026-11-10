@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { ANNOUNCEMENT_AT, countdownParts } from '../src/data/celebrationTime.js';
+import { parseSupportersFeed } from '../src/data/supportersFeed.js';
+
+assert.equal(new Date(ANNOUNCEMENT_AT).toISOString(), '2026-11-14T11:00:00.000Z');
+assert.deepEqual(countdownParts(ANNOUNCEMENT_AT - 90061000).values, [1, 1, 1, 1]);
+assert.deepEqual(countdownParts(ANNOUNCEMENT_AT - 1), { reached: false, values: [0, 0, 0, 1] });
+assert.deepEqual(countdownParts(ANNOUNCEMENT_AT), { reached: true, values: [0, 0, 0, 0] });
+assert.deepEqual(countdownParts(ANNOUNCEMENT_AT + 86400000), { reached: true, values: [0, 0, 0, 0] });
+const supporters = JSON.parse(readFileSync(new URL('../src/data/supporters.json', import.meta.url), 'utf8'));
+assert.equal(supporters.names.length, 236);
+assert.equal(new Set(supporters.names).size, supporters.names.length);
+assert.ok(supporters.names.every(name => typeof name === 'string' && name.trim()));
+console.log('PASS: Thailand announcement boundary, countdown values, 236 unique supporters.');
+assert.equal(supporters.supporters.length, 236);
+assert.ok(supporters.supporters.every((item, index, all) => index === 0 || all[index - 1].amount >= item.amount));
+assert.deepEqual(new Set(supporters.supporters.map(item => item.name)), new Set(supporters.names));
+const fixture = {status:'ok',table:{rows:[{c:[{v:'Low'},{v:1.1}]},{c:[{v:'High'},{v:'1,200.50'}]},{c:[{v:'Low'},{v:2.2}]},{c:[null,null]},{c:[{v:'Invalid'},{v:'oops'}]}]}};
+assert.deepEqual(parseSupportersFeed(`/*O_o*/\ngoogle.visualization.Query.setResponse(${JSON.stringify(fixture)});`), [{name:'High',amount:1200.5},{name:'Low',amount:3.3}]);
+assert.throws(() => parseSupportersFeed('<html>Sign in</html>'));
+assert.throws(() => parseSupportersFeed('google.visualization.Query.setResponse({"status":"error"});'));
+console.log('PASS: supporter amounts, descending ranking, duplicates, blank rows and invalid feed.');

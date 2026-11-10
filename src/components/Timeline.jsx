@@ -14,11 +14,12 @@ const SCENE_MAP = {
   diary: 'story',
   center: 'center',
   bouquet: 'ge2026',
-  birthday19: 'birthday19',
+  victory: 'victory',
+  birthday19: 'victory',
 };
 
 const TONES = ['pink', 'lavender', 'mint', 'butter'];
-const NODE_ICONS = ['heart', 'rose', 'star', 'note'];
+const NODE_ICONS = ['heart', 'rose', 'star', 'crown'];
 
 function MemoryCard({ ev, index, isLast }) {
   const [imgError, setImgError] = useState(false);
@@ -33,15 +34,15 @@ function MemoryCard({ ev, index, isLast }) {
       {/* หมุดบนเส้นเวลา */}
       <div className={`tl-node ${isLast ? 'is-final' : ''}`}>
         <PixelIcon
-          name={isLast ? 'cake' : NODE_ICONS[index % NODE_ICONS.length]}
+          name={isLast ? 'trophy' : NODE_ICONS[index % NODE_ICONS.length]}
           size={22}
         />
       </div>
 
       <PixelFrame
-        label={`${ev.seasonLabel || `Memory ${String(index + 1).padStart(2, '0')}`} · ${ev.date || ''}`}
-        icon={isLast ? 'cake' : 'heart'}
-        tone={isLast ? 'pink' : TONES[index % TONES.length]}
+        label={`${ev.seasonLabel || `Milestone ${String(index + 1).padStart(2, '0')}`} · ${ev.date || ''}`}
+        icon={isLast ? 'trophy' : 'rose'}
+        tone={isLast ? 'butter' : TONES[index % TONES.length]}
         className="tl-card"
       >
         <div className="tl-photo">
@@ -81,10 +82,10 @@ export default function Timeline({ items }) {
     <section className="px-section" id="journey">
       <ScrollReveal>
         <SectionHeading
-          chip="ROSE'S JOURNEY"
+          chip="ROAD TO VICTORY"
           icon="rose"
-          title="เส้นทางการเติบโตของโรส"
-          desc="ย้อนดูเรื่องราวตั้งแต่วันแรกที่ลืมตาดูโลก จนถึงวันที่ก้าวสู่วัย 19 ปีอย่างสดใส"
+          title="บันทึกเส้นทางความพยายามของโรส"
+          desc="ย้อนดูทุกก้าวสำคัญตั้งแต่วันแรกของความฝัน จนถึงวันที่ผลิบานอย่างภาคภูมิใจในงาน General Election"
         />
       </ScrollReveal>
 

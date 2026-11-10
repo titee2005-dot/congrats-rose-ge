@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import './celebration.css';
 import App from './App.jsx';
 
 // YouTube IFrame Player บล็อก raw IP origin (127.0.0.1) ด้วยรหัส 150 จึงสลับไป localhost ตอนรัน Dev

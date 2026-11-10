@@ -2,9 +2,18 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import WishCardView from '../components/WishCardView';
 import PixelFrame from '../components/PixelFrame';
-import { PixelBunnySprite, PixelIcon, TimelineChapterArt } from '../components/PixelSprites';
+import {
+  PixelBunnySprite,
+  PixelIcon,
+  TimelineChapterArt,
+} from '../components/PixelSprites';
 import { isSupabaseConfigured } from '../supabase';
-import { computeAutoBunnyCount, ROSE_TIMELINE, ROSE_PLAYLIST } from '../data/roseData';
+import {
+  computeAutoBunnyCount,
+  ROSE_TIMELINE,
+  ROSE_PLAYLIST,
+  DEFAULT_GE_MILESTONE,
+} from '../data/roseData';
 
 function compressImageFile(file) {
   return new Promise((resolve, reject) => {
@@ -41,6 +50,7 @@ function compressImageFile(file) {
 export default function Admin({
   wishes,
   updateWishStatus,
+  toggleFeaturedWish,
   deleteWish,
   siteConfig,
   updateSiteConfig,
@@ -48,19 +58,55 @@ export default function Admin({
   timelineItems = [],
   updateTimelineItems,
   uploadTimelineImage,
+  geMilestone,
+  updateGeMilestone,
 }) {
   const [tab, setTab] = useState('pending');
   const [search, setSearch] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem('roseAdminAuthenticated') === 'true'
+    () => sessionStorage.getItem('roseGEAdminAuthenticated') === 'true'
   );
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const [videoInput, setVideoInput] = useState(siteConfig?.party_video_url || '');
+  const [videoInput, setVideoInput] = useState(
+    siteConfig?.party_video_url || ''
+  );
   const [isSavingConfig, setIsSavingConfig] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [configToast, setConfigToast] = useState('');
+
+  // Local state สำหรับแก้ไขป้ายรางวัล GE
+  const [msForm, setMsForm] = useState({
+    ...DEFAULT_GE_MILESTONE,
+    ...(geMilestone || {}),
+  });
+  const [isSavingMilestone, setIsSavingMilestone] = useState(false);
+  const [isUploadingMilestone, setIsUploadingMilestone] = useState(false);
+
+  const handleMilestonePhoto = async (file) => {
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 25 * 1024 * 1024) {
+      alert('กรุณาเลือกภาพ JPG, PNG หรือ WEBP ขนาดไม่เกิน 25MB');
+      return;
+    }
+    setIsUploadingMilestone(true);
+    try {
+      let imageUrl;
+      if (isSupabaseConfigured) {
+        imageUrl = await uploadTimelineImage?.(file, 'milestone');
+        if (!imageUrl) throw new Error('Upload failed');
+      } else {
+        imageUrl = await compressImageFile(file);
+      }
+      setMsForm((previous) => ({ ...previous, imageUrl }));
+      showSavedNotice('เลือกรูปแล้ว กดบันทึกป้ายรางวัล GE เพื่อแสดงบนหน้าเว็บ');
+    } catch {
+      alert('อัปโหลดภาพไม่สำเร็จ กรุณาลองใหม่');
+    } finally {
+      setIsUploadingMilestone(false);
+    }
+  };
 
   // Local state สำหรับแก้ไข Timeline
   const [timelineList, setTimelineList] = useState(
@@ -74,6 +120,12 @@ export default function Admin({
   useEffect(() => {
     setVideoInput(siteConfig?.party_video_url || '');
   }, [siteConfig?.party_video_url]);
+
+  useEffect(() => {
+    if (geMilestone) {
+      setMsForm({ ...DEFAULT_GE_MILESTONE, ...geMilestone });
+    }
+  }, [geMilestone]);
 
   useEffect(() => {
     if (Array.isArray(timelineItems) && timelineItems.length > 0) {
@@ -92,7 +144,7 @@ export default function Admin({
 
   const handleLogin = () => {
     if (password === adminPassword) {
-      sessionStorage.setItem('roseAdminAuthenticated', 'true');
+      sessionStorage.setItem('roseGEAdminAuthenticated', 'true');
       setIsAuthenticated(true);
       setPassword('');
     } else {
@@ -101,7 +153,7 @@ export default function Admin({
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('roseAdminAuthenticated');
+    sessionStorage.removeItem('roseGEAdminAuthenticated');
     setIsAuthenticated(false);
   };
 
@@ -109,16 +161,17 @@ export default function Admin({
     return (
       <div className="px-page admin-login-page">
         <PixelFrame
-          label="Admin Login"
-          icon="bunny"
+          label="GE Admin Login"
+          icon="crown"
           tone="pink"
           className="admin-login-frame"
           bodyClassName="admin-login-body"
         >
-          <PixelBunnySprite variant="pink-rose" frame="hop" size={64} />
-          <h2>เข้าสู่ระบบแอดมิน</h2>
+          <PixelBunnySprite variant="crown-ge" frame="hop" size={64} />
+          <h2>เข้าสู่ระบบแอดมิน (เว็บแสดงความยินดี GE)</h2>
           <p className="admin-login-hint">
-            สำหรับอนุมัติการ์ด ปรับจำนวนกระต่าย แก้ไข Timeline และตั้งค่าวิดีโอหน้าเว็บ
+            สำหรับอนุมัติการ์ด ปักหมุด Hall of Fame ตั้งค่ารางวัล GE และจัดการหน้าเว็บ
+            (ข้อมูลแยกจากเว็บวันเกิด 100%)
           </p>
 
           <div className="admin-pw-wrap">
@@ -207,7 +260,7 @@ export default function Admin({
     if (ok) {
       showSavedNotice(
         trimmed
-          ? 'บันทึกลิงก์วิดีโอช่อง Rose Birthday Party แล้ว'
+          ? 'บันทึกลิงก์วิดีโอช่อง Rose Victory Stage แล้ว'
           : 'นำวิดีโอออกเรียบร้อยแล้ว'
       );
     }
@@ -217,7 +270,9 @@ export default function Admin({
     const file = e.target.files?.[0];
     if (!file || !uploadPartyVideo) return;
     if (file.size > 50 * 1024 * 1024) {
-      alert('ไฟล์วิดีโอใหญ่เกิน 50MB กรุณาบีบอัดหรือวางเป็นลิงก์ YouTube / MP4 แทนนะคะ');
+      alert(
+        'ไฟล์วิดีโอใหญ่เกิน 50MB กรุณาบีบอัดหรือวางเป็นลิงก์ YouTube / MP4 แทนนะคะ'
+      );
       e.target.value = '';
       return;
     }
@@ -227,7 +282,22 @@ export default function Admin({
     e.target.value = '';
     if (url) {
       setVideoInput(url);
-      showSavedNotice('อัปโหลดและเปลี่ยนวิดีโอ Rose Birthday Party เรียบร้อยแล้ว!');
+      showSavedNotice(
+        'อัปโหลดและเปลี่ยนวิดีโอ Rose Victory Stage เรียบร้อยแล้ว!'
+      );
+    }
+  };
+
+  const handleSaveMilestone = async () => {
+    if (!updateGeMilestone) return;
+    setIsSavingMilestone(true);
+    const ok = await updateGeMilestone({
+      ...msForm,
+      goalTarget: Math.max(50, Number(msForm.goalTarget) || 500),
+    });
+    setIsSavingMilestone(false);
+    if (ok) {
+      showSavedNotice('บันทึกข้อมูลป้ายประกาศรางวัล GE เรียบร้อยแล้ว!');
     }
   };
 
@@ -249,7 +319,9 @@ export default function Admin({
     setIsSavingTimeline(false);
     if (ok) {
       const ch = timelineList[index];
-      showSavedNotice(`บันทึก ${ch?.seasonLabel || `บทที่ ${index + 1}`} เรียบร้อยแล้ว!`);
+      showSavedNotice(
+        `บันทึก ${ch?.seasonLabel || `บทที่ ${index + 1}`} เรียบร้อยแล้ว!`
+      );
     }
   };
 
@@ -264,10 +336,12 @@ export default function Admin({
     try {
       let finalUrl = null;
       if (uploadTimelineImage) {
-        finalUrl = await uploadTimelineImage(file, timelineList[index]?.chapter || index + 1);
+        finalUrl = await uploadTimelineImage(
+          file,
+          timelineList[index]?.chapter || index + 1
+        );
       }
       if (!finalUrl) {
-        // Local fallback: compress to Data URL
         finalUrl = await compressImageFile(file);
       }
 
@@ -277,7 +351,9 @@ export default function Admin({
       if (updateTimelineItems) {
         await updateTimelineItems(nextList);
       }
-      showSavedNotice(`อัปเดตรูปภาพสำหรับ ${nextList[index]?.seasonLabel || `บทที่ ${index + 1}`} สำเร็จแล้ว!`);
+      showSavedNotice(
+        `อัปเดตรูปภาพสำหรับ ${nextList[index]?.seasonLabel || `บทที่ ${index + 1}`} สำเร็จแล้ว!`
+      );
     } catch (err) {
       console.error(err);
       alert('เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ');
@@ -293,20 +369,20 @@ export default function Admin({
     if (updateTimelineItems) {
       await updateTimelineItems(nextList);
     }
-    showSavedNotice(`นำรูปออกและคืนค่าเป็นภาพพิกเซลเรียบร้อยแล้ว`);
+    showSavedNotice('นำรูปออกและคืนค่าเป็นภาพพิกเซลเรียบร้อยแล้ว');
   };
 
   const handleAddChapter = async () => {
     const nextNum = timelineList.length + 1;
     const newChapter = {
       chapter: nextNum,
-      seasonLabel: `Memory ${String(nextNum).padStart(2, '0')}`,
+      seasonLabel: `Milestone ${String(nextNum).padStart(2, '0')}`,
       date: '2026',
-      title: 'ความทรงจำใหม่ของโรส',
+      title: 'ก้าวสำคัญใหม่ของโรส',
       body: 'พิมพ์ข้อความเรื่องราวความประทับใจของโรสตรงนี้...',
-      polaroidNote: 'Rose BNK48 19th',
+      polaroidNote: 'Congrats Rose BNK48',
       img: '',
-      scene: 'birthday19',
+      scene: 'victory',
       tape: 'pink-plaid',
     };
     const nextList = [...timelineList, newChapter];
@@ -314,7 +390,7 @@ export default function Admin({
     if (updateTimelineItems) {
       await updateTimelineItems(nextList);
     }
-    showSavedNotice(`เพิ่มความทรงจำ Memory ${nextNum} เรียบร้อยแล้ว`);
+    showSavedNotice(`เพิ่ม Milestone ${nextNum} เรียบร้อยแล้ว`);
   };
 
   const handleDeleteChapter = async (index) => {
@@ -336,7 +412,7 @@ export default function Admin({
     if (updateTimelineItems) {
       await updateTimelineItems(filtered);
     }
-    showSavedNotice('ลบความทรงจำเรียบร้อยแล้ว');
+    showSavedNotice('ลบบทความทรงจำเรียบร้อยแล้ว');
   };
 
   const handleResetTimelineToDefault = async () => {
@@ -380,10 +456,30 @@ export default function Admin({
   };
 
   const TABS = [
-    { key: 'pending', label: 'รออนุมัติ', icon: 'clock', count: pendingList.length },
-    { key: 'approved', label: 'อนุมัติแล้ว', icon: 'check', count: approvedList.length },
-    { key: 'hidden', label: 'ซ่อนไว้', icon: 'eye-off', count: hiddenList.length },
-    { key: 'timeline', label: 'ไทม์ไลน์ความทรงจำ', icon: 'rose', count: timelineList.length },
+    {
+      key: 'pending',
+      label: 'รออนุมัติ',
+      icon: 'clock',
+      count: pendingList.length,
+    },
+    {
+      key: 'approved',
+      label: 'อนุมัติแล้ว',
+      icon: 'check',
+      count: approvedList.length,
+    },
+    {
+      key: 'hidden',
+      label: 'ซ่อนไว้',
+      icon: 'eye-off',
+      count: hiddenList.length,
+    },
+    {
+      key: 'timeline',
+      label: 'ไทม์ไลน์เส้นทาง GE',
+      icon: 'rose',
+      count: timelineList.length,
+    },
   ];
 
   return (
@@ -392,10 +488,10 @@ export default function Admin({
         <header className="px-header">
           <Link to="/" className="px-brand">
             <span className="px-brand-icon">
-              <PixelIcon name="rose" size={24} />
+              <PixelIcon name="crown" size={24} />
             </span>
             <span className="px-brand-text">
-              <strong>ROSE</strong>
+              <strong>ROSE GE</strong>
               <em>Admin</em>
             </span>
           </Link>
@@ -407,7 +503,7 @@ export default function Admin({
             />
             <span>
               {isSupabaseConfigured
-                ? 'เชื่อมต่อ Supabase แล้ว'
+                ? 'เชื่อมต่อตาราง rose_ge_wishes แล้ว'
                 : 'โหมดบันทึกในเครื่อง'}
             </span>
           </span>
@@ -424,10 +520,10 @@ export default function Admin({
       </div>
 
       <main className="px-main admin-main">
-        {/* แผงตั้งค่าหน้าเว็บ: จำนวนกระต่าย & วิดีโอช่อง Rose Birthday Party */}
+        {/* แผงตั้งค่าหน้าเว็บ */}
         <PixelFrame
-          label="Site Settings"
-          icon="sparkle"
+          label="GE Celebration Settings"
+          icon="trophy"
           tone="lavender"
           className="admin-settings-frame"
           bodyClassName="admin-settings-body"
@@ -440,15 +536,126 @@ export default function Admin({
           )}
 
           <div className="admin-settings-grid">
+            {/* การ์ดตั้งค่าป้ายรางวัล & เกียรติยศ GE */}
+            <div className="admin-cfg-box">
+              <div className="admin-cfg-head">
+                <PixelIcon name="trophy" size={34} />
+                <div>
+                  <h3>ตั้งค่าป้ายรางวัล & อันดับ GE</h3>
+                  <p>ตั้งค่าอันดับ ภาพโรส และข้อความขอบคุณบนการ์ดหลัก</p>
+                </div>
+              </div>
+
+              <div className="admin-tl-row2">
+                <div className="admin-tl-field">
+                  <label>อันดับ GE (เช่น 15 หรือ GE เมื่อยังไม่ประกาศ)</label>
+                  <input
+                    type="text"
+                    className="px-input"
+                    value={msForm.rankNumber || ''}
+                    onChange={(e) =>
+                      setMsForm((p) => ({ ...p, rankNumber: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="admin-tl-field">
+                  <label>เป้าหมายดอกไม้รวม (ครั้ง)</label>
+                  <input
+                    type="number"
+                    className="px-input"
+                    value={msForm.goalTarget || 500}
+                    onChange={(e) =>
+                      setMsForm((p) => ({ ...p, goalTarget: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="admin-tl-field">
+                <label>หัวข้อรางวัลหลัก (Rank Badge)</label>
+                <input
+                  type="text"
+                  className="px-input"
+                  value={msForm.rankBadge || ''}
+                  onChange={(e) =>
+                    setMsForm((p) => ({ ...p, rankBadge: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-tl-row2">
+                <div className="admin-tl-field">
+                  <label>ชื่องาน (Event Title)</label>
+                  <input
+                    type="text"
+                    className="px-input"
+                    value={msForm.eventTitle || ''}
+                    onChange={(e) =>
+                      setMsForm((p) => ({ ...p, eventTitle: e.target.value }))
+                    }
+                  />
+                </div>
+                <div className="admin-tl-field">
+                  <label>คะแนนโหวต / พลังซัพพอร์ต</label>
+                  <input
+                    type="text"
+                    className="px-input"
+                    value={msForm.voteScore || ''}
+                    onChange={(e) =>
+                      setMsForm((p) => ({ ...p, voteScore: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="admin-tl-field">
+                <label htmlFor="milestone-quote">ข้อความที่โรสพูดขอบคุณ</label>
+                <textarea
+                  id="milestone-quote"
+                  className="px-input px-textarea"
+                  style={{ minHeight: '72px' }}
+                  value={msForm.quote || ''}
+                  onChange={(e) =>
+                    setMsForm((p) => ({ ...p, quote: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="admin-tl-field">
+                <label htmlFor="milestone-image-url">ภาพบนการ์ดอันดับ (แสดงในวงกลม)</label>
+                {msForm.imageUrl && <img className="admin-result-preview" src={msForm.imageUrl} alt="ตัวอย่างภาพบนการ์ดอันดับ" />}
+                <input id="milestone-image-url" type="url" className="px-input" placeholder="https://... หรือเลือกอัปโหลดภาพด้านล่าง" value={msForm.imageUrl || ''} disabled={isUploadingMilestone} onChange={(e) => setMsForm((p) => ({ ...p, imageUrl: e.target.value }))} />
+                <label htmlFor="milestone-image-file">อัปโหลดภาพ JPG, PNG, WEBP ไม่เกิน 25MB</label>
+                <input id="milestone-image-file" type="file" accept="image/jpeg,image/png,image/webp" disabled={isUploadingMilestone || isSavingMilestone} onChange={(e) => { handleMilestonePhoto(e.target.files?.[0]); e.target.value = ''; }} />
+                {isUploadingMilestone && <span role="status">กำลังอัปโหลดภาพ...</span>}
+                {msForm.imageUrl && <button type="button" className="px-btn sm" disabled={isUploadingMilestone} onClick={() => setMsForm((p) => ({ ...p, imageUrl: '' }))}>นำภาพออก</button>}
+              </div>
+
+              <button
+                type="button"
+                className="px-btn primary sm"
+                disabled={isSavingMilestone || isUploadingMilestone}
+                onClick={handleSaveMilestone}
+              >
+                <PixelIcon name="check" size={15} />
+                <span>
+                  {isSavingMilestone ? 'กำลังบันทึก...' : 'บันทึกป้ายรางวัล GE'}
+                </span>
+              </button>
+            </div>
+
             {/* การ์ดตั้งค่าจำนวนกระต่าย */}
             <div className="admin-cfg-box">
               <div className="admin-cfg-head">
-                <PixelBunnySprite variant="pink-rose" frame="hop" size={40} />
+                <PixelBunnySprite variant="crown-ge" frame="hop" size={40} />
                 <div>
                   <h3>จำนวนกระต่ายบนหน้าเว็บ</h3>
                   <p>
-                    แสดงอยู่ตอนนี้: <strong>{activeBunnyCount} ตัว</strong>{' '}
-                    ({bunnyMode === 'auto' ? 'คำนวณอัตโนมัติ' : 'กำหนดเองโดยแอดมิน'})
+                    แสดงอยู่ตอนนี้: <strong>{activeBunnyCount} ตัว</strong> (
+                    {bunnyMode === 'auto'
+                      ? 'คำนวณอัตโนมัติ'
+                      : 'กำหนดเองโดยแอดมิน'}
+                    )
                   </p>
                 </div>
               </div>
@@ -462,16 +669,20 @@ export default function Admin({
                 >
                   <PixelIcon name="wand" size={15} />
                   <em>
-                    อัตโนมัติตามคำอวยพร ({approvedList.length} ใบ · {autoCount} ตัว)
+                    อัตโนมัติตามการ์ด ({approvedList.length} ใบ · {autoCount}{' '}
+                    ตัว)
                   </em>
                 </button>
               </div>
 
               <div className="bunny-manual-row">
-                <span className="cfg-mini-label">หรือเลือกกำหนดจำนวนเอง (0–5 ตัว):</span>
+                <span className="cfg-mini-label">
+                  หรือเลือกกำหนดจำนวนเอง (0–5 ตัว):
+                </span>
                 <div className="bunny-count-btns">
                   {[0, 1, 2, 3, 4, 5].map((num) => {
-                    const selected = bunnyMode === 'manual' && manualCount === num;
+                    const selected =
+                      bunnyMode === 'manual' && manualCount === num;
                     return (
                       <button
                         key={num}
@@ -495,16 +706,16 @@ export default function Admin({
               </div>
 
               <small className="cfg-scale-note">
-                เกณฑ์อัตโนมัติ: การ์ด 7 ใบต่อกระต่าย 1 ตัว (1–7 ใบ = 1 ตัว · 8–14 = 2 ตัว · 15–21 = 3 ตัว · 22–28 = 4 ตัว · 29+ = 5 ตัว สูงสุด 5 ตัว)
+                เกณฑ์อัตโนมัติ: การ์ด 7 ใบต่อกระต่าย 1 ตัว (สูงสุด 5 ตัว)
               </small>
             </div>
 
-            {/* การ์ดตั้งค่าวิดีโอช่อง Rose Birthday Party */}
+            {/* การ์ดตั้งค่าวิดีโอช่อง Rose Victory Stage */}
             <div className="admin-cfg-box">
               <div className="admin-cfg-head">
-                <PixelIcon name="cake" size={34} />
+                <PixelIcon name="crown" size={34} />
                 <div>
-                  <h3>วิดีโอช่อง Rose Birthday Party</h3>
+                  <h3>วิดีโอช่อง Rose Victory Stage</h3>
                   <p className="cfg-status-line">
                     <PixelIcon
                       name={siteConfig?.party_video_url ? 'video' : 'image'}
@@ -513,7 +724,7 @@ export default function Admin({
                     <span>
                       {siteConfig?.party_video_url
                         ? 'กำลังแสดงวิดีโออยู่ในหน้าแรก'
-                        : 'กำลังแสดงภาพปกเริ่มต้น (ยังไม่ได้ใส่วิดีโอ)'}
+                        : 'กำลังใช้วิดีโอเริ่มต้น'}
                     </span>
                   </p>
                 </div>
@@ -567,7 +778,9 @@ export default function Admin({
                       onClick={async () => {
                         setVideoInput('');
                         setIsSavingConfig(true);
-                        const ok = await updateSiteConfig({ party_video_url: '' });
+                        const ok = await updateSiteConfig({
+                          party_video_url: '',
+                        });
                         setIsSavingConfig(false);
                         if (ok) {
                           showSavedNotice('นำวิดีโอออกเรียบร้อยแล้ว');
@@ -580,10 +793,6 @@ export default function Admin({
                   )}
                 </div>
               </div>
-
-              <small className="cfg-scale-note">
-                รองรับทั้งการอัปโหลดไฟล์ MP4/WebM (ไม่เกิน 50MB), ลิงก์ตรง .mp4, ลิงก์ YouTube หรือวางไฟล์ที่ <code>public/assets/rose_party.mp4</code>
-              </small>
             </div>
 
             {/* การ์ดเพลงประจำเว็บ (BGM Playlist) */}
@@ -593,10 +802,8 @@ export default function Admin({
                   <PixelIcon name="disc" size={32} />
                 </div>
                 <div>
-                  <h3>เพลงประจำเว็บ (Rose Playlist)</h3>
-                  <p>
-                    เล่นเพลง Happy Birthday เป็นหลัก แล้วรันเพลงที่น้องมีส่วนร่วมจนครบแล้ววนลูปใหม่
-                  </p>
+                  <h3>เพลงประจำเว็บฉลอง GE (Rose Playlist)</h3>
+                  <p>รันเพลงที่น้องโรสมีส่วนร่วมวนลูปเป็น BGM ประจำเว็บ</p>
                 </div>
               </div>
 
@@ -619,18 +826,18 @@ export default function Admin({
           </div>
         </PixelFrame>
 
-        {/* แถบควบคุมแท็บ: รออนุมัติ | อนุมัติแล้ว | ซ่อนไว้ | ไทม์ไลน์ความทรงจำ */}
+        {/* แถบควบคุมแท็บ */}
         <div className="admin-top">
           <div>
             <h2 className="admin-title">
               {tab === 'timeline'
                 ? 'จัดการไทม์ไลน์เส้นทางของโรส'
-                : 'จัดการการ์ดคำอวยพร'}
+                : 'จัดการการ์ดแสดงความยินดี & หอเกียรติยศ'}
             </h2>
             <p className="admin-sub">
               {tab === 'timeline'
                 ? 'เพิ่ม แก้ไขรูปภาพ วันที่ หัวข้อ และข้อความความทรงจำของโรสได้อย่างอิสระ'
-                : 'การ์ดใหม่ทุกใบจะอยู่ในหมวด "รออนุมัติ" ก่อนแสดงบนหน้าเว็บ'}
+                : 'สามารถกด "ติดดาว Hall of Fame" เพื่อให้การ์ดแสดงเด่นในหมวดหอเกียรติยศได้'}
             </p>
           </div>
           {tab === 'pending' && pendingList.length > 0 && (
@@ -651,7 +858,7 @@ export default function Admin({
                 onClick={handleAddChapter}
               >
                 <PixelIcon name="check" size={14} />
-                <span>+ เพิ่มความทรงจำใหม่</span>
+                <span>+ เพิ่มบทใหม่</span>
               </button>
               <button
                 type="button"
@@ -693,19 +900,17 @@ export default function Admin({
           )}
         </div>
 
-        {/* แท็บที่ 4: จัดการไทม์ไลน์เส้นทางการเติบโตของโรส */}
         {tab === 'timeline' ? (
           <div className="admin-tl-list">
             {timelineList.map((ch, idx) => (
               <PixelFrame
                 key={ch.chapter || idx}
-                label={`Chapter ${ch.chapter || idx + 1}: ${ch.seasonLabel || `Memory ${idx + 1}`}`}
+                label={`Chapter ${ch.chapter || idx + 1}: ${ch.seasonLabel || `Milestone ${idx + 1}`}`}
                 icon="rose"
                 tone="pink"
                 bodyClassName="admin-tl-card-body"
               >
                 <div className="admin-tl-grid">
-                  {/* คอลัมน์ซ้าย: พรีวิวรูป + อัปโหลดรูปภาพ */}
                   <div className="admin-tl-preview-col">
                     <div className="admin-tl-photo-box">
                       {ch.img ? (
@@ -725,8 +930,8 @@ export default function Admin({
                           {uploadingChapterIdx === idx
                             ? 'กำลังอัปโหลด...'
                             : ch.img
-                            ? 'เปลี่ยนรูปถ่าย'
-                            : 'อัปโหลดรูปถ่ายจริง'}
+                              ? 'เปลี่ยนรูปถ่าย'
+                              : 'อัปโหลดรูปถ่ายจริง'}
                         </span>
                         <input
                           type="file"
@@ -762,7 +967,6 @@ export default function Admin({
                     </div>
                   </div>
 
-                  {/* คอลัมน์ขวา: ฟิลด์แก้ไขข้อความ */}
                   <div className="admin-tl-fields-col">
                     <div className="admin-tl-row2">
                       <div className="admin-tl-field">
@@ -770,10 +974,14 @@ export default function Admin({
                         <input
                           type="text"
                           className="px-input"
-                          placeholder="เช่น Memory 01"
+                          placeholder="เช่น Milestone 01"
                           value={ch.seasonLabel || ''}
                           onChange={(e) =>
-                            handleTimelineFieldChange(idx, 'seasonLabel', e.target.value)
+                            handleTimelineFieldChange(
+                              idx,
+                              'seasonLabel',
+                              e.target.value
+                            )
                           }
                         />
                       </div>
@@ -822,10 +1030,14 @@ export default function Admin({
                       <input
                         type="text"
                         className="px-input"
-                        placeholder="เช่น Little Rose · Nakhon Pathom"
+                        placeholder="เช่น Congrats Rose BNK48"
                         value={ch.polaroidNote || ''}
                         onChange={(e) =>
-                          handleTimelineFieldChange(idx, 'polaroidNote', e.target.value)
+                          handleTimelineFieldChange(
+                            idx,
+                            'polaroidNote',
+                            e.target.value
+                          )
                         }
                       />
                     </div>
@@ -859,7 +1071,7 @@ export default function Admin({
           </div>
         ) : filteredWishes.length === 0 ? (
           <PixelFrame tone="cream" bodyClassName="empty-body">
-            <PixelBunnySprite variant="white-ribbon" frame="idle" size={56} />
+            <PixelBunnySprite variant="crown-ge" frame="idle" size={56} />
             <h3>ไม่มีการ์ดในหมวดนี้</h3>
           </PixelFrame>
         ) : (
@@ -868,9 +1080,12 @@ export default function Admin({
               <div key={w.id || idx} className="admin-card">
                 <WishCardView
                   bg={w.bg}
+                  stamp={w.stamp}
                   name={w.name}
                   message={w.message}
                   img={w.img}
+                  likes={w.likes || 0}
+                  isFeatured={Boolean(w.is_featured)}
                   letterNumber={`#${w.id}`}
                 />
                 <div className="admin-actions">
@@ -884,6 +1099,17 @@ export default function Admin({
                       <span>อนุมัติ</span>
                     </button>
                   )}
+                  <button
+                    type="button"
+                    className={`act-btn ${w.is_featured ? 'approve' : ''}`}
+                    onClick={() =>
+                      toggleFeaturedWish?.(w.id, !Boolean(w.is_featured))
+                    }
+                    title="ปักหมุดขึ้นหอเกียรติยศ (Hall of Fame)"
+                  >
+                    <PixelIcon name="crown" size={13} />
+                    <span>{w.is_featured ? 'ติดดาวแล้ว' : 'ติดดาว'}</span>
+                  </button>
                   {tab !== 'hidden' && (
                     <button
                       type="button"

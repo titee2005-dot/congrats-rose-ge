@@ -1,26 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { ROSE_PROFILE, ROSE_PARTY_MEDIA } from '../data/roseData';
+import { ROSE_PROFILE, ROSE_PARTY_MEDIA, DEFAULT_GE_MILESTONE } from '../data/roseData';
 import PixelFrame from './PixelFrame';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
-function computeTimeInfo() {
+function computeDebutDays() {
   const now = Date.now();
-  const target = new Date(ROSE_PROFILE.celebrationISO).getTime();
-  const birth = new Date('2007-11-01T00:00:00+07:00').getTime();
-  const daysAlive = Math.max(0, Math.floor((now - birth) / 86400000));
-  const diff = target - now;
-
-  if (diff <= 0) {
-    return { reached: true, daysAlive, days: 0, hours: 0, mins: 0, secs: 0 };
-  }
-  return {
-    reached: false,
-    daysAlive,
-    days: Math.floor(diff / 86400000),
-    hours: Math.floor((diff / 3600000) % 24),
-    mins: Math.floor((diff / 60000) % 60),
-    secs: Math.floor((diff / 1000) % 60),
-  };
+  const debut = new Date(ROSE_PROFILE.debutDateISO || '2025-05-31T00:00:00+07:00').getTime();
+  return Math.max(1, Math.floor((now - debut) / 86400000));
 }
 
 function extractYouTubeId(url) {
@@ -36,18 +22,25 @@ function extractYouTubeId(url) {
   return null;
 }
 
-const pad = (n) => String(n).padStart(2, '0');
-
 export default function Hero({
   siteConfig,
+  geMilestone,
+  wishCount = 0,
+  totalCheers = 0,
   onHeroScrolledPast,
   onHeroVideoPlaying,
+  onLaunchConfetti,
 }) {
-  const [t, setT] = useState(computeTimeInfo);
+  const [daysSinceDebut] = useState(computeDebutDays);
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
+
+  const milestone = {
+    ...DEFAULT_GE_MILESTONE,
+    ...(geMilestone || {}),
+  };
 
   const rawVideoUrl = (
     siteConfig?.party_video_url ||
@@ -63,18 +56,11 @@ export default function Hero({
   }, [rawVideoUrl]);
 
   useEffect(() => {
-    const timer = setInterval(() => setT(computeTimeInfo()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // ตรวจจับเมื่อเลื่อนจอผ่านส่วนแรก (Hero) เพื่อหยุดวิดีโออัตโนมัติ และแจ้งเริ่มเพลงเว็บ
-  useEffect(() => {
     const heroEl = document.getElementById('home');
     if (!heroEl) return;
 
     const handleScroll = () => {
       const rect = heroEl.getBoundingClientRect();
-      // เมื่อส่วนแรกเลื่อนพ้นจอขึ้นไป (bottom พ้นด้านบนของจอ)
       const isPast = rect.bottom <= 100;
       if (isPast) {
         if (videoRef.current && !videoRef.current.paused) {
@@ -92,7 +78,6 @@ export default function Hero({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [onHeroScrolledPast]);
 
-  // แจ้งสถานะเสียงวิดีโอ เพื่อหยุด BGM ชั่วคราวเมื่อเปิดเสียงวิดีโอ
   useEffect(() => {
     const isActuallyPlayingWithSound = !isPaused && !isMuted;
     onHeroVideoPlaying?.(isActuallyPlayingWithSound);
@@ -134,27 +119,28 @@ export default function Hero({
   return (
     <section id="home" className="hero">
       <div className="hero-heading">
-        <span className="px-chip">
-          <PixelIcon name="sparkle" size={14} />
-          01.11.2007 — 01.11.2026
-          <PixelIcon name="sparkle" size={14} />
+        <span className="px-chip hero-congrats-chip">
+          <PixelIcon name="crown" size={14} />
+          CONGRATULATIONS · GENERAL ELECTION
+          <PixelIcon name="trophy" size={14} />
         </span>
         <h1 className="hero-title">
-          <span className="hero-title-sm">Happy Birthday</span>
+          <span className="hero-title-sm">THE GE EDITION · 2026</span>
           <span className="hero-title-lg">
-            Rose <b>19</b>
+            Rose <b>{milestone.rankNumber || 'GE'}</b>
           </span>
         </h1>
         <p className="hero-sub">
-          สุขสันต์วันเกิดครบ 19 ปี <strong>โรส BNK48</strong> — ปาณิสรา บูรณาภา
+          บันทึกช่วงเวลาที่ความพยายามผลิบาน และส่งคำยินดีให้{' '}
+          <strong>โรส BNK48</strong> — ปาณิสรา บูรณาภา
         </p>
       </div>
 
       <div className="hero-grid">
-        {/* ช่องหลัก: Rose Birthday Party (วิดีโอพร้อมปุ่มหยุด/เล่น และเปิด/ปิดเสียง โดยไม่ใช้ภาพเก่าเป็นพื้นหลัง) */}
+        {/* ช่องหลัก: Rose Victory Stage */}
         <PixelFrame
-          label="Rose Birthday Party"
-          icon="cake"
+          label="Rose Victory Stage"
+          icon="crown"
           tone="pink"
           className="hero-photo-frame"
           bodyClassName="hero-photo-body"
@@ -176,7 +162,7 @@ export default function Hero({
               <iframe
                 className="hero-video-embed"
                 src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&playsinline=1&rel=0`}
-                title="Rose Birthday Party Video"
+                title="Rose Victory Stage Video"
                 allow="autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
@@ -240,64 +226,41 @@ export default function Hero({
               </>
             ) : (
               <div className="hero-video-empty">
-                <PixelBunnySprite variant="party-19" frame="hop" size={56} />
-                <span>Rose Birthday Party</span>
+                <PixelBunnySprite variant="crown-ge" frame="hop" size={56} />
+                <span>Rose Victory Stage</span>
               </div>
             )}
           </div>
         </PixelFrame>
 
-        {/* การ์ดข้อมูลวันเกิด */}
+        {/* การ์ดข้อมูลฉลองความสำเร็จ */}
         <PixelFrame
-          label="Birthday Ticket"
-          icon="gift"
-          tone="lavender"
+          label="Victory Ticket"
+          icon="trophy"
+          tone="butter"
           className="hero-info-frame"
           bodyClassName="hero-info-body"
         >
-          {t.reached ? (
-            <div className="hero-today">
-              <PixelIcon name="cake" size={40} />
-              <div>
-                <strong>วันนี้วันเกิดโรส!</strong>
-                <span>HAPPY ROSE DAY · 01.11.2026</span>
-              </div>
+          <div className="hero-today hero-victory-banner">
+            <PixelIcon name="trophy" size={40} />
+            <div>
+              <strong>{milestone.rankBadge}</strong>
+              <span>{milestone.eventTitle}</span>
             </div>
-          ) : (
-            <div className="hero-countdown">
-              <span className="hero-mini-label">นับถอยหลังสู่วันเกิด</span>
-              <div className="cd-row">
-                {[
-                  [t.days, 'วัน'],
-                  [pad(t.hours), 'ชม.'],
-                  [pad(t.mins), 'นาที'],
-                  [pad(t.secs), 'วิ'],
-                ].map(([v, l]) => (
-                  <div key={l} className="cd-cell">
-                    <b>{v}</b>
-                    <small>{l}</small>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
 
           <ul className="hero-facts">
             <li>
-              <span>วันเกิด</span>
-              <b>1 พ.ย. 2007</b>
+              <span>โอกาสฉลอง</span>
+              <b>General Election</b>
             </li>
             <li>
-              <span>อายุครบ</span>
-              <b>19 ปี</b>
+              <span>การ์ดแสดงความยินดี</span>
+              <b>{wishCount.toLocaleString()} ใบ</b>
             </li>
             <li>
-              <span>รุ่น</span>
-              <b>BNK48 Gen 6</b>
-            </li>
-            <li>
-              <span>เติบโตมาแล้ว</span>
-              <b>{t.daysAlive.toLocaleString()} วัน</b>
+              <span>เติบโตบนเส้นทางไอดอล</span>
+              <b>{daysSinceDebut.toLocaleString()} วัน</b>
             </li>
           </ul>
 
@@ -307,16 +270,28 @@ export default function Hero({
               className="px-btn primary"
               onClick={() => scrollTo('wish')}
             >
-              <PixelIcon name="envelope" size={18} /> เขียนการ์ดอวยพร
+              <PixelIcon name="envelope" size={18} />
+              <span>เขียนการ์ดแสดงความยินดี</span>
             </button>
-            <button
-              type="button"
-              className="px-btn"
-              onClick={() => scrollTo('journey')}
-            >
-              <span>ดูเส้นทางของโรส</span>
-              <PixelIcon name="arrow-down" size={16} />
-            </button>
+
+            <div className="hero-sub-actions">
+              <button
+                type="button"
+                className="px-btn gold-btn"
+                onClick={() => scrollTo('cheer')}
+              >
+                <PixelIcon name="bunny" size={16} />
+                <span>ฟาร์มกระต่าย</span>
+              </button>
+              <button
+                type="button"
+                className="px-btn"
+                onClick={onLaunchConfetti}
+              >
+                <PixelIcon name="firework" size={16} />
+                <span>จุดพลุฉลอง!</span>
+              </button>
+            </div>
           </div>
         </PixelFrame>
       </div>

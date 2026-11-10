@@ -2,20 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
 const BUNNY_QUOTES = [
-  { text: 'HBD พี่โรส 19 ขวบ!', icon: 'cake' },
-  { text: 'รักโรสที่สุดเลยน้า~', icon: 'rose' },
-  { text: 'ปิ้วๆ เขียนการ์ดให้โรสกัน!', icon: 'envelope' },
-  { text: 'จะยังไงก็รักโรส', icon: 'heart' },
-  { text: '19 ปีขอให้สดใสทุกวันเลย', icon: 'star' },
-  { text: 'กระต่ายน้อยของโรสเองคับ', icon: 'bunny' },
-  { text: 'แค่เพียงมีโรสก็มีความสุขแล้ว', icon: 'heart' },
-  { text: 'กินของอร่อยเยอะๆ นะพี่โรส', icon: 'cake' },
+  { text: 'ยินดีด้วยนะพี่โรสคนเก่ง!', icon: 'trophy' },
+  { text: 'ภูมิใจในตัวโรสที่สุดเลย~', icon: 'crown' },
+  { text: 'ปิ้วๆ ส่งช่อดอกไม้ให้โรสกัน!', icon: 'bouquet' },
+  { text: 'ความพยายามไม่เคยทรยศเลย!', icon: 'medal' },
+  { text: 'ชาวสวนกุหลาบรักโรสน้า', icon: 'rose' },
+  { text: 'กระต่ายน้อยมาฉลอง GE คับ!', icon: 'bunny' },
+  { text: 'เปล่งประกายไปอีกขั้นเลยนะ', icon: 'star' },
+  { text: 'เขียนการ์ดแสดงความยินดีกัน!', icon: 'envelope' },
 ];
 
 const VARIANTS = [
-  'white-ribbon',
+  'crown-ge',
   'pink-rose',
-  'party-19',
+  'white-ribbon',
   'lavender-gen6',
   'lop-cream',
 ];
@@ -348,7 +348,7 @@ export default function PixelBunnies({
             }}
             onClick={() => handleClickBunny(b.id)}
             title="จิ้มน้องกระต่ายเพื่อทักทาย!"
-            aria-label="น้องกระต่ายอวยพรวันเกิดโรส"
+            aria-label="น้องกระต่ายมาร่วมแสดงความยินดีกับโรส"
           >
             {b.speech && (
               <span className={`bunny-bubble ${bubbleEdgeClass}`}>
