@@ -51,10 +51,10 @@ export const PAST_ACTIVITIES = [
     id: 18,
     title: 'One Last Time',
     icon: 'clock',
-    image: '/assets/activities/activity-18-one-last-time.jpg',
+    image: '/assets/activities/activity-18-congratulations.jpg',
     images: [
-      '/assets/activities/activity-18-one-last-time.jpg',
       '/assets/activities/activity-18-congratulations.jpg',
+      '/assets/activities/activity-18-one-last-time.jpg',
     ],
   },
 ];

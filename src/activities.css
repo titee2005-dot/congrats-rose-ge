@@ -13,8 +13,12 @@
 .activity-memory-copy { flex: 1; padding: 16px 14px; display: flex; flex-direction: column; }
 .activity-kicker { font-size: 0.68rem; font-weight: 700; color: var(--gold-d); letter-spacing: 0.12em; }
 .activity-memory h3 { margin: 6px 0 0; font-size: 1rem; line-height: 1.6; color: var(--wine); overflow-wrap: anywhere; }
-.activity-memory.is-featured { border: 2px solid var(--gold); }
-.activity-memory.is-featured .activity-kicker { color: var(--wine); font-weight: 800; }
+.activity-memory.is-featured { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, 0.65fr); align-items: stretch; border: 1px solid #d6bd9d; border-top: 5px solid var(--gold); }
+.activity-memory.is-featured .activity-memory-image { display: grid; place-items: center; height: clamp(260px, 34vw, 440px); min-height: 220px; aspect-ratio: auto; border-bottom: 0; border-right: 1px solid #d6bd9d; padding: 18px; }
+.activity-memory.is-featured .activity-memory-image img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+.activity-memory.is-featured .activity-memory-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(22px, 4vw, 44px); }
+.activity-memory.is-featured .activity-memory-copy h3 { font-size: clamp(1.35rem, 3vw, 2.2rem); line-height: 1.35; }
+.activity-memory.is-featured .activity-image-placeholder { width: 100%; }
 .activity-story { margin: 36px 0; padding: 24px; border: 1px solid #d6bd9d; border-top: 5px solid var(--gold); background: #eee1e3; }
 .activity-story-heading { margin-bottom: 22px; }
 .activity-story-heading > span { color: var(--ink2); font-size: 0.68rem; letter-spacing: 0.12em; }
@@ -56,6 +60,10 @@
   .px-header .px-nav.show .px-mobile-nav-actions:focus-within { outline: 3px solid var(--gold); outline-offset: 3px; }
   .px-section { scroll-margin-top: 90px; }
   .activity-archive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+}
+@media (max-width: 640px) {
+  .activity-memory.is-featured { display: flex; flex-direction: column; }
+  .activity-memory.is-featured .activity-memory-image { height: auto; min-height: 0; aspect-ratio: 16 / 9; border-right: 0; border-bottom: 1px solid #d6bd9d; padding: 0; }
 }
 @media (max-width: 480px) {
   .activity-memory-copy { padding: 12px 10px; }
