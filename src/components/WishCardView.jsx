@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { resolveCardTheme, resolveCardStamp } from '../data/roseData';
 import { PixelIcon } from './PixelSprites';
 
@@ -18,6 +19,7 @@ export default function WishCardView({
   compact = false,
   showFooterHint = false,
 }) {
+  const copy = useSiteCopy();
   const theme = resolveCardTheme(bg);
   const stampInfo = resolveCardStamp(stamp);
   const v = theme.variant;
@@ -45,15 +47,15 @@ export default function WishCardView({
         </span>
         <div className="wc-titles">
           <strong>
-            {letterNumber || 'Congrats Rose BNK48'}
+            {letterNumber || copy("WishCardView.9d9a0aeb06", "Congrats Rose BNK48")}
             {isFeatured && (
-              <span className="wc-hof-pill" title="การ์ดหอเกียรติยศ (Hall of Fame)">
+              <span className="wc-hof-pill" title={copy("WishCardView.ad5ed1000a", "การ์ดหอเกียรติยศ (Hall of Fame)")}>
                 <PixelIcon name="crown" size={12} />
-                <span>STAR</span>
+                <span>{copy("WishCardView.a3520cc6bc", "STAR")}</span>
               </span>
             )}
           </strong>
-          <small>{theme.sub || theme.name}</small>
+          <small>{copy(`theme.${theme.id}.sub`, theme.sub || theme.name)}</small>
         </div>
 
         {/* ตราประทับเกียรติยศที่ผู้ส่งเลือก */}
@@ -64,10 +66,10 @@ export default function WishCardView({
             '--st-border': stampInfo.border,
             '--st-color': stampInfo.color,
           }}
-          title={`ตราประทับ: ${stampInfo.titleTh}`}
+          title={copy("WishCardView.36ae4982d8", "ตราประทับ: {value1}", {value1: copy(`stamp.${stampInfo.id}.titleTh`, stampInfo.titleTh)})}
         >
           <PixelIcon name={stampInfo.icon} size={15} />
-          <span>{stampInfo.code}</span>
+          <span>{copy(`stamp.${stampInfo.id}.code`, stampInfo.code)}</span>
         </div>
       </header>
 
@@ -88,18 +90,18 @@ export default function WishCardView({
 
         {!compact && img && (
           <div className="wc-photo">
-            <img src={img} alt="รูปที่แนบมากับการ์ด" />
+            <img src={img} alt={copy("WishCardView.a84db91159", "รูปที่แนบมากับการ์ด")} />
           </div>
         )}
 
         <div className="wc-msg-row">
           <p className={`wc-msg ${compact ? 'is-clamped' : ''}`}>
             {message ||
-              'เขียนคำแสดงความยินดีและกำลังใจถึงน้องโรสตรงนี้ได้เลย...'}
+              copy("WishCardView.cb81e380de", "เขียนคำแสดงความยินดีและกำลังใจถึงน้องโรสตรงนี้ได้เลย...")}
           </p>
           {compact && img && (
             <div className="wc-thumb">
-              <img src={img} alt="รูปแนบ" />
+              <img src={img} alt={copy("WishCardView.1e1537c236", "รูปแนบ")} />
             </div>
           )}
         </div>
@@ -107,9 +109,9 @@ export default function WishCardView({
         <div className="wc-sign">
           <span className="wc-to">
             <PixelIcon name={stampInfo.icon} size={14} />
-            <span>{stampInfo.titleTh}</span>
+            <span>{copy(`stamp.${stampInfo.id}.titleTh`, stampInfo.titleTh)}</span>
           </span>
-          <span className="wc-from">จาก {name || 'แฟนคลับของโรส'}</span>
+          <span className="wc-from">{copy("WishCardView.99bd2ab798", "จาก ")}{name || copy("WishCardView.5f78946b40", "แฟนคลับของโรส")}</span>
         </div>
 
         {showFooterHint && (
@@ -120,7 +122,7 @@ export default function WishCardView({
                   type="button"
                   className={`wc-like-btn ${isLiked ? 'is-liked' : ''}`}
                   onClick={handleHeartClick}
-                  title="กดส่งหัวใจให้การ์ดใบนี้"
+                  title={copy("WishCardView.5d7bd1fb4d", "กดส่งหัวใจให้การ์ดใบนี้")}
                 >
                   <PixelIcon name="heart" size={13} />
                   <span>{Number(likes) || 0}</span>
@@ -129,12 +131,12 @@ export default function WishCardView({
               {img && (
                 <span className="wc-has-photo">
                   <PixelIcon name="camera" size={13} />
-                  <span>โพลาลอยด์</span>
+                  <span>{copy("WishCardView.cb1e5af0a2", "โพลาลอยด์")}</span>
                 </span>
               )}
             </div>
             <span className="wc-open">
-              <span>กดเพื่ออ่าน</span>
+              <span>{copy("WishCardView.892dc9b376", "กดเพื่ออ่าน")}</span>
               <PixelIcon name="chevron-right" size={13} />
             </span>
           </div>

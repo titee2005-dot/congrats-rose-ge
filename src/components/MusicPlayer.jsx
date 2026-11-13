@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ROSE_PLAYLIST } from '../data/roseData';
 import { PixelIcon } from './PixelSprites';
@@ -7,6 +8,7 @@ export default function MusicPlayer({
   heroVideoActive = false,
   customPlaylist = null,
 }) {
+  const copy = useSiteCopy();
   const playlist =
     Array.isArray(customPlaylist) && customPlaylist.length > 0
       ? customPlaylist
@@ -401,8 +403,8 @@ export default function MusicPlayer({
             setIsExpanded((v) => !v);
             setIsMenuOpen(false);
           }}
-          title={isExpanded ? 'พับเครื่องเล่นเพลง' : 'เปิดเครื่องเล่นเพลง'}
-          aria-label={isExpanded ? 'พับเครื่องเล่นเพลง' : 'เปิดเครื่องเล่นเพลง'}
+          title={isExpanded ? copy("MusicPlayer.1625547275", "พับเครื่องเล่นเพลง") : copy("MusicPlayer.cb836bbd96", "เปิดเครื่องเล่นเพลง")}
+          aria-label={isExpanded ? copy("MusicPlayer.1625547275", "พับเครื่องเล่นเพลง") : copy("MusicPlayer.cb836bbd96", "เปิดเครื่องเล่นเพลง")}
           aria-expanded={isExpanded}
         >
           <span className={`px-bgm-disc-ico ${isPlaying ? 'spin' : ''}`}>
@@ -420,7 +422,7 @@ export default function MusicPlayer({
           <div
             className="px-bgm-menu"
             role="listbox"
-            aria-label="เลือกเพลง"
+            aria-label={copy("MusicPlayer.36039f1c56", "เลือกเพลง")}
           >
             {playlist.map((track, idx) => {
               const active = idx === currentIndex;
@@ -444,7 +446,7 @@ export default function MusicPlayer({
                       <span>{idx + 1}.</span>
                     )}
                   </span>
-                  <span className="px-bgm-item-name">{track.title}</span>
+                  <span className="px-bgm-item-name">{copy(`track.${track.id}`, track.title)}</span>
                 </button>
               );
             })}
@@ -455,11 +457,11 @@ export default function MusicPlayer({
           type="button"
           className="px-bgm-song-btn"
           onClick={() => setIsMenuOpen((v) => !v)}
-          title="เลือกเพลง"
+          title={copy("MusicPlayer.36039f1c56", "เลือกเพลง")}
           aria-expanded={isMenuOpen}
           tabIndex={isExpanded ? 0 : -1}
         >
-          <span className="px-bgm-song-name">{currentTrack.title}</span>
+          <span className="px-bgm-song-name">{copy(`track.${currentTrack.id}`, currentTrack.title)}</span>
           <PixelIcon
             name={isMenuOpen ? 'chevron-down' : 'chevron-up'}
             size={11}
@@ -470,8 +472,8 @@ export default function MusicPlayer({
           type="button"
           className="px-bgm-icon-btn is-play"
           onClick={handleTogglePlay}
-          title={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
-          aria-label={isPlaying ? 'หยุดเพลง' : 'เล่นเพลง'}
+          title={isPlaying ? copy("MusicPlayer.6c8f5d03c3", "หยุดเพลง") : copy("MusicPlayer.76a46cb1fb", "เล่นเพลง")}
+          aria-label={isPlaying ? copy("MusicPlayer.6c8f5d03c3", "หยุดเพลง") : copy("MusicPlayer.76a46cb1fb", "เล่นเพลง")}
           tabIndex={isExpanded ? 0 : -1}
         >
           <PixelIcon name={isPlaying ? 'pause' : 'play'} size={11} />
@@ -481,8 +483,8 @@ export default function MusicPlayer({
           type="button"
           className="px-bgm-icon-btn is-next"
           onClick={handleNextClick}
-          title="เพลงถัดไป"
-          aria-label="เพลงถัดไป"
+          title={copy("MusicPlayer.ff49a138c8", "เพลงถัดไป")}
+          aria-label={copy("MusicPlayer.ff49a138c8", "เพลงถัดไป")}
           tabIndex={isExpanded ? 0 : -1}
         >
           <PixelIcon name="next" size={11} />

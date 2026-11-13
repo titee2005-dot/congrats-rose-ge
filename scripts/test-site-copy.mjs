@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import { createServer } from 'vite';
+import { createElement as h } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+const server = await createServer({ server: { middlewareMode: true }, appType: 'custom' });
+try {
+ const {SiteCopyProvider,formatCopy}=await server.ssrLoadModule('/src/content/SiteCopy.jsx');
+ const {SITE_COPY}=await server.ssrLoadModule('/src/content/siteCopyCatalog.js');
+ assert.equal(new Set(SITE_COPY.map(x=>x.key)).size,SITE_COPY.length);
+ assert(SITE_COPY.every(x=>x.section&&typeof x.text==='string'));
+ assert.equal(formatCopy({},'x','default'),'default');
+ assert.equal(formatCopy({x:''},'x','default'),'');
+ assert.equal(formatCopy({x:'จำนวน {count} ใบ'},'x','default',{count:42}),'จำนวน 42 ใบ');
+ assert.equal(formatCopy({x:'{count}'},'x','default',{count:'$&'}),'$&');
+ const load=async name=>(await server.ssrLoadModule(`/src/components/${name}.jsx`)).default;
+ const render=(C,props={},overrides={})=>renderToStaticMarkup(h(SiteCopyProvider,{overrides},h(C,props)));
+ const Header=await load('Header');
+ let html=render(Header,{wishCount:42,bunnyCount:1},{'nav.activities':'กิจกรรมที่แก้ไข'});
+ assert(html.includes('กิจกรรมที่แก้ไข'));assert(html.includes('>42</span>'));
+ const Activities=await load('PastActivities');
+ html=render(Activities,{}, {'activity.18.title':'THE FINAL MEMORY'});
+ assert.equal((html.match(/<article/g)||[]).length,18);assert(html.includes('THE FINAL MEMORY'));assert(html.includes('is-featured'));
+ const Profile=await load('FollowRose');
+ html=render(Profile,{}, {'profile.fullNameTh':'ชื่อแก้ไข','favorite.bunny':'งานอดิเรกใหม่'});
+ assert(html.includes('ชื่อแก้ไข'));assert(html.includes('งานอดิเรกใหม่'));
+ const Card=await load('WishCardView');
+ html=render(Card,{name:'ชื่อผู้ส่งเดิม',message:'ข้อความจากแฟนคลับ'}, {'stamp.crown-gold.titleTh':'ตราประทับใหม่'});
+ assert(html.includes('ชื่อผู้ส่งเดิม'));assert(html.includes('ข้อความจากแฟนคลับ'));assert(html.includes('ตราประทับใหม่'));
+ const Hero=await load('Hero'); const heroTitle=SITE_COPY.find(x=>x.text==='THE GE EDITION · 2026');
+ html=render(Hero,{}, {[heroTitle.key]:'<script>test</script>'});assert(html.includes('&lt;script&gt;test&lt;/script&gt;'));assert(!html.includes('<script>test'));
+ const Farm=await load('BunnyFarmGallery');html=render(Farm);assert.equal((html.match(/<img/g)||[]).length,1);assert(!html.includes('<a '));assert.equal((html.match(/<button/g)||[]).length,3);assert(html.includes('aria-pressed="true"'));
+ const Editor=await load('SiteTextEditor');html=render(Editor,{siteConfig:{text_overrides:{'activity.18.title':'ข้อความที่บันทึก'}},updateSiteConfig:async()=>true});assert(html.includes('ข้อความที่บันทึก'));assert.equal((html.match(/<textarea/g)||[]).length,SITE_COPY.length);
+ console.log(`PASS: ${SITE_COPY.length} catalog entries; overrides, fallbacks, templates, data labels, 18 activities, counts, safe text, editor hydration.`);
+} finally { await server.close(); }

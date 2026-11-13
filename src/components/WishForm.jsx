@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import html2canvas from 'html2canvas';
@@ -48,6 +49,7 @@ function compressImageFile(file) {
 }
 
 export default function WishForm({ onAddWish, onLaunchConfetti }) {
+  const copy = useSiteCopy();
   const [selectedCard, setSelectedCard] = useState(CARD_THEMES[0].id);
   const [selectedStamp, setSelectedStamp] = useState(CARD_STAMPS[0].id);
   const [name, setName] = useState('');
@@ -73,7 +75,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) {
-      setPopupMsg('ไฟล์รูปใหญ่เกินไป กรุณาเลือกไฟล์ขนาดไม่เกิน 25MB นะคะ');
+      setPopupMsg(copy("WishForm.d38a79bf61", "ไฟล์รูปใหญ่เกินไป กรุณาเลือกไฟล์ขนาดไม่เกิน 25MB นะคะ"));
       return;
     }
     setFileObj(f);
@@ -95,7 +97,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
 
   const handleSubmit = async () => {
     if (!name.trim() || !message.trim()) {
-      setPopupMsg('กรุณากรอกชื่อผู้ส่งและข้อความแสดงความยินดีให้ครบถ้วนนะคะ');
+      setPopupMsg(copy("WishForm.ee2f3fb5b5", "กรุณากรอกชื่อผู้ส่งและข้อความแสดงความยินดีให้ครบถ้วนนะคะ"));
       return;
     }
 
@@ -134,7 +136,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
       onLaunchConfetti?.();
     } catch (err) {
       console.error(err);
-      setPopupMsg('เกิดข้อผิดพลาดในการเตรียมรูปภาพ กรุณาลองใหม่อีกครั้งนะคะ');
+      setPopupMsg(copy("WishForm.8e69576fe5", "เกิดข้อผิดพลาดในการเตรียมรูปภาพ กรุณาลองใหม่อีกครั้งนะคะ"));
     } finally {
       setIsSubmitting(false);
     }
@@ -155,7 +157,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
       link.click();
     } catch (err) {
       console.error(err);
-      alert('เกิดข้อผิดพลาดในการบันทึกรูปการ์ด');
+      alert(copy("WishForm.cdc5174827", "เกิดข้อผิดพลาดในการบันทึกรูปการ์ด"));
     }
   };
 
@@ -164,10 +166,10 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
       <section className="px-section" id="wish">
         <ScrollReveal>
           <SectionHeading
-            chip="SEND CONGRATS CARD"
+            chip={copy("WishForm.8f4122fc9d", "SEND CONGRATS CARD")}
             icon="envelope"
-            title="เขียนการ์ดแสดงความยินดีให้โรส"
-            desc="เลือกแบบการ์ด ประทับตราเกียรติยศ แล้วส่งความภูมิใจถึงน้องโรสได้เลย (การ์ดทุกใบจะรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศนะคะ)"
+            title={copy("WishForm.833478a4de", "เขียนการ์ดแสดงความยินดีให้โรส")}
+            desc={copy("WishForm.478f4e5178", "เลือกแบบการ์ด ประทับตราเกียรติยศ แล้วส่งความภูมิใจถึงน้องโรสได้เลย (การ์ดทุกใบจะรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศนะคะ)")}
           />
         </ScrollReveal>
 
@@ -175,15 +177,14 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
           <div className="wish-layout">
             {/* ฟอร์มเขียนการ์ด */}
             <PixelFrame
-              label="Congrats Letter"
+              label={copy("WishForm.78473cf808", "Congrats Letter")}
               icon="crown"
               tone="pink"
               bodyClassName="wish-form-body"
             >
               <div className="field">
                 <span className="field-label">
-                  <i>1</i> เลือกแบบการ์ดฉลอง
-                </span>
+                  <i>1</i>{copy("WishForm.693ba7b382", " เลือกแบบการ์ดฉลอง")}</span>
                 <div className="card-picker">
                   {CARD_THEMES.map((t) => {
                     const active = selectedCard === t.id;
@@ -198,8 +199,8 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                           '--pick-bg': t.softBg,
                         }}
                         onClick={() => setSelectedCard(t.id)}
-                        title={t.sub || t.name}
-                        aria-label={t.sub || t.name}
+                        title={copy(`theme.${t.id}.sub`, t.sub || t.name)}
+                        aria-label={copy(`theme.${t.id}.sub`, t.sub || t.name)}
                       >
                         <span className={`pick-swatch sw-${t.variant}`}>
                           <span>
@@ -219,8 +220,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
 
               <div className="field">
                 <span className="field-label">
-                  <i>2</i> เลือกตราประทับเกียรติยศ (Honor Stamp)
-                </span>
+                  <i>2</i>{copy("WishForm.3155a511d7", " เลือกตราประทับเกียรติยศ (Honor Stamp)")}</span>
                 <div className="stamp-picker">
                   {CARD_STAMPS.map((st) => {
                     const active = selectedStamp === st.id;
@@ -238,8 +238,8 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                       >
                         <PixelIcon name={st.icon} size={17} />
                         <span className="stamp-pick-text">
-                          <strong>{st.titleTh}</strong>
-                          <small>{st.code}</small>
+                          <strong>{copy(`stamp.${st.id}.titleTh`, st.titleTh)}</strong>
+                          <small>{copy(`stamp.${st.id}.code`, st.code)}</small>
                         </span>
                       </button>
                     );
@@ -249,14 +249,13 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
 
               <div className="field">
                 <label className="field-label" htmlFor="sender-name-inp">
-                  <i>3</i> ชื่อ / นามแฝงผู้ส่ง
-                </label>
+                  <i>3</i>{copy("WishForm.d6689b9503", " ชื่อ / นามแฝงผู้ส่ง")}</label>
                 <input
                   id="sender-name-inp"
                   type="text"
                   className="px-input"
                   maxLength={40}
-                  placeholder="เช่น ชาวสวนกุหลาบของโรส"
+                  placeholder={copy("WishForm.313cc053b3", "เช่น ชาวสวนกุหลาบของโรส")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -265,8 +264,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
               <div className="field">
                 <div className="field-label-row">
                   <label className="field-label" htmlFor="wish-msg-inp">
-                    <i>4</i> ข้อความแสดงความยินดี
-                  </label>
+                    <i>4</i>{copy("WishForm.2c0e72bdd1", " ข้อความแสดงความยินดี")}</label>
                   <span
                     className={`char-count ${message.length >= 460 ? 'near' : ''}`}
                   >
@@ -277,23 +275,23 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                   id="wish-msg-inp"
                   className="px-input px-textarea"
                   maxLength={500}
-                  placeholder="ร่วมเขียนข้อความแสดงความยินดีและส่งกำลังใจให้น้องโรสในงาน General Election..."
+                  placeholder={copy("WishForm.553ae7a78d", "ร่วมเขียนข้อความแสดงความยินดีและส่งกำลังใจให้น้องโรสในงาน General Election...")}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                 />
 
                 <div className="quick-prompts-bar">
-                  <span className="qp-label">ประโยคแนะนำ:</span>
+                  <span className="qp-label">{copy("WishForm.2b45ee81f7", "ประโยคแนะนำ:")}</span>
                   <div className="qp-chips">
                     {QUICK_PROMPTS.map((qp, idx) => (
                       <button
                         key={idx}
                         type="button"
                         className="qp-chip"
-                        onClick={() => handleApplyQuickPrompt(qp)}
+                        onClick={() => handleApplyQuickPrompt(copy(`prompt.${idx}`, qp))}
                       >
                         <PixelIcon name="sparkle" size={12} />
-                        <span>แบบที่ {idx + 1}</span>
+                        <span>{copy("WishForm.ef2c496387", "แบบที่ ")}{idx + 1}</span>
                       </button>
                     ))}
                   </div>
@@ -302,13 +300,12 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
 
               <div className="field">
                 <span className="field-label">
-                  <i>5</i> แนบรูปโพลาลอยด์ที่ระลึก (ไม่บังคับ)
-                </span>
+                  <i>5</i>{copy("WishForm.2e85c2cd95", " แนบรูปโพลาลอยด์ที่ระลึก (ไม่บังคับ)")}</span>
                 {!previewImgUrl ? (
                   <label className="upload-drop">
                     <PixelIcon name="camera" size={26} />
-                    <strong>คลิกเพื่อเลือกรูปภาพประทับใจ</strong>
-                    <small>JPG, PNG, WEBP ไม่เกิน 25MB (จะจัดแสดงในหมวดโพลาลอยด์ด้วย)</small>
+                    <strong>{copy("WishForm.e1f9b1eca4", "คลิกเพื่อเลือกรูปภาพประทับใจ")}</strong>
+                    <small>{copy("WishForm.08557a7ee4", "JPG, PNG, WEBP ไม่เกิน 25MB (จะจัดแสดงในหมวดโพลาลอยด์ด้วย)")}</small>
                     <input
                       type="file"
                       hidden
@@ -318,14 +315,14 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                   </label>
                 ) : (
                   <div className="upload-picked">
-                    <img src={previewImgUrl} alt="ตัวอย่างรูปแนบ" />
+                    <img src={previewImgUrl} alt={copy("WishForm.473293c84d", "ตัวอย่างรูปแนบ")} />
                     <button
                       type="button"
                       className="px-btn sm"
                       onClick={clearSelectedFile}
                     >
                       <PixelIcon name="close" size={14} />
-                      <span>นำรูปออก</span>
+                      <span>{copy("WishForm.afdc433078", "นำรูปออก")}</span>
                     </button>
                   </div>
                 )}
@@ -340,23 +337,21 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                 >
                   <PixelIcon name="bouquet" size={16} />
                   <span>
-                    {isSubmitting ? 'กำลังส่งการ์ด...' : 'ส่งการ์ดแสดงความยินดี'}
+                    {isSubmitting ? copy("WishForm.9861857043", "กำลังส่งการ์ด...") : copy("WishForm.ffb14bc7cc", "ส่งการ์ดแสดงความยินดี")}
                   </span>
                 </button>
                 <button
                   type="button"
                   className="px-btn"
                   onClick={() => setShowPreviewModal(true)}
-                >
-                  ดูการ์ดเต็มใบ
-                </button>
+                >{copy("WishForm.245559596a", "ดูการ์ดเต็มใบ")}</button>
               </div>
             </PixelFrame>
 
             {/* พรีวิวการ์ดแบบสด */}
             <div className="wish-preview-col">
               <PixelFrame
-                label="Live Preview"
+                label={copy("WishForm.a62da90101", "Live Preview")}
                 icon="sparkle"
                 tone="lavender"
                 bodyClassName="wish-preview-body"
@@ -367,11 +362,11 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                   name={name}
                   message={message}
                   img={previewImgUrl}
-                  letterNumber="Congrats Rose GE"
+                  letterNumber={copy("WishForm.29becf46f6", "Congrats Rose GE")}
                 />
                 <div className="preview-bunny" aria-hidden="true">
                   <PixelBunnySprite variant="crown-ge" frame="idle" size={44} />
-                  <span>การ์ดที่ระลึกของคุณจะหน้าตาแบบนี้นะ!</span>
+                  <span>{copy("WishForm.2245906241", "การ์ดที่ระลึกของคุณจะหน้าตาแบบนี้นะ!")}</span>
                 </div>
               </PixelFrame>
             </div>
@@ -391,7 +386,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                 type="button"
                 className="px-modal-close"
                 onClick={() => setShowPreviewModal(false)}
-                aria-label="ปิด"
+                aria-label={copy("WishForm.96d79d763f", "ปิด")}
               >
                 <PixelIcon name="close" size={16} />
               </button>
@@ -401,7 +396,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                 name={name}
                 message={message}
                 img={previewImgUrl}
-                letterNumber="ตัวอย่างการ์ดแสดงความยินดี"
+                letterNumber={copy("WishForm.ec9d9ac9b3", "ตัวอย่างการ์ดแสดงความยินดี")}
               />
             </div>
           </div>,
@@ -418,17 +413,14 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
           >
             <div className="px-modal wide" onClick={(e) => e.stopPropagation()}>
               <PixelFrame
-                label="Congrats Sent!"
+                label={copy("WishForm.8d3c390a9c", "Congrats Sent!")}
                 icon="trophy"
                 tone="mint"
                 bodyClassName="success-body"
               >
                 <PixelBunnySprite variant="crown-ge" frame="hop" size={56} />
-                <h3>ส่งการ์ดแสดงความยินดีถึงโรสเรียบร้อยแล้ว!</h3>
-                <p className="success-note">
-                  การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศ
-                  สามารถบันทึกรูปการ์ดที่ระลึกเก็บไว้แชร์ลงโซเชียลได้เลยนะ!
-                </p>
+                <h3>{copy("WishForm.0c2c34538a", "ส่งการ์ดแสดงความยินดีถึงโรสเรียบร้อยแล้ว!")}</h3>
+                <p className="success-note">{copy("WishForm.aed2d8b934", "การ์ดของคุณกำลังรอแอดมินตรวจสอบก่อนขึ้นหอเกียรติยศ สามารถบันทึกรูปการ์ดที่ระลึกเก็บไว้แชร์ลงโซเชียลได้เลยนะ!")}</p>
 
                 <div id="rose-recap-card" className="recap-capture">
                   <WishCardView
@@ -437,7 +429,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                     name={recapData.name}
                     message={recapData.message}
                     img={recapData.img}
-                    letterNumber="Congratulations Rose BNK48"
+                    letterNumber={copy("WishForm.52dd7d2e38", "Congratulations Rose BNK48")}
                   />
                 </div>
 
@@ -448,15 +440,13 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                     onClick={handleDownloadRecap}
                   >
                     <PixelIcon name="download" size={16} />
-                    <span>บันทึกรูปการ์ดที่ระลึก (PNG)</span>
+                    <span>{copy("WishForm.181cc82e39", "บันทึกรูปการ์ดที่ระลึก (PNG)")}</span>
                   </button>
                   <button
                     type="button"
                     className="px-btn"
                     onClick={() => setShowSuccessModal(false)}
-                  >
-                    ปิดหน้าต่าง
-                  </button>
+                  >{copy("WishForm.434e4773e3", "ปิดหน้าต่าง")}</button>
                 </div>
               </PixelFrame>
             </div>
@@ -473,7 +463,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
               onClick={(e) => e.stopPropagation()}
             >
               <PixelFrame
-                label="Notice"
+                label={copy("WishForm.5256fffffb", "Notice")}
                 icon="bunny"
                 tone="butter"
                 bodyClassName="alert-body"
@@ -484,9 +474,7 @@ export default function WishForm({ onAddWish, onLaunchConfetti }) {
                   type="button"
                   className="px-btn primary"
                   onClick={() => setPopupMsg(null)}
-                >
-                  ตกลง
-                </button>
+                >{copy("WishForm.98f0a324e7", "ตกลง")}</button>
               </PixelFrame>
             </div>
           </div>,

@@ -9,6 +9,7 @@ import WishForm from '../components/WishForm';
 import WishWall from '../components/WishWall';
 import FollowRose from '../components/FollowRose';
 import Footer from '../components/Footer';
+import PastActivities from '../components/PastActivities';
 import Supporters from '../components/Supporters';
 import PixelBunnies from '../components/PixelBunnies';
 import MusicPlayer from '../components/MusicPlayer';
@@ -182,6 +183,8 @@ export default function Home({
           totalCheers={totalCheers}
           onLaunchConfetti={handleLaunchConfetti}
         />
+
+        <PastActivities />
 
         <CheerPavilion
           cheerStats={cheerStats}

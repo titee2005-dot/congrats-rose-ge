@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import html2canvas from 'html2canvas';
@@ -23,6 +24,7 @@ function loadLikedIds() {
 }
 
 export default function WishWall({ wishes, isLoading, onLikeWish }) {
+  const copy = useSiteCopy();
   const [selectedWishId, setSelectedWishId] = useState(null);
   const [showAll, setShowAll] = useState(false);
   const [viewMode, setViewMode] = useState('all'); // 'all' | 'hof' | 'polaroid'
@@ -122,7 +124,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
       link.click();
     } catch (err) {
       console.error(err);
-      alert('เกิดข้อผิดพลาดในการบันทึกรูปการ์ด');
+      alert(copy("WishWall.cdc5174827", "เกิดข้อผิดพลาดในการบันทึกรูปการ์ด"));
     } finally {
       setIsDownloading(false);
     }
@@ -133,17 +135,17 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
       <section className="px-section" id="wall">
         <ScrollReveal>
           <SectionHeading
-            chip={`CONGRATS WALL · ${approvedWishes.length}`}
+            chip={copy("WishWall.69af1654ab", "CONGRATS WALL · {value1}", {value1: approvedWishes.length})}
             icon="crown"
-            title="กำแพงการ์ดแสดงความยินดี"
-            desc="รวมทุกความภาคภูมิใจและคำยินดีจากแฟนคลับที่ส่งให้น้องโรส กดหัวใจให้การ์ดที่ชอบ หรือดาวน์โหลดการ์ดที่ระลึกได้เลย"
+            title={copy("WishWall.f2e3d5c4bd", "กำแพงการ์ดแสดงความยินดี")}
+            desc={copy("WishWall.0a087506b3", "รวมทุกความภาคภูมิใจและคำยินดีจากแฟนคลับที่ส่งให้น้องโรส กดหัวใจให้การ์ดที่ชอบ หรือดาวน์โหลดการ์ดที่ระลึกได้เลย")}
           />
         </ScrollReveal>
 
         {/* แถบเลือกโหมดจัดแสดง (Hall of Fame / Polaroid / ค้นหา / กรองตราประทับ) */}
         <ScrollReveal delay={50}>
           <div className="wall-toolbar">
-            <div className="wall-mode-tabs" role="group" aria-label="หมวดการ์ด">
+            <div className="wall-mode-tabs" role="group" aria-label={copy("WishWall.71edbf5f27", "หมวดการ์ด")}>
               <button
                 type="button"
                 className={`px-tab ${viewMode === 'all' ? 'is-active' : ''}`}
@@ -151,7 +153,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 aria-pressed={viewMode === 'all'}
               >
                 <PixelIcon name="envelope" size={15} />
-                <em>ทั้งหมด</em><span>{approvedWishes.length}</span>
+                <em>{copy("WishWall.56effdba63", "ทั้งหมด")}</em><span>{approvedWishes.length}</span>
               </button>
               <button
                 type="button"
@@ -160,7 +162,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 aria-pressed={viewMode === 'hof'}
               >
                 <PixelIcon name="crown" size={15} />
-                <em>หอเกียรติยศ</em><span>{hofCount}</span>
+                <em>{copy("WishWall.48c7e04323", "หอเกียรติยศ")}</em><span>{hofCount}</span>
               </button>
               <button
                 type="button"
@@ -169,25 +171,24 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 aria-pressed={viewMode === 'polaroid'}
               >
                 <PixelIcon name="camera" size={15} />
-                <em>โพลาลอยด์</em><span>{polaroidCount}</span>
+                <em>{copy("WishWall.cb1e5af0a2", "โพลาลอยด์")}</em><span>{polaroidCount}</span>
               </button>
             </div>
 
             <div className="wall-filter-row">
-              <label className="wall-stamp-select">ตราประทับ
-                <select aria-label="ตราประทับ" value={stampFilter} onChange={(e) => setStampFilter(e.target.value)}>
-                  <option value="all">ทุกตราประทับ</option>
-                  {CARD_STAMPS.map((st) => <option key={st.id} value={st.id}>{st.titleTh}</option>)}
+              <label className="wall-stamp-select">{copy("WishWall.fd5f2b0d96", "ตราประทับ")}<select aria-label={copy("WishWall.fd5f2b0d96", "ตราประทับ")} value={stampFilter} onChange={(e) => setStampFilter(e.target.value)}>
+                  <option value="all">{copy("WishWall.c7dc5d4af2", "ทุกตราประทับ")}</option>
+                  {CARD_STAMPS.map((st) => <option key={st.id} value={st.id}>{copy(`stamp.${st.id}.titleTh`, st.titleTh)}</option>)}
                 </select>
               </label>
-              <div className="wall-stamp-pills" role="group" aria-label="กรองตามตราประทับ">
+              <div className="wall-stamp-pills" role="group" aria-label={copy("WishWall.6abc5afbb6", "กรองตามตราประทับ")}>
                 <button
                   type="button"
                   className={`stamp-filter-chip ${stampFilter === 'all' ? 'is-active' : ''}`}
                   onClick={() => setStampFilter('all')}
                   aria-pressed={stampFilter === 'all'}
                 >
-                  <span>ทุกตราประทับ</span>
+                  <span>{copy("WishWall.c7dc5d4af2", "ทุกตราประทับ")}</span>
                 </button>
                 {CARD_STAMPS.map((st) => (
                   <button
@@ -198,7 +199,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                     aria-pressed={stampFilter === st.id}
                   >
                     <PixelIcon name={st.icon} size={13} />
-                    <span>{st.titleTh}</span>
+                    <span>{copy(`stamp.${st.id}.titleTh`, st.titleTh)}</span>
                   </button>
                 ))}
               </div>
@@ -207,8 +208,8 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 <PixelIcon name="search" size={15} />
                 <input
                   type="search"
-                  aria-label="ค้นหาการ์ดจากชื่อหรือข้อความ"
-                  placeholder="ค้นหาชื่อหรือข้อความ..."
+                  aria-label={copy("WishWall.fc6d2a4566", "ค้นหาการ์ดจากชื่อหรือข้อความ")}
+                  placeholder={copy("WishWall.99979bdc51", "ค้นหาชื่อหรือข้อความ...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -217,7 +218,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                     type="button"
                     className="wall-search-clear"
                     onClick={() => setSearchQuery('')}
-                    aria-label="ล้างคำค้นหา"
+                    aria-label={copy("WishWall.18ef8d921e", "ล้างคำค้นหา")}
                   >
                     <PixelIcon name="close" size={12} />
                   </button>
@@ -233,14 +234,14 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
               <PixelBunnySprite variant="crown-ge" frame="idle" size={60} />
               <h3>
                 {isLoading
-                  ? 'กำลังโหลดการ์ดแสดงความยินดี...'
+                  ? copy("WishWall.b9ed832873", "กำลังโหลดการ์ดแสดงความยินดี...")
                   : viewMode === 'polaroid'
-                    ? 'ยังไม่มีการ์ดที่แนบรูปโพลาลอยด์ในหมวดนี้'
-                    : 'ไม่พบการ์ดที่ตรงกับตัวกรองในขณะนี้'}
+                    ? copy("WishWall.bf64a86dc9", "ยังไม่มีการ์ดที่แนบรูปโพลาลอยด์ในหมวดนี้")
+                    : copy("WishWall.c7ecb3b0ee", "ไม่พบการ์ดที่ตรงกับตัวกรองในขณะนี้")}
               </h3>
               {!isLoading && (
                 <p className="empty-sub">
-                  <span>มาร่วมเขียนการ์ดแสดงความยินดีและแนบรูปที่ระลึกให้โรสกันนะ!</span>
+                  <span>{copy("WishWall.aff90a7a01", "มาร่วมเขียนการ์ดแสดงความยินดีและแนบรูปที่ระลึกให้โรสกันนะ!")}</span>
                   <PixelIcon name="bouquet" size={15} />
                 </p>
               )}
@@ -282,7 +283,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                         isFeatured={Boolean(w.is_featured)}
                         isLiked={isLiked}
                         onLikeClick={() => handleToggleLike(w)}
-                        letterNumber={`การ์ดใบที่ ${cardNo}`}
+                        letterNumber={copy("WishWall.bd986d22ab", "การ์ดใบที่ {value1}", {value1: cardNo})}
                         compact
                         showFooterHint
                       />
@@ -301,8 +302,8 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 >
                   <span>
                     {showAll
-                      ? 'ย่อกลับ'
-                      : `ดูการ์ดทั้งหมด (${sortedFiltered.length} ใบ)`}
+                      ? copy("WishWall.748de45dc9", "ย่อกลับ")
+                      : copy("WishWall.ed0c4c3a62", "ดูการ์ดทั้งหมด ({value1} ใบ)", {value1: sortedFiltered.length})}
                   </span>
                   <PixelIcon
                     name={showAll ? 'chevron-up' : 'chevron-down'}
@@ -326,7 +327,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                 type="button"
                 className="px-modal-close"
                 onClick={() => setSelectedWishId(null)}
-                aria-label="ปิด"
+                aria-label={copy("WishWall.96d79d763f", "ปิด")}
               >
                 <PixelIcon name="close" size={16} />
               </button>
@@ -340,7 +341,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                   img={activeWish.img}
                   likes={activeWish.likes || 0}
                   isFeatured={Boolean(activeWish.is_featured)}
-                  letterNumber={`การ์ดใบที่ ${approvedWishes.length - approvedWishes.indexOf(activeWish)}`}
+                  letterNumber={copy("WishWall.bd986d22ab", "การ์ดใบที่ {value1}", {value1: approvedWishes.length - approvedWishes.indexOf(activeWish)})}
                 />
               </div>
 
@@ -351,8 +352,7 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                   onClick={() => handleToggleLike(activeWish)}
                 >
                   <PixelIcon name="heart" size={15} />
-                  <span>
-                    ส่งหัวใจ ({Number(activeWish.likes) || 0})
+                  <span>{copy("WishWall.a0d4c74ba1", "ส่งหัวใจ (")}{Number(activeWish.likes) || 0})
                   </span>
                 </button>
 
@@ -365,8 +365,8 @@ export default function WishWall({ wishes, isLoading, onLikeWish }) {
                   <PixelIcon name="download" size={15} />
                   <span>
                     {isDownloading
-                      ? 'กำลังบันทึก...'
-                      : 'ดาวน์โหลดการ์ดที่ระลึก (PNG)'}
+                      ? copy("WishWall.c348b89a89", "กำลังบันทึก...")
+                      : copy("WishWall.aa3218f9c2", "ดาวน์โหลดการ์ดที่ระลึก (PNG)")}
                   </span>
                 </button>
               </div>

@@ -1,24 +1,26 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { ROSE_PROFILE, ROSE_SOCIALS } from '../data/roseData';
 import ScrollReveal from './ScrollReveal';
 import PixelFrame, { SectionHeading } from './PixelFrame';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
 export default function FollowRose() {
+  const copy = useSiteCopy();
   return (
     <section className="px-section" id="follow">
       <ScrollReveal>
         <SectionHeading
-          chip="ABOUT ROSE"
+          chip={copy("FollowRose.56183db3ed", "ABOUT ROSE")}
           icon="bunny"
-          title="รู้จักโรส & ช่องทางติดตาม"
-          desc="แวะไปทักทาย ส่งกำลังใจ และติดตามเรื่องราวน่ารัก ๆ ของโรสได้ที่ช่องทางทางการ"
+          title={copy("FollowRose.3a9b53f97f", "รู้จักโรส & ช่องทางติดตาม")}
+          desc={copy("FollowRose.f93f44bd9b", "แวะไปทักทาย ส่งกำลังใจ และติดตามเรื่องราวน่ารัก ๆ ของโรสได้ที่ช่องทางทางการ")}
         />
       </ScrollReveal>
 
       <ScrollReveal delay={80}>
         <div className="follow-grid">
           <PixelFrame
-            label="Profile"
+            label={copy("FollowRose.ff4fc0276e", "Profile")}
             icon="rose"
             tone="pink"
             bodyClassName="profile-body"
@@ -28,40 +30,40 @@ export default function FollowRose() {
                 <PixelBunnySprite variant="pink-rose" frame="idle" size={64} />
               </div>
               <div>
-                <span className="profile-group">{ROSE_PROFILE.group}</span>
+                <span className="profile-group">{copy('profile.group', ROSE_PROFILE.group)}</span>
                 <h3>
-                  {ROSE_PROFILE.nicknameTh} · {ROSE_PROFILE.fullNameTh}
+                  {copy('profile.nicknameTh', ROSE_PROFILE.nicknameTh)} · {copy('profile.fullNameTh', ROSE_PROFILE.fullNameTh)}
                 </h3>
-                <p className="profile-en">{ROSE_PROFILE.fullNameEn}</p>
+                <p className="profile-en">{copy('profile.fullNameEn', ROSE_PROFILE.fullNameEn)}</p>
               </div>
             </div>
 
             <dl className="profile-facts">
               <div>
-                <dt>วันเกิด</dt>
-                <dd>{ROSE_PROFILE.birthDateThai}</dd>
+                <dt>{copy("FollowRose.cefb3b84fb", "วันเกิด")}</dt>
+                <dd>{copy('profile.birthDateThai', ROSE_PROFILE.birthDateThai)}</dd>
               </div>
               <div>
-                <dt>ภูมิลำเนา</dt>
-                <dd>{ROSE_PROFILE.hometown}</dd>
+                <dt>{copy("FollowRose.aa657df9d0", "ภูมิลำเนา")}</dt>
+                <dd>{copy('profile.hometown', ROSE_PROFILE.hometown)}</dd>
               </div>
               <div>
-                <dt>ส่วนสูง</dt>
-                <dd>{ROSE_PROFILE.height}</dd>
+                <dt>{copy("FollowRose.4b52c7298c", "ส่วนสูง")}</dt>
+                <dd>{copy('profile.height', ROSE_PROFILE.height)}</dd>
               </div>
               <div>
-                <dt>กรุ๊ปเลือด</dt>
-                <dd>{ROSE_PROFILE.bloodGroup}</dd>
+                <dt>{copy("FollowRose.dabd29bdf9", "กรุ๊ปเลือด")}</dt>
+                <dd>{copy('profile.bloodGroup', ROSE_PROFILE.bloodGroup)}</dd>
               </div>
             </dl>
 
             <div className="profile-likes">
-              <span className="likes-title">สิ่งที่โรสชอบ</span>
+              <span className="likes-title">{copy("FollowRose.6b170c6324", "สิ่งที่โรสชอบ")}</span>
               <div className="likes-chips">
                 {ROSE_PROFILE.favorites.map((fav) => (
-                  <span key={fav.text}>
+                  <span key={copy(`favorite.${fav.icon}`, fav.text)}>
                     <PixelIcon name={fav.icon} size={15} />
-                    {fav.text}
+                    {copy(`favorite.${fav.icon}`, fav.text)}
                   </span>
                 ))}
               </div>
@@ -81,8 +83,8 @@ export default function FollowRose() {
                   <PixelIcon name={soc.key} size={34} />
                 </span>
                 <span className="px-social-info">
-                  <small>{soc.platform}</small>
-                  <strong>{soc.handle}</strong>
+                  <small>{copy(`social.${soc.key}.platform`, soc.platform)}</small>
+                  <strong>{copy(`social.${soc.key}.handle`, soc.handle)}</strong>
                 </span>
                 <span className="px-social-arrow" aria-hidden="true">
                   <PixelIcon name="chevron-right" size={18} />

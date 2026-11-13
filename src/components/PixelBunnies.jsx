@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState, useEffect, useRef } from 'react';
 import { PixelBunnySprite, PixelIcon } from './PixelSprites';
 
@@ -55,6 +56,7 @@ export default function PixelBunnies({
   visible = true,
   carrotSignal = 0,
 }) {
+  const copy = useSiteCopy();
   const safeTarget = Math.max(0, Math.min(5, Math.round(Number(targetCount) || 0)));
 
   const [bunnies, setBunnies] = useState(() => buildInitialBunnies(safeTarget));
@@ -347,12 +349,12 @@ export default function PixelBunnies({
               transform: `translate(-50%, -${b.jumpOffset}px)`,
             }}
             onClick={() => handleClickBunny(b.id)}
-            title="จิ้มน้องกระต่ายเพื่อทักทาย!"
-            aria-label="น้องกระต่ายมาร่วมแสดงความยินดีกับโรส"
+            title={copy("PixelBunnies.041ec0444d", "จิ้มน้องกระต่ายเพื่อทักทาย!")}
+            aria-label={copy("PixelBunnies.549ecb5a5c", "น้องกระต่ายมาร่วมแสดงความยินดีกับโรส")}
           >
             {b.speech && (
               <span className={`bunny-bubble ${bubbleEdgeClass}`}>
-                <span>{b.speech.text}</span>
+                <span>{copy(`bunny.${b.speech.text}`, b.speech.text)}</span>
                 {b.speech.icon && (
                   <PixelIcon name={b.speech.icon} size={13} />
                 )}

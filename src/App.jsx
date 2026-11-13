@@ -1,3 +1,4 @@
+import { SiteCopyProvider, formatCopy } from './content/SiteCopy';
 import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
@@ -39,6 +40,7 @@ export const DEFAULT_SITE_CONFIG = {
   bunny_mode: 'auto', // 'auto' | 'manual'
   bunny_manual_count: 5, // 0..5
   party_video_url: '',
+  text_overrides: {},
   bgm_enabled: true,
   bgm_auto_start_on_scroll: true,
 };
@@ -463,10 +465,10 @@ export default function App() {
   // =========================
   const updateSiteConfig = async (patch) => {
     const nextConfig = { ...siteConfig, ...patch };
-    setSiteConfig(nextConfig);
-    saveLocalSiteConfig(nextConfig);
 
     if (!isSupabaseConfigured || !supabase) {
+      setSiteConfig(nextConfig);
+      saveLocalSiteConfig(nextConfig);
       return true;
     }
 
@@ -484,6 +486,8 @@ export default function App() {
         alert('บันทึกการตั้งค่าไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
         return false;
       }
+      setSiteConfig(nextConfig);
+      saveLocalSiteConfig(nextConfig);
       return true;
     } catch (err) {
       console.error('Save site_config error:', err);
@@ -565,7 +569,7 @@ export default function App() {
 
       if (error) {
         console.error('Error inserting wish:', error);
-        alert('เกิดข้อผิดพลาดในการบันทึกการ์ด กรุณาลองใหม่อีกครั้ง');
+        alert(formatCopy(siteConfig.text_overrides, 'submission.retry', 'เกิดข้อผิดพลาดในการบันทึกการ์ด กรุณาลองใหม่อีกครั้ง'));
         return false;
       }
 
@@ -577,7 +581,7 @@ export default function App() {
       return true;
     } catch (err) {
       console.error('Add wish error:', err);
-      alert('เกิดข้อผิดพลาดในการบันทึกการ์ด');
+      alert(formatCopy(siteConfig.text_overrides, 'submission.failed', 'เกิดข้อผิดพลาดในการบันทึกการ์ด'));
       return false;
     }
   };
@@ -792,6 +796,7 @@ export default function App() {
   };
 
   return (
+    <SiteCopyProvider overrides={siteConfig.text_overrides}>
     <BrowserRouter>
       <Routes>
         <Route
@@ -831,5 +836,6 @@ export default function App() {
         />
       </Routes>
     </BrowserRouter>
+    </SiteCopyProvider>
   );
 }

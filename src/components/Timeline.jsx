@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState } from 'react';
 import { ROSE_TIMELINE } from '../data/roseData';
 import ScrollReveal from './ScrollReveal';
@@ -75,6 +76,7 @@ function MemoryCard({ ev, index, isLast }) {
 }
 
 export default function Timeline({ items }) {
+  const copy = useSiteCopy();
   const timelineList =
     Array.isArray(items) && items.length > 0 ? items : ROSE_TIMELINE;
 
@@ -82,10 +84,10 @@ export default function Timeline({ items }) {
     <section className="px-section" id="journey">
       <ScrollReveal>
         <SectionHeading
-          chip="ROAD TO VICTORY"
+          chip={copy("Timeline.4d5ba7e762", "ROAD TO VICTORY")}
           icon="rose"
-          title="บันทึกเส้นทางความพยายามของโรส"
-          desc="ย้อนดูทุกก้าวสำคัญตั้งแต่วันแรกของความฝัน จนถึงวันที่ผลิบานอย่างภาคภูมิใจในงาน General Election"
+          title={copy("Timeline.13d1012a9d", "บันทึกเส้นทางความพยายามของโรส")}
+          desc={copy("Timeline.3a00d45187", "ย้อนดูทุกก้าวสำคัญตั้งแต่วันแรกของความฝัน จนถึงวันที่ผลิบานอย่างภาคภูมิใจในงาน General Election")}
         />
       </ScrollReveal>
 

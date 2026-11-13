@@ -1,0 +1,41 @@
+import { useSiteCopy } from '../content/SiteCopy';
+import { SectionHeading } from './PixelFrame';
+import { PixelIcon } from './PixelSprites';
+import { PAST_ACTIVITIES } from '../data/pastActivities';
+
+const cleanActivityTitle = text => text.replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\u200d\ufe0f]/gu, '').trim();
+
+function ActivityCards({ items }) {
+  const copy = useSiteCopy();
+  return <div className="activity-archive-grid">{items.map((item) => (
+    <article className={`activity-memory ${item.id === 18 ? 'is-featured' : ''}`} key={item.id}>
+      <div className="activity-memory-image">
+        {item.image ? <img src={item.image} alt={copy(`activity.${item.id}.title`, item.title)} loading="lazy" /> : <div className="activity-image-placeholder"><PixelIcon name={item.chapter ? 'book' : 'camera'} size={32} /><span>{copy("PastActivities.ca13cbaf95", "ภาพความทรงจำเร็ว ๆ นี้")}</span></div>}
+        <span className="activity-number">{String(item.id).padStart(2, '0')}</span>
+      </div>
+      <div className="activity-memory-copy">
+        <span className="activity-kicker">{item.chapter ? copy("PastActivities.5ea7b2af9f", "Chapter {value1}", {value1: item.chapter}) : copy("PastActivities.7b68f84bd8", "ACTIVITY {value1}", {value1: String(item.id).padStart(2, '0')})}</span>
+        <h3 className="activity-title"><PixelIcon name={item.icon || "star"} size={20} /><span>{cleanActivityTitle(copy(`activity.${item.id}.title`, item.title))}</span></h3>
+      </div>
+    </article>
+  ))}</div>;
+}
+
+export default function PastActivities() {
+  const copy = useSiteCopy();
+  return <section className="px-section past-activities" id="activities">
+    <SectionHeading chip={copy("PastActivities.82c8bb9fff", "OUR MEMORIES TOGETHER")} icon="book" title={copy("PastActivities.ca369f85ec", "RoseIsOn5ire")} desc={copy("PastActivities.01c7d9ceff", "กิจกรรมที่ผ่านมา · ความทรงจำของโรสและพวกเราตลอดเส้นทาง General Election")} />
+    <ActivityCards items={PAST_ACTIVITIES.filter(item => !item.chapter)} />
+    <div className="activity-story">
+      <div className="activity-story-heading">
+        <span>{copy("PastActivities.0e9d4805dc", "THE STORY COLLECTION · 5 CHAPTERS")}</span>
+        <h3 className="activity-story-title">
+          <PixelIcon name="bunny" size={25} />
+          <span>{copy("PastActivities.c9e40ff110", "ROLLZY BUNNY’s Story")}</span>
+          <PixelIcon name="book" size={24} />
+        </h3>
+      </div>
+      <ActivityCards items={PAST_ACTIVITIES.filter(item => item.chapter)} />
+    </div>
+  </section>;
+}

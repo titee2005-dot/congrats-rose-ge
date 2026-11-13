@@ -1,3 +1,4 @@
+import { useSiteCopy } from '../content/SiteCopy';
 import { useState, useEffect, useRef } from 'react';
 import { ROSE_PROFILE, ROSE_PARTY_MEDIA, DEFAULT_GE_MILESTONE } from '../data/roseData';
 import PixelFrame from './PixelFrame';
@@ -31,6 +32,7 @@ export default function Hero({
   onHeroVideoPlaying,
   onLaunchConfetti,
 }) {
+  const copy = useSiteCopy();
   const [daysSinceDebut] = useState(computeDebutDays);
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -118,28 +120,23 @@ export default function Hero({
 
   return (
     <section id="home" className="hero">
-      <div className="hero-heading">
+      <div className="hero-heading" data-edition={copy("hero.edition", "GE  /  2026")}>
         <span className="px-chip hero-congrats-chip">
-          <PixelIcon name="crown" size={14} />
-          CONGRATULATIONS · GENERAL ELECTION
-          <PixelIcon name="trophy" size={14} />
+          <PixelIcon name="crown" size={14} />{copy("Hero.fa2a236a83", "CONGRATULATIONS · GENERAL ELECTION")}<PixelIcon name="trophy" size={14} />
         </span>
         <h1 className="hero-title">
-          <span className="hero-title-sm">THE GE EDITION · 2026</span>
-          <span className="hero-title-lg">
-            Rose <b>{milestone.rankNumber || 'GE'}</b>
+          <span className="hero-title-sm">{copy("Hero.1f1d2d906a", "THE GE EDITION · 2026")}</span>
+          <span className="hero-title-lg">{copy("Hero.df147d43ab", "Rose ")}<b>{milestone.rankNumber || copy("Hero.7841417529", "GE")}</b>
           </span>
         </h1>
-        <p className="hero-sub">
-          บันทึกช่วงเวลาที่ความพยายามผลิบาน และส่งคำยินดีให้{' '}
-          <strong>โรส BNK48</strong> — ปาณิสรา บูรณาภา
-        </p>
+        <p className="hero-sub">{copy("Hero.6c98440e55", "บันทึกช่วงเวลาที่ความพยายามผลิบาน และส่งคำยินดีให้")}{' '}
+          <strong>{copy("Hero.d7515b0353", "โรส BNK48")}</strong>{copy("Hero.7fe6560ddd", " — ปาณิสรา บูรณาภา")}</p>
       </div>
 
       <div className="hero-grid">
         {/* ช่องหลัก: Rose Victory Stage */}
         <PixelFrame
-          label="Rose Victory Stage"
+          label={copy("Hero.52816545f6", "Rose Victory Stage")}
           icon="crown"
           tone="pink"
           className="hero-photo-frame"
@@ -150,7 +147,7 @@ export default function Hero({
             onClick={togglePlay}
             role="button"
             tabIndex={0}
-            aria-label={isPaused ? 'แตะเพื่อเล่นวิดีโอต่อ' : 'แตะเพื่อหยุดวิดีโอ'}
+            aria-label={isPaused ? copy("Hero.ac70995822", "แตะเพื่อเล่นวิดีโอต่อ") : copy("Hero.70a89011f2", "แตะเพื่อหยุดวิดีโอ")}
             onKeyDown={(e) => {
               if (e.key === ' ' || e.key === 'Enter') {
                 e.preventDefault();
@@ -162,7 +159,7 @@ export default function Hero({
               <iframe
                 className="hero-video-embed"
                 src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&playsinline=1&rel=0`}
-                title="Rose Victory Stage Video"
+                title={copy("Hero.ec27c1a055", "Rose Victory Stage Video")}
                 allow="autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen
               />
@@ -202,32 +199,32 @@ export default function Hero({
                     type="button"
                     className="hero-sound-btn hero-play-btn"
                     onClick={togglePlay}
-                    title={isPaused ? 'เล่นวิดีโอต่อ' : 'หยุดวิดีโอชั่วคราว'}
-                    aria-label={isPaused ? 'เล่นวิดีโอต่อ' : 'หยุดวิดีโอชั่วคราว'}
+                    title={isPaused ? copy("Hero.18a0c3d973", "เล่นวิดีโอต่อ") : copy("Hero.eef5b14838", "หยุดวิดีโอชั่วคราว")}
+                    aria-label={isPaused ? copy("Hero.18a0c3d973", "เล่นวิดีโอต่อ") : copy("Hero.eef5b14838", "หยุดวิดีโอชั่วคราว")}
                   >
                     <PixelIcon name={isPaused ? 'play' : 'pause'} size={14} />
-                    <span>{isPaused ? 'เล่น' : 'หยุด'}</span>
+                    <span>{isPaused ? copy("Hero.7e361eaab9", "เล่น") : copy("Hero.2cff5207a8", "หยุด")}</span>
                   </button>
 
                   <button
                     type="button"
                     className="hero-sound-btn"
                     onClick={toggleSound}
-                    title={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
-                    aria-label={isMuted ? 'เปิดเสียงวิดีโอ' : 'ปิดเสียงวิดีโอ'}
+                    title={isMuted ? copy("Hero.029a6f6bb8", "เปิดเสียงวิดีโอ") : copy("Hero.b6e9391cfc", "ปิดเสียงวิดีโอ")}
+                    aria-label={isMuted ? copy("Hero.029a6f6bb8", "เปิดเสียงวิดีโอ") : copy("Hero.b6e9391cfc", "ปิดเสียงวิดีโอ")}
                   >
                     <PixelIcon
                       name={isMuted ? 'volume-off' : 'volume-on'}
                       size={15}
                     />
-                    <span>{isMuted ? 'เปิดเสียง' : 'ปิดเสียง'}</span>
+                    <span>{isMuted ? copy("Hero.fb9ee0f79d", "เปิดเสียง") : copy("Hero.fb638e1998", "ปิดเสียง")}</span>
                   </button>
                 </div>
               </>
             ) : (
               <div className="hero-video-empty">
                 <PixelBunnySprite variant="crown-ge" frame="hop" size={56} />
-                <span>Rose Victory Stage</span>
+                <span>{copy("Hero.52816545f6", "Rose Victory Stage")}</span>
               </div>
             )}
           </div>
@@ -235,7 +232,7 @@ export default function Hero({
 
         {/* การ์ดข้อมูลฉลองความสำเร็จ */}
         <PixelFrame
-          label="Victory Ticket"
+          label={copy("Hero.72f3f29b2c", "Victory Ticket")}
           icon="trophy"
           tone="butter"
           className="hero-info-frame"
@@ -251,16 +248,16 @@ export default function Hero({
 
           <ul className="hero-facts">
             <li>
-              <span>โอกาสฉลอง</span>
-              <b>General Election</b>
+              <span>{copy("Hero.b3a065039b", "โอกาสฉลอง")}</span>
+              <b>{copy("Hero.64050544bd", "General Election")}</b>
             </li>
             <li>
-              <span>การ์ดแสดงความยินดี</span>
-              <b>{wishCount.toLocaleString()} ใบ</b>
+              <span>{copy("Hero.7732070e77", "การ์ดแสดงความยินดี")}</span>
+              <b>{wishCount.toLocaleString()}{copy("Hero.64a45cdb40", " ใบ")}</b>
             </li>
             <li>
-              <span>เติบโตบนเส้นทางไอดอล</span>
-              <b>{daysSinceDebut.toLocaleString()} วัน</b>
+              <span>{copy("Hero.6b1dd4bbc4", "เติบโตบนเส้นทางไอดอล")}</span>
+              <b>{daysSinceDebut.toLocaleString()}{copy("Hero.52d7e26d5b", " วัน")}</b>
             </li>
           </ul>
 
@@ -271,7 +268,7 @@ export default function Hero({
               onClick={() => scrollTo('wish')}
             >
               <PixelIcon name="envelope" size={18} />
-              <span>เขียนการ์ดแสดงความยินดี</span>
+              <span>{copy("Hero.51254f0441", "เขียนการ์ดแสดงความยินดี")}</span>
             </button>
 
             <div className="hero-sub-actions">
@@ -281,7 +278,7 @@ export default function Hero({
                 onClick={() => scrollTo('cheer')}
               >
                 <PixelIcon name="bunny" size={16} />
-                <span>ฟาร์มกระต่าย</span>
+                <span>{copy("Hero.56d29de232", "ฟาร์มกระต่าย")}</span>
               </button>
               <button
                 type="button"
@@ -289,7 +286,7 @@ export default function Hero({
                 onClick={onLaunchConfetti}
               >
                 <PixelIcon name="firework" size={16} />
-                <span>จุดพลุฉลอง!</span>
+                <span>{copy("Hero.a613c234dc", "จุดพลุฉลอง!")}</span>
               </button>
             </div>
           </div>

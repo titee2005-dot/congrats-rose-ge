@@ -1,3 +1,4 @@
+import SiteTextEditor from '../components/SiteTextEditor';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import WishCardView from '../components/WishCardView';
@@ -349,7 +350,8 @@ export default function Admin({
       nextList[index] = { ...nextList[index], img: finalUrl };
       setTimelineList(nextList);
       if (updateTimelineItems) {
-        await updateTimelineItems(nextList);
+        const saved = await updateTimelineItems(nextList);
+      if (!saved) { alert('บันทึกการ์ดไม่สำเร็จ กรุณาลองอีกครั้ง'); return; }
       }
       showSavedNotice(
         `อัปเดตรูปภาพสำหรับ ${nextList[index]?.seasonLabel || `บทที่ ${index + 1}`} สำเร็จแล้ว!`
@@ -520,6 +522,7 @@ export default function Admin({
       </div>
 
       <main className="px-main admin-main">
+        <SiteTextEditor siteConfig={siteConfig} updateSiteConfig={updateSiteConfig} />
         {/* แผงตั้งค่าหน้าเว็บ */}
         <PixelFrame
           label="GE Celebration Settings"
@@ -858,7 +861,7 @@ export default function Admin({
                 onClick={handleAddChapter}
               >
                 <PixelIcon name="check" size={14} />
-                <span>+ เพิ่มบทใหม่</span>
+                <span>+ เพิ่มการ์ดเส้นทางของโรส</span>
               </button>
               <button
                 type="button"
@@ -1049,7 +1052,7 @@ export default function Admin({
                         style={{ flex: 'none', padding: '7px 14px' }}
                         onClick={() => handleDeleteChapter(idx)}
                       >
-                        ลบบทนี้
+                        ลบการ์ดนี้
                       </button>
 
                       <div className="admin-tl-btn-group">
@@ -1060,7 +1063,7 @@ export default function Admin({
                           onClick={() => handleSaveChapter(idx)}
                         >
                           <PixelIcon name="check" size={15} />
-                          <span>บันทึกบทนี้</span>
+                          <span>บันทึกการ์ดนี้</span>
                         </button>
                       </div>
                     </div>
