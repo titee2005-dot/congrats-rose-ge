@@ -5,6 +5,10 @@
 .activity-image-placeholder { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8b6c70; background-image: radial-gradient(#c4aa9738 1px, transparent 1px); background-size: 12px 12px; }
 .activity-image-placeholder span { font-size: 0.8rem; }
 .activity-number { position: absolute; top: 12px; left: 12px; background: var(--wine); color: var(--gold-l); padding: 4px 8px; font-family: "Courier New", monospace; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 1rem; line-height: 1.2; letter-spacing: .02em; border: 1px solid var(--gold); border-radius: 0; }
+.activity-gallery-nav { position: absolute; bottom: 8px; right: 8px; display: inline-flex; align-items: center; gap: 4px; background: rgba(30, 15, 22, 0.88); padding: 3px 6px; border: 1px solid var(--gold); border-radius: 4px; z-index: 2; user-select: none; }
+.activity-gallery-btn { background: transparent; border: none; color: #fff; cursor: pointer; padding: 2px 5px; font-size: 0.72rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.activity-gallery-btn:hover { color: var(--gold-l); }
+.activity-gallery-counter { color: var(--gold-l); font-size: 0.72rem; font-family: "Courier New", monospace; font-weight: 700; letter-spacing: 0.05em; padding: 0 3px; }
 .activity-memory-copy { flex: 1; padding: 18px; }
 .activity-kicker { font-size: 0.68rem; font-weight: 700; color: var(--gold-d); letter-spacing: 0.12em; }
 .activity-memory h3 { margin: 6px 0 0; font-size: 1rem; line-height: 1.6; color: var(--wine); overflow-wrap: anywhere; }
