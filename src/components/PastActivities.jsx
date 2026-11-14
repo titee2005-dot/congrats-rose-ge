@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSiteCopy } from '../content/SiteCopy';
 import { SectionHeading } from './PixelFrame';
 import { PixelIcon } from './PixelSprites';
@@ -77,6 +78,20 @@ export default function PastActivities() {
   const copy = useSiteCopy();
   const [activeModal, setActiveModal] = useState(null);
 
+  useEffect(() => {
+    if (!activeModal) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setActiveModal(null);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeModal]);
+
   return (
     <section className="px-section past-activities" id="activities">
       <SectionHeading chip={copy("PastActivities.82c8bb9fff", "OUR MEMORIES TOGETHER")} icon="book" title={copy("PastActivities.ca369f85ec", "RoseIsOn5ire")} desc={copy("PastActivities.01c7d9ceff", "กิจกรรมที่ผ่านมา · ความทรงจำของโรสและพวกเราตลอดเส้นทาง General Election")} />
@@ -93,15 +108,17 @@ export default function PastActivities() {
         <ActivityCards items={PAST_ACTIVITIES.filter(item => item.chapter)} onOpenImage={(src, title) => setActiveModal({ src, title })} />
       </div>
 
-      {activeModal && (
-        <div className="activity-lightbox-backdrop" onClick={() => setActiveModal(null)} role="dialog" aria-modal="true">
-          <div className="activity-lightbox-box" onClick={e => e.stopPropagation()}>
-            <button type="button" className="activity-lightbox-close" onClick={() => setActiveModal(null)} aria-label="Close modal">✕</button>
-            <img src={activeModal.src} alt={activeModal.title || 'Activity image'} />
-            {activeModal.title && <div className="activity-lightbox-caption">{activeModal.title}</div>}
-          </div>
-        </div>
-      )}
+      {activeModal && typeof document !== 'undefined' &&
+        createPortal(
+          <div className="activity-lightbox-backdrop" onClick={() => setActiveModal(null)} role="dialog" aria-modal="true">
+            <div className="activity-lightbox-box" onClick={e => e.stopPropagation()}>
+              <button type="button" className="activity-lightbox-close" onClick={() => setActiveModal(null)} aria-label="Close modal">✕</button>
+              <img src={activeModal.src} alt={activeModal.title || 'Activity image'} />
+              {activeModal.title && <div className="activity-lightbox-caption">{activeModal.title}</div>}
+            </div>
+          </div>,
+          document.body
+        )}
     </section>
   );
 }
