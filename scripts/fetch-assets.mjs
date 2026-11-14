@@ -12,11 +12,6 @@ const SOURCE_BUNDLE = {
 
 const ASSETS = [
   {
-    remote: 'og_cover.jpg',
-    local: 'public/assets/og_cover.jpg',
-    sha256: '0879904bd24a7a7a3010f40ceec14ad6208e9e2305609d57c07b0d2dea881952',
-  },
-  {
     remote: 'fonts/LINESeedSansTH_W_Rg.woff2',
     local: 'public/assets/fonts/LINESeedSansTH_W_Rg.woff2',
     sha256: 'caf74c95ba957707253e40747d8364c937970df80551ab0766afc073d1fd90d6',
